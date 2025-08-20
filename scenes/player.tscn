@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dqw7kqxhj2hen" path="res://scripts/player.gd" id="1_g2els"]
 [ext_resource type="Texture2D" uid="uid://bbtlix5m7kq1u" path="res://Snoblin_Prototype_Character/Assets/Prototype_Character/prototype_character.png" id="2_qhqgy"]
-[ext_resource type="Texture2D" uid="uid://bn71f30t4rck2" path="res://oubliette_weapons - free/spr_wep_brnz_sword_2.png" id="3_dqkch"]
+[ext_resource type="Texture2D" uid="uid://cvgyqoppxmv27" path="res://oubliette_weapons - free/spr_wep_iron_baxe_3.png" id="3_dqkch"]
 [ext_resource type="Script" uid="uid://cyfvy2j00ira6" path="res://scenes/trail_effect.gd" id="4_dqkch"]
 
 [sub_resource type="Animation" id="Animation_dqkch"]
@@ -274,10 +274,11 @@ collision_mask = 8
 shape = SubResource("CircleShape2D_dqkch")
 
 [node name="HealthBar" type="ProgressBar" parent="."]
-offset_left = -2.0
-offset_top = -72.0
-offset_right = 2.0
-offset_bottom = -45.0
+offset_left = -47.0
+offset_top = -69.0
+offset_right = 47.0
+offset_bottom = -52.0
+show_percentage = false
 
 [node name="AttackSprite" type="Sprite2D" parent="."]
 texture_filter = 1
