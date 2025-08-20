@@ -17,11 +17,38 @@ extends CharacterBody2D
 @export var max_animation_speed = 2.0  # Maximum animation speed at full speed
 @export var speed_threshold = 50       # Minimum speed to play walk animation
 
+# Sword animation settings
+@export var swing_arc_degrees = 120  # How wide the swing arc is
+@export var swing_duration = 0.3     # How long the swing animation takes
+@export var swing_offset_distance = 30  # Distance from player center
+@export var enable_trail_effect = true
+@export var trail_fade_duration = 0.2
+
+# Mouse-based attack settings
+@export var attack_range = 50  # How far from player the sword swings
+@export var swing_arc_half_angle = 60  # Half the swing arc in degrees (total will be 120°)
+
 # Attack state variables
 var is_attacking = false
 var attack_timer = 0.0
 var cooldown_timer = 0.0
 var last_direction = Vector2.DOWN
+
+# Mouse-based attack variables
+var mouse_attack_direction = Vector2.RIGHT
+var swing_start_angle = 0.0
+var swing_end_angle = 0.0
+var swing_current_progress = 0.0
+var is_swing_animating = false
+
+# Trail effect variables
+var trail_positions = []
+var max_trail_length = 8
+
+# Add trail visual settings
+@export var trail_color = Color.CYAN
+@export var trail_width = 3.0
+@export var trail_max_alpha = 0.8
 
 # Health and damage variables
 var current_health
@@ -117,8 +144,11 @@ func _physics_process(delta):
 	if cooldown_timer > 0:
 		cooldown_timer -= delta
 	
-	# Handle attack input
+	# Handle attack input with mouse direction
 	if Input.is_action_just_pressed('Attack') and not is_attacking and cooldown_timer <= 0:
+		# Calculate mouse direction from player
+		var mouse_pos = get_global_mouse_position()
+		mouse_attack_direction = (mouse_pos - global_position).normalized()
 		start_attack()
 	
 	# Handle knockback
@@ -132,7 +162,7 @@ func _physics_process(delta):
 		# Check if player is moving
 		is_moving = direction.length() > 0
 		
-		# Update last direction for attacks (only when moving and not attacking)
+		# Update last direction for animations (only when moving and not attacking)
 		if direction.length() > 0 and not is_attacking:
 			last_direction = direction.normalized()
 		
@@ -144,6 +174,10 @@ func _physics_process(delta):
 	# Update animations and sprite flipping
 	update_animation()
 	update_sprite_flip(velocity)
+	
+	# Update sword swing animation
+	if is_swing_animating:
+		update_sword_swing_animation(delta)
 	
 	move_and_slide()
 
@@ -224,7 +258,7 @@ func play_animation(animation_name: String):
 			animation_player.play("Idle_down")
 			current_animation = "Idle_down"
 
-# IMPROVED: Take damage function with better enemy interaction
+# Take damage function with better enemy interaction
 func take_damage(amount: int, source: Node = null):
 	print("=== PLAYER TAKE_DAMAGE CALLED ===")
 	print("Damage amount: ", amount)
@@ -305,12 +339,15 @@ func start_attack():
 	is_attacking = true
 	attack_timer = attack_duration
 	
-	# Play attack animation - UPDATED FOR YOUR ANIMATION NAMES
-	var direction_string = get_direction_string(last_direction)
+	# Start mouse-directed sword swing animation
+	start_mouse_sword_swing_animation()
+	
+	# Play attack animation on player based on mouse direction
+	var direction_string = get_direction_string(mouse_attack_direction)
 	var attack_animation = "hit_" + direction_string
 	play_animation(attack_animation)
 	
-	# Reset animation speed for attack (attacks should play at normal speed)
+	# Reset animation speed for attack
 	if animation_player:
 		animation_player.speed_scale = 1.0
 	
@@ -319,16 +356,120 @@ func start_attack():
 		attack_area.monitoring = true
 		print("Player attack started - monitoring enabled")
 	
-	# Position attack hitbox based on facing direction
-	position_attack_hitbox(last_direction)
+	# Position attack hitbox towards mouse
+	position_attack_hitbox(mouse_attack_direction)
 	
-	# Update sprite to attack animation
-	update_attack_sprite(last_direction)
+	print("Player attack started towards mouse direction: ", mouse_attack_direction)
+
+func start_mouse_sword_swing_animation():
+	if not attack_sprite:
+		return
 	
-	print("Player attack started in direction: ", last_direction)
+	is_swing_animating = true
+	swing_current_progress = 0.0
+	
+	# Calculate the base angle towards mouse
+	var mouse_angle = mouse_attack_direction.angle()
+	
+	# Calculate swing arc (swing from -60° to +60° relative to mouse direction)
+	swing_start_angle = mouse_angle - deg_to_rad(swing_arc_half_angle)
+	swing_end_angle = mouse_angle + deg_to_rad(swing_arc_half_angle)
+	
+	# Position sword at start of swing
+	var start_position = Vector2(cos(swing_start_angle), sin(swing_start_angle)) * attack_range
+	attack_sprite.position = start_position
+	attack_sprite.rotation = swing_start_angle
+	
+	# Make sword visible and reset properties
+	attack_sprite.visible = true
+	attack_sprite.modulate.a = 1.0
+	
+	# Don't flip the sprite - let rotation handle the direction
+	attack_sprite.flip_h = false
+	attack_sprite.flip_v = false
+	
+	# Initialize trail
+	if enable_trail_effect:
+		trail_positions.clear()
+	
+	print("Mouse swing started - From angle: ", rad_to_deg(swing_start_angle), " To angle: ", rad_to_deg(swing_end_angle))
+
+func update_sword_swing_animation(delta):
+	if not is_swing_animating or not attack_sprite:
+		return
+	
+	# Update swing progress
+	swing_current_progress += delta / swing_duration
+	swing_current_progress = clamp(swing_current_progress, 0.0, 1.0)
+	
+	# Use easing for smoother swing motion
+	var ease_progress = ease_out_quad(swing_current_progress)
+	
+	# Calculate current angle by interpolating between start and end angles
+	var current_angle = lerp_angle(swing_start_angle, swing_end_angle, ease_progress)
+	
+	# Position sword at current angle
+	var sword_position = Vector2(cos(current_angle), sin(current_angle)) * attack_range
+	attack_sprite.position = sword_position
+	
+	# Since the sword sprite points right (0°) in the texture, 
+	# we can use the angle directly
+	attack_sprite.rotation = current_angle
+	
+	# Reset any flipping to ensure consistent appearance
+	attack_sprite.flip_v = false
+	attack_sprite.flip_h = false
+	
+	# Update trail effect
+	if enable_trail_effect:
+		update_sword_trail()
+	
+	# Check if swing is complete
+	if swing_current_progress >= 1.0:
+		is_swing_animating = false
+		print("Swing animation completed")
+
+# Add this new function to draw the trail
+func _draw():
+	if not enable_trail_effect or trail_positions.size() < 2:
+		return
+	
+	# Draw trail as connected lines with fading alpha
+	for i in range(trail_positions.size() - 1):
+		var start_pos = to_local(trail_positions[i])
+		var end_pos = to_local(trail_positions[i + 1])
+		
+		# Calculate alpha based on position in trail (newer = more opaque)
+		var alpha = float(i) / float(trail_positions.size() - 1)
+		var color = trail_color
+		color.a = alpha * trail_max_alpha
+		
+		# Draw line segment
+		draw_line(start_pos, end_pos, color, trail_width)
+
+# Easing function for smoother animation
+func ease_out_quad(t: float) -> float:
+	return 1.0 - (1.0 - t) * (1.0 - t)
+
+func update_sword_trail():
+	if not attack_sprite:
+		return
+	
+	# Add current sword tip position to trail
+	var sword_tip_offset = Vector2(cos(attack_sprite.rotation), sin(attack_sprite.rotation)) * 20
+	var sword_tip_position = attack_sprite.global_position + sword_tip_offset
+	trail_positions.append(sword_tip_position)
+	
+	# Limit trail length
+	if trail_positions.size() > max_trail_length:
+		trail_positions.pop_front()
+	
+	# Draw trail using queue_redraw (this will trigger _draw)
+	queue_redraw()
 
 func end_attack():
 	is_attacking = false
+	is_swing_animating = false
 	cooldown_timer = attack_cooldown
 	
 	# Disable attack area
@@ -336,12 +477,26 @@ func end_attack():
 		attack_area.monitoring = false
 		print("Player attack ended - monitoring disabled")
 	
-	# Hide attack sprite
-	if attack_sprite:
-		attack_sprite.visible = false
+	# Clear trail and stop drawing
+	if enable_trail_effect:
+		trail_positions.clear()
+		queue_redraw()  # Redraw to clear trail
 	
-	# Return to appropriate idle/walk animation
-	# This will be handled by update_animation() in the next frame
+	# Hide attack sprite with fade effect
+	if attack_sprite:
+		fade_out_sword()
+
+func fade_out_sword():
+	if not attack_sprite:
+		return
+	
+	# Create fade out tween
+	var tween = create_tween()
+	tween.tween_property(attack_sprite, "modulate:a", 0.0, 0.1)
+	tween.tween_callback(func(): 
+		attack_sprite.visible = false
+		attack_sprite.modulate.a = 1.0  # Reset alpha for next use
+	)
 
 func position_attack_hitbox(direction: Vector2):
 	if not attack_collision:
@@ -354,33 +509,9 @@ func position_attack_hitbox(direction: Vector2):
 		attack_collision.position = hitbox_offset
 		print("Attack hitbox positioned at: ", hitbox_offset)
 	
-	# Rotate hitbox shape if needed (for rectangular shapes)
-	if direction.x != 0:  # Horizontal attack
-		attack_collision.rotation = 0
-	else:  # Vertical attack
-		attack_collision.rotation = PI/2
-
-func update_attack_sprite(direction: Vector2):
-	if not attack_sprite:
-		return
-	
-	attack_sprite.visible = true
-	var sword_offset = direction * 24  # Distance from player center
-	attack_sprite.position = sword_offset
-	
-	# Rotate sword sprite based on direction
-	if direction == Vector2.RIGHT:
-		attack_sprite.rotation = 0
-		attack_sprite.flip_h = false
-	elif direction == Vector2.LEFT:
-		attack_sprite.rotation = 0
-		attack_sprite.flip_h = true
-	elif direction == Vector2.DOWN:
-		attack_sprite.rotation = PI/2
-		attack_sprite.flip_h = false
-	elif direction == Vector2.UP:
-		attack_sprite.rotation = -PI/2
-		attack_sprite.flip_h = false
+	# Optional: Rotate hitbox shape if needed (for rectangular shapes)
+	# You might want to keep this as 0 for circular hitboxes
+	attack_collision.rotation = direction.angle()
 
 func _on_attack_area_body_entered(body):
 	print("Player attack hit: ", body.name)
@@ -401,9 +532,15 @@ func _on_attack_area_body_entered(body):
 func get_is_attacking() -> bool:
 	return is_attacking
 
-# Function to get current facing direction
+# Function to get current facing direction (now returns mouse direction during attacks)
 func get_facing_direction() -> Vector2:
+	if is_attacking:
+		return mouse_attack_direction
 	return last_direction
+
+# Function to get mouse attack direction
+func get_mouse_attack_direction() -> Vector2:
+	return mouse_attack_direction
 
 # Utility functions for other scripts
 func is_alive() -> bool:
@@ -419,6 +556,6 @@ func get_max_health() -> int:
 func can_take_damage() -> bool:
 	return damage_immunity_timer <= 0
 
-#  Get knockback resistance (for enemy calculations)
+# Get knockback resistance (for enemy calculations)
 func get_knockback_resistance() -> float:
 	return knockback_resistance
