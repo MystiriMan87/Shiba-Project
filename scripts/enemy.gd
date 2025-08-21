@@ -5,13 +5,20 @@ extends CharacterBody2D
 @export var damage = 1
 @export var knockback_force = 200
 @export var detection_range = 150
-@export var attack_range = 100  # Increased from 50
-@export var attack_cooldown = 2.0
+@export var attack_range = 100
 
-# Wind-up attack system
-@export var windup_duration = 1.2
-@export var attack_duration = 0.3
-@export var attack_reach = 100
+# Jump attack settings
+@export var jump_force = 300
+@export var jump_windup_duration = 0.8
+@export var jump_duration = 0.6
+@export var jump_cooldown = 2.5
+@export var jump_arc_height = 150
+@export var land_damage_radius = 40
+
+# Walking settings
+@export var walk_acceleration = 300
+@export var walk_friction = 200
+@export var walk_animation_speed = 1.0  # Speed multiplier for walk animation
 
 # Health and state
 var current_health
@@ -20,25 +27,33 @@ var is_taking_damage = false
 var damage_timer = 0.0
 var damage_flash_duration = 0.2
 
-# Combat states - SIMPLIFIED
+# Combat and movement states
 var attack_timer = 0.0
-var is_winding_up = false
-var windup_timer = 0.0
-var is_attacking = false
-var attack_active_timer = 0.0
 var knockback_velocity = Vector2.ZERO
 var knockback_friction = 0.15
 
-# AI States - CLEAR STATE MACHINE
-enum EnemyState {
+# Jump attack variables
+var is_jumping = false
+var jump_start_position = Vector2.ZERO
+var jump_target_position = Vector2.ZERO
+var jump_progress = 0.0
+var jump_windup_timer = 0.0
+
+# Walking variables
+var target_velocity = Vector2.ZERO
+var is_moving = false
+
+# AI States for slime behavior
+enum SlimeState {
 	IDLE,
-	CHASING,
-	PREPARING_ATTACK,  # Wind-up phase
-	ATTACKING,         # Active attack
-	COOLDOWN          # Post-attack cooldown
+	WALKING,       # Walking towards player
+	JUMP_WINDUP,   # Preparing to jump attack
+	JUMPING,       # Attack jump in the air
+	LANDING,       # Just landed from attack
+	COOLDOWN       # Post-jump recovery
 }
 
-var current_state = EnemyState.IDLE
+var current_state = SlimeState.IDLE
 var player_in_detection_range = false
 
 # Chase behavior
@@ -50,6 +65,7 @@ var player = null
 
 # Node references
 @onready var sprite = $Sprite2D
+@onready var animation_player = $AnimationPlayer if has_node("AnimationPlayer") else null
 @onready var collision_shape = $CollisionShape2D
 @onready var health_bar = get_node("HealthBar") if has_node("HealthBar") else null
 @onready var detection_area = get_node("DetectionArea") if has_node("DetectionArea") else null
@@ -59,33 +75,29 @@ var player = null
 
 func _ready():
 	current_health = max_health
-	print("=== ENEMY READY ===")
+	print("=== SLIME ENEMY READY ===")
 	
-	# FIX: Set enemy collision layers
-	collision_layer = 4  # Enemy body on layer 4
-	collision_mask = 1   # Enemy can collide with player/environment on layer 1
-	print("Enemy physics layers - Layer: 4, Mask: 1")
+	# Set collision layers
+	collision_layer = 4
+	collision_mask = 1
+	print("Slime physics layers - Layer: 4, Mask: 1")
 	
 	# Set up health bar
 	if health_bar:
 		health_bar.max_value = max_health
 		health_bar.value = current_health
 	
-	# IMPROVED: Better WindUp bar setup with debugging
+	# Set up wind-up bar for jump preparation
 	if has_node("WindupBar"):
 		windup_bar = get_node("WindupBar")
 		if windup_bar is ProgressBar:
 			windup_bar.max_value = 100
 			windup_bar.value = 0
 			windup_bar.visible = false
-			windup_bar.modulate = Color.ORANGE
-			print("✓ Wind-up bar found and configured: ", windup_bar.name)
+			windup_bar.modulate = Color.YELLOW
+			print("✓ Jump windup bar configured")
 		else:
-			print("✗ WindupBar node is not a ProgressBar! It's a: ", windup_bar.get_class())
-	else:
-		print("✗ WindupBar node not found! Available children:")
-		for child in get_children():
-			print("  - ", child.name, " (", child.get_class(), ")")
+			print("✗ WindupBar node is not a ProgressBar!")
 	
 	# Set up attack system
 	setup_attack_area()
@@ -94,11 +106,14 @@ func _ready():
 	# Find player
 	call_deferred("find_player")
 	
-	print("Enemy starting in IDLE state")
+	# Start idle animation
+	if animation_player:
+		play_animation("idle")
+	
+	print("Slime starting in IDLE state")
 
 func setup_attack_area():
 	if not attack_area:
-		# Create attack area automatically
 		attack_area = Area2D.new()
 		attack_area.name = "AttackArea"
 		add_child(attack_area)
@@ -107,21 +122,20 @@ func setup_attack_area():
 		attack_area.add_child(attack_collision)
 		
 		var shape = CircleShape2D.new()
-		shape.radius = 30
+		shape.radius = land_damage_radius
 		attack_collision.shape = shape
 		
-		print("Auto-created AttackArea")
+		print("Auto-created slime attack area")
 	
 	if attack_area:
 		attack_area.monitoring = false
-		# FIX: Set proper collision layers for enemy attacks
-		attack_area.collision_layer = 4   # Enemy attacks are on layer 4
-		attack_area.collision_mask = 1    # Can hit player on layer 1
+		attack_area.collision_layer = 4
+		attack_area.collision_mask = 1
 		
 		if not attack_area.body_entered.is_connected(_on_attack_area_body_entered):
 			attack_area.body_entered.connect(_on_attack_area_body_entered)
 		
-		print("Attack area configured - Layer: 4, Mask: 1")
+		print("Slime attack area configured")
 
 func setup_detection_area():
 	if detection_area:
@@ -137,18 +151,11 @@ func find_player():
 		player = players[0]
 		print("Found player:", player.name)
 	else:
-		print("ERROR: No player found! Add player to 'player' group")
+		print("ERROR: No player found!")
 
 func _physics_process(delta):
 	if is_dead:
 		return
-	
-	# Debug: Print current state every 2 seconds
-	if Engine.get_process_frames() % 120 == 0:
-		print("=== ENEMY STATE: ", EnemyState.keys()[current_state], " ===")
-		if player:
-			print("Distance to player: ", global_position.distance_to(player.global_position))
-		print("Attack timer: ", attack_timer)
 	
 	# Handle damage flash
 	if is_taking_damage:
@@ -161,258 +168,377 @@ func _physics_process(delta):
 	if attack_timer > 0:
 		attack_timer -= delta
 	
-	# Handle knockback
-	if knockback_velocity.length() > 5:
+	# Handle knockback (but not during jumps)
+	if knockback_velocity.length() > 5 and not is_jumping:
 		velocity = knockback_velocity
 		knockback_velocity = knockback_velocity.lerp(Vector2.ZERO, knockback_friction)
 		move_and_slide()
 		return
 	
-	# STATE MACHINE - This is the key fix!
+	# SLIME STATE MACHINE
 	match current_state:
-		EnemyState.IDLE:
+		SlimeState.IDLE:
 			handle_idle_state(delta)
 		
-		EnemyState.CHASING:
-			handle_chase_state(delta)
+		SlimeState.WALKING:
+			handle_walking_state(delta)
 		
-		EnemyState.PREPARING_ATTACK:
-			handle_windup_state(delta)
+		SlimeState.JUMP_WINDUP:
+			handle_jump_windup_state(delta)
 		
-		EnemyState.ATTACKING:
-			handle_attack_state(delta)
+		SlimeState.JUMPING:
+			handle_jumping_state(delta)
 		
-		EnemyState.COOLDOWN:
+		SlimeState.LANDING:
+			handle_landing_state(delta)
+		
+		SlimeState.COOLDOWN:
 			handle_cooldown_state(delta)
 	
-	move_and_slide()
+	# Only move_and_slide if not jumping (walking uses normal physics)
+	if not is_jumping:
+		move_and_slide()
 
 func handle_idle_state(delta):
-	velocity = velocity.lerp(Vector2.ZERO, 0.1)
+	# Stop moving
+	target_velocity = Vector2.ZERO
+	velocity = velocity.move_toward(target_velocity, walk_friction * delta)
+	is_moving = false
 	
-	# Check if player entered detection range
+	# Force idle animation to play
+	if animation_player:
+		if animation_player.current_animation != "idle":
+			animation_player.play("idle")
+			animation_player.speed_scale = 1.0
+			print("Playing idle animation")
+	
+	# Check if player is in range to start chasing
 	if player_in_detection_range and player:
-		print("IDLE → CHASING: Player detected")
-		current_state = EnemyState.CHASING
+		print("IDLE → WALKING: Player detected, starting to walk")
+		current_state = SlimeState.WALKING
 		chase_timer = chase_duration
 
-func handle_chase_state(delta):
+func handle_walking_state(delta):
 	if not player:
-		current_state = EnemyState.IDLE
+		current_state = SlimeState.IDLE
 		return
 	
 	var distance_to_player = global_position.distance_to(player.global_position)
 	
-	# DEBUG: Print detailed state info every few frames
-	if Engine.get_process_frames() % 30 == 0:  # Every half second at 60fps
-		print("=== CHASE DEBUG ===")
-		print("Distance to player: ", distance_to_player)
-		print("Attack range: ", attack_range)
-		print("Attack timer: ", attack_timer)
-		print("Player position: ", player.global_position)
-		print("Enemy position: ", global_position)
-		print("In attack range: ", distance_to_player <= attack_range)
-		print("Attack ready: ", attack_timer <= 0)
-	
-	# CRITICAL FIX: Check attack range with more generous threshold
-	if distance_to_player <= (attack_range + 10) and attack_timer <= 0:  # Added +10 buffer
-		print("CHASING → PREPARING_ATTACK: Player in range (", distance_to_player, ") - Attack range: ", attack_range)
-		start_attack_preparation()
+	# Check if we should jump attack
+	if distance_to_player <= attack_range and attack_timer <= 0:
+		print("WALKING → JUMP_WINDUP: Player in attack range")
+		start_jump_windup()
 		return
 	
-	# Continue chasing if player still in detection or chase timer active
+	# Continue chasing if player is in range
 	if player_in_detection_range:
 		chase_timer = chase_duration
 	else:
 		chase_timer -= delta
 	
 	if chase_timer > 0:
-		# Chase the player - SLOW DOWN when getting close
-		var direction = (player.global_position - global_position).normalized()
+		# Calculate direction to player
+		var direction_to_player = (player.global_position - global_position).normalized()
+		target_velocity = direction_to_player * speed
 		
-		# Slow down when approaching attack range to avoid overshooting
-		var chase_speed = speed
-		if distance_to_player <= (attack_range + 30):  # Slow down when close
-			chase_speed = speed * 0.3  # Much slower approach
-			print("SLOWING DOWN - Close to attack range: ", distance_to_player)
+		# Move towards target velocity with acceleration
+		velocity = velocity.move_toward(target_velocity, walk_acceleration * delta)
 		
-		velocity = direction * chase_speed
+		# Check if we're actually moving
+		is_moving = velocity.length() > 5
 		
-		# Flip sprite
-		if sprite and direction.x != 0:
-			sprite.flip_h = direction.x < 0
+		# Flip sprite based on movement direction
+		if sprite and direction_to_player.x != 0:
+			sprite.flip_h = direction_to_player.x < 0
 		
-		# Only print occasionally to avoid spam
-		if Engine.get_process_frames() % 60 == 0:
-			print("Chasing player, distance:", distance_to_player, " speed:", chase_speed)
+		# Play appropriate animation based on movement
+		if is_moving:
+			play_walking_animation()
+		else:
+			play_animation("idle")
+			
+		print_rich("[color=green]Walking towards player - Speed: %.1f[/color]" % velocity.length())
 	else:
-		# Stop chasing
-		print("CHASING → IDLE: Lost player")
-		current_state = EnemyState.IDLE
+		print("WALKING → IDLE: Lost player")
+		current_state = SlimeState.IDLE
 
-func handle_windup_state(delta):
-	# STOP MOVING during wind-up
-	velocity = Vector2.ZERO
+func handle_jump_windup_state(delta):
+	# Stop moving during windup
+	target_velocity = Vector2.ZERO
+	velocity = velocity.move_toward(target_velocity, walk_friction * delta)
+	is_moving = false
 	
-	windup_timer -= delta
+	play_animation("jump_prepare")
 	
-	# IMPROVED: Update wind-up bar with better debugging
+	jump_windup_timer -= delta
+	
+	# Update windup progress bar
 	if windup_bar:
-		var progress = (windup_duration - windup_timer) / windup_duration
-		var new_value = progress * 100
+		var progress = (jump_windup_duration - jump_windup_timer) / jump_windup_duration
+		windup_bar.value = progress * 100
+		windup_bar.modulate = Color.YELLOW.lerp(Color.RED, progress)
 		
-		# Debug every 10 frames to avoid spam
-		if Engine.get_process_frames() % 10 == 0:
-			print("WindUp Progress: ", progress, " | Bar Value: ", windup_bar.value, " → ", new_value)
-		
-		windup_bar.value = new_value
-		windup_bar.modulate = Color.ORANGE.lerp(Color.RED, progress)
-		
-		# Ensure bar is visible
 		if not windup_bar.visible:
 			windup_bar.visible = true
-			print("Made WindUp bar visible!")
-	else:
-		print("WindUp bar is null! Cannot update.")
 	
-	# Wind-up complete
-	if windup_timer <= 0:
-		execute_attack()
+	# Start jump when windup complete
+	if jump_windup_timer <= 0:
+		execute_jump()
 
-func handle_attack_state(delta):
-	# STOP MOVING during attack
+func handle_jumping_state(delta):
+	# Custom jump movement with arc (no regular physics during jump)
+	jump_progress += delta / jump_duration
+	jump_progress = clamp(jump_progress, 0.0, 1.0)
+	
+	# Calculate position along jump arc
+	var horizontal_pos = jump_start_position.lerp(jump_target_position, jump_progress)
+	
+	# Add vertical arc (parabola)
+	var arc_progress = jump_progress * 2.0 - 1.0  # -1 to 1
+	var height_offset = jump_arc_height * (1.0 - arc_progress * arc_progress)
+	
+	global_position = horizontal_pos + Vector2(0, -height_offset)
+	
+	# Play synchronized jump animation
+	play_animation_synced("jump_air", jump_duration, 3.0)
+	
+	# Add rotation during jump
+	sprite.rotation = sin(jump_progress * PI) * 0.3
+	
+	# Check if jump is complete
+	if jump_progress >= 1.0:
+		land_jump()
+
+func handle_landing_state(delta):
+	target_velocity = Vector2.ZERO
 	velocity = Vector2.ZERO
+	is_moving = false
 	
-	attack_active_timer -= delta
+	play_animation("jump_land")
 	
-	print("Attacking... ", attack_active_timer, " seconds left")
-	
-	if attack_active_timer <= 0:
-		end_attack()
+	# Brief landing state, then go to cooldown
+	if not animation_player or not animation_player.is_playing():
+		print("LANDING → COOLDOWN")
+		current_state = SlimeState.COOLDOWN
+		attack_timer = jump_cooldown
 
 func handle_cooldown_state(delta):
-	# STOP MOVING during cooldown
-	velocity = Vector2.ZERO
+	target_velocity = Vector2.ZERO
+	velocity = velocity.move_toward(target_velocity, walk_friction * delta)
+	is_moving = false
+	
+	play_animation("idle")
 	
 	if attack_timer <= 0:
 		print("COOLDOWN → IDLE: Ready to act again")
-		current_state = EnemyState.IDLE
+		current_state = SlimeState.IDLE
 
-func start_attack_preparation():
-	print("=== STARTING WIND-UP ===")
-	print("Current distance: ", global_position.distance_to(player.global_position) if player else "No player")
-	print("Attack range: ", attack_range)
+func play_walking_animation():
+	"""Play the appropriate walking animation with speed synchronization"""
+	if not animation_player:
+		return
 	
-	current_state = EnemyState.PREPARING_ATTACK
-	windup_timer = windup_duration
+	# Use jump animation for walking (since that's what you have)
+	var walk_anim = "jump"  # Your walking cycle animation
 	
-	# Show wind-up bar
+	# Check if we have other walk animations
+	if animation_player.has_animation("walk"):
+		walk_anim = "walk"
+	elif animation_player.has_animation("move"):
+		walk_anim = "move"
+	
+	# Calculate animation speed based on movement speed
+	# Faster movement = faster animation
+	var speed_ratio = velocity.length() / speed  # 0 to 1
+	var animation_speed = walk_animation_speed * (0.5 + speed_ratio * 0.5)  # 0.5x to 1.0x speed
+	
+	# Only change animation if not already playing the walk animation
+	if animation_player.current_animation != walk_anim:
+		animation_player.play(walk_anim)
+		print("Started walking animation: ", walk_anim)
+	
+	# Update animation speed to match movement speed
+	animation_player.speed_scale = animation_speed
+
+func start_jump_windup():
+	print("=== STARTING JUMP WINDUP ===")
+	current_state = SlimeState.JUMP_WINDUP
+	jump_windup_timer = jump_windup_duration
+	
+	# Show windup bar
 	if windup_bar:
 		windup_bar.visible = true
 		windup_bar.value = 0
-		windup_bar.modulate = Color.ORANGE
+		windup_bar.modulate = Color.YELLOW
 	
-	# Visual indicator
-	if sprite:
-		sprite.modulate = Color(1.2, 0.9, 0.9)
+	# Store jump target (predict player position)
+	if player:
+		var player_velocity = Vector2.ZERO
+		if player.has_method("get_velocity"):
+			player_velocity = player.get_velocity()
+		elif "velocity" in player:
+			player_velocity = player.velocity
+		
+		jump_target_position = player.global_position + (player_velocity * jump_windup_duration * 0.5)
+	else:
+		jump_target_position = global_position + Vector2(50, 0)
 	
-	print("Wind-up started for", windup_duration, "seconds")
-	print("Enemy state changed to: PREPARING_ATTACK")
+	print("Jump target set to: ", jump_target_position)
 
-func execute_attack():
-	print("=== EXECUTING ATTACK ===")
-	current_state = EnemyState.ATTACKING
-	attack_active_timer = attack_duration
-	attack_timer = attack_cooldown  # Set cooldown timer
+func execute_jump():
+	print("=== EXECUTING JUMP ===")
+	current_state = SlimeState.JUMPING
+	is_jumping = true
+	jump_progress = 0.0
+	jump_start_position = global_position
 	
-	# Hide wind-up bar
+	# Hide windup bar
 	if windup_bar:
 		windup_bar.visible = false
 	
-	# Set up attack hitbox
-	if player and attack_area and attack_collision:
-		var direction_to_player = (player.global_position - global_position).normalized()
-		attack_collision.position = direction_to_player * attack_reach
-		attack_area.monitoring = true
-		
-		print("Attack hitbox positioned at:", attack_collision.position)
-		print("Attack monitoring ENABLED")
-	
-	# Flash red during attack
+	# Visual effects for jump start
 	if sprite:
-		sprite.modulate = Color.RED
-
-func end_attack():
-	print("=== ATTACK ENDED ===")
-	current_state = EnemyState.COOLDOWN
+		sprite.modulate = Color(1.2, 1.2, 0.8)
 	
-	# Disable attack area
+	print("Jumping from ", jump_start_position, " to ", jump_target_position)
+
+func land_jump():
+	print("=== SLIME LANDED ===")
+	current_state = SlimeState.LANDING
+	is_jumping = false
+	jump_progress = 0.0
+	
+	# Reset sprite effects and animation speed
+	sprite.rotation = 0
+	sprite.modulate = Color.WHITE
+	if animation_player:
+		animation_player.speed_scale = 1.0
+	
+	# Enable attack area for landing damage
 	if attack_area:
-		attack_area.monitoring = false
-		print("Attack monitoring DISABLED")
+		attack_area.monitoring = true
+		print("Landing damage area activated")
+		
+		# Disable after brief moment
+		var timer = get_tree().create_timer(0.2)
+		timer.timeout.connect(func(): 
+			if attack_area:
+				attack_area.monitoring = false
+				print("Landing damage area deactivated")
+		)
 	
-	# Reset sprite
-	if sprite:
-		sprite.modulate = Color.WHITE
-	
-	print("Entering cooldown for", attack_cooldown, "seconds")
+	print("Slime landed at: ", global_position)
 
-func _on_attack_area_body_entered(body):
-	print("=== HIT DETECTED ===")
-	print("Hit body name: ", body.name)
-	print("Hit body class: ", body.get_class())
-	print("Hit body groups: ", body.get_groups())
-	print("Hit body collision layer: ", body.collision_layer)
-	print("Current enemy state: ", EnemyState.keys()[current_state])
-	print("Attack area monitoring: ", attack_area.monitoring if attack_area else "NULL")
+func play_animation_synced(anim_name: String, movement_duration: float, speed_multiplier: float = 2.0):
+	if not animation_player:
+		return
 	
-	# Only damage during active attack state
-	if current_state == EnemyState.ATTACKING:
-		if body.is_in_group("player"):
-			print("✓ Player confirmed in 'player' group")
-			if body.has_method("take_damage"):
-				print("✓ Player has take_damage method")
-				var damage_result = body.take_damage(damage, self)
-				print("Damage result: ", damage_result)
-				if damage_result:
-					print("SUCCESS: Dealt ", damage, " damage to player!")
-					flash_sprite(Color.YELLOW, 0.3)
+	var target_anim = anim_name
+	
+	# Handle fallback animations
+	if not animation_player.has_animation(anim_name):
+		match anim_name:
+			"jump_air":
+				if animation_player.has_animation("jump"):
+					target_anim = "jump"
 				else:
-					print("FAILED: Player was immune or blocked damage")
-			else:
-				print("✗ Player missing take_damage method")
-		else:
-			print("✗ Hit target is not in 'player' group")
+					target_anim = "idle"
+			"jump_prepare":
+				if animation_player.has_animation("windup"):
+					target_anim = "windup"
+				else:
+					target_anim = "idle"
+			"jump_land":
+				if animation_player.has_animation("land"):
+					target_anim = "land"
+				else:
+					target_anim = "idle"
+			_:
+				if animation_player.has_animation("idle"):
+					target_anim = "idle"
+				else:
+					return
+	
+	if not animation_player.has_animation(target_anim):
+		return
+	
+	var anim_length = animation_player.get_animation(target_anim).length
+	if anim_length <= 0:
+		print("Warning: Animation ", target_anim, " has invalid length: ", anim_length)
+		return
+	
+	# Only set up sync when starting a new animation
+	if animation_player.current_animation != target_anim:
+		var sync_speed = (anim_length / movement_duration) * speed_multiplier
+		
+		animation_player.play(target_anim)
+		animation_player.speed_scale = sync_speed
+		
+		print("Started synced animation: ", target_anim, " | Speed: ", sync_speed)
+
+func play_animation(anim_name: String, speed_multiplier: float = 1.0):
+	if not animation_player:
+		return
+	
+	animation_player.speed_scale = speed_multiplier
+	
+	if animation_player.has_animation(anim_name):
+		if animation_player.current_animation != anim_name:
+			animation_player.play(anim_name)
 	else:
-		print("✗ Hit detected but not in ATTACKING state")
+		# Fallback animations
+		match anim_name:
+			"move":
+				if animation_player.has_animation("walk"):
+					animation_player.play("walk")
+				elif animation_player.has_animation("jump"):
+					animation_player.play("jump")
+			"jump_prepare":
+				if animation_player.has_animation("windup"):
+					animation_player.play("windup")
+			"jump_air":
+				if animation_player.has_animation("jump"):
+					animation_player.play("jump")
+			"jump_land":
+				if animation_player.has_animation("land"):
+					animation_player.play("land")
+			_:
+				if animation_player.has_animation("idle"):
+					animation_player.play("idle")
 
 func take_damage(amount: int):
 	if is_dead:
 		return
 	
-	# Interrupt attack preparation if taking damage
-	if current_state == EnemyState.PREPARING_ATTACK:
-		cancel_attack_preparation()
+	# Interrupt jump windup if taking damage
+	if current_state == SlimeState.JUMP_WINDUP:
+		cancel_jump_windup()
+	
+	# Interrupt walking if taking damage
+	if current_state == SlimeState.WALKING:
+		# Brief pause when hit, then return to walking
+		target_velocity = Vector2.ZERO
 	
 	current_health -= amount
-	print("Enemy took", amount, "damage! Health:", current_health)
+	print("Slime took", amount, "damage! Health:", current_health)
 	
 	if health_bar:
 		health_bar.value = current_health
 	
 	flash_sprite(Color.RED, damage_flash_duration)
 	
-	# Knockback
-	if player:
+	# Knockback (but not during jump)
+	if player and not is_jumping:
 		var knockback_dir = (global_position - player.global_position).normalized()
 		knockback_velocity = knockback_dir * knockback_force
 	
 	if current_health <= 0:
 		die()
 
-func cancel_attack_preparation():
-	print("Attack preparation cancelled!")
-	current_state = EnemyState.IDLE
+func cancel_jump_windup():
+	print("Jump windup cancelled by damage!")
+	current_state = SlimeState.IDLE
 	
 	if windup_bar:
 		windup_bar.visible = false
@@ -428,29 +554,96 @@ func flash_sprite(color: Color, duration: float):
 
 func die():
 	is_dead = true
-	current_state = EnemyState.IDLE
-	print("Enemy died!")
+	is_jumping = false
+	is_moving = false
+	current_state = SlimeState.IDLE
+	print("Slime died!")
 	
 	if windup_bar:
 		windup_bar.visible = false
 	
 	collision_shape.disabled = true
 	
+	# Death animation
 	var tween = create_tween()
-	tween.tween_property(sprite, "modulate:a", 0.0, 0.5)
+	tween.parallel().tween_property(sprite, "modulate:a", 0.0, 0.5)
+	tween.parallel().tween_property(sprite, "scale", Vector2(1.5, 0.5), 0.5)
 	tween.tween_callback(queue_free)
 
 func _on_detection_area_entered(body):
 	if body.is_in_group("player"):
-		print("Player ENTERED detection range")
+		print("Player ENTERED slime detection range")
 		player_in_detection_range = true
 		if not player:
 			player = body
 
 func _on_detection_area_exited(body):
 	if body.is_in_group("player"):
-		print("Player EXITED detection range")
+		print("Player EXITED slime detection range")
 		player_in_detection_range = false
+
+func _on_attack_area_body_entered(body):
+	print("=== SLIME LANDING HIT ===")
+	print("Hit target: ", body.name)
+	
+	if current_state == SlimeState.LANDING:
+		if body.is_in_group("player"):
+			if body.has_method("take_damage"):
+				var damage_result = body.take_damage(damage, self)
+				if damage_result:
+					print("SUCCESS: Slime landing dealt ", damage, " damage!")
+					flash_sprite(Color.YELLOW, 0.3)
+					apply_player_stun_flash(body)
+				else:
+					print("Player was immune to landing damage")
+
+func apply_player_stun_flash(player_body):
+	if not player_body or not player_body.has_method("get_node"):
+		return
+	
+	var player_sprite = null
+	if player_body.has_node("Sprite2D"):
+		player_sprite = player_body.get_node("Sprite2D")
+	elif player_body.has_node("AnimatedSprite2D"):
+		player_sprite = player_body.get_node("AnimatedSprite2D")
+	
+	if not player_sprite:
+		print("Could not find player sprite for flashing effect")
+		return
+	
+	var stun_duration = 1.0
+	if "immunity_duration" in player_body:
+		stun_duration = player_body.immunity_duration
+	elif "stun_duration" in player_body:
+		stun_duration = player_body.stun_duration
+	elif "invulnerability_time" in player_body:
+		stun_duration = player_body.invulnerability_time
+	
+	print("Applying player flash for ", stun_duration, " seconds")
+	
+	var flash_tween = create_tween()
+	flash_tween.set_loops(int(stun_duration * 6))
+	
+	flash_tween.tween_method(
+		func(alpha): player_sprite.modulate.a = alpha,
+		1.0,
+		0.3,
+		0.08
+	)
+	flash_tween.tween_method(
+		func(alpha): player_sprite.modulate.a = alpha,
+		0.3,
+		1.0,
+		0.08
+	)
+	
+	flash_tween.tween_callback(func(): 
+		if player_sprite:
+			player_sprite.modulate.a = 1.0
+	)
 
 func is_alive() -> bool:
 	return not is_dead and current_health > 0
+
+func get_knockback_force() -> float:
+	return knockback_force

@@ -1,26 +1,86 @@
-[gd_scene load_steps=6 format=3 uid="uid://drik1twhweam8"]
+[gd_scene load_steps=10 format=3 uid="uid://drik1twhweam8"]
 
 [ext_resource type="Script" uid="uid://ba4klw55e614j" path="res://scripts/enemy.gd" id="1_md0e3"]
-[ext_resource type="Texture2D" uid="uid://dxa61mw40yf4p" path="res://icon.svg" id="2_4ra3w"]
+[ext_resource type="Texture2D" uid="uid://pc5fy4ks2pd" path="res://Assets/green-slime-spritesheet.png" id="2_md0e3"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5uy6h"]
-size = Vector2(125, 127)
+size = Vector2(52, 38)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_md0e3"]
 radius = 234.214
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_md0e3"]
-size = Vector2(202, 212)
+size = Vector2(75.5, 68.5)
+
+[sub_resource type="Animation" id="Animation_5uy6h"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_4ra3w"]
+resource_name = "idle"
+length = 2.7
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.0666667, 0.6, 1.13333, 1.66667, 2.2),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4]
+}
+
+[sub_resource type="Animation" id="Animation_c4w8v"]
+resource_name = "jump"
+length = 1.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.1, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [3, 4, 5, 6, 7, 8, 9, 10]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_xwavj"]
+_data = {
+&"RESET": SubResource("Animation_5uy6h"),
+&"idle": SubResource("Animation_4ra3w"),
+&"jump": SubResource("Animation_c4w8v")
+}
 
 [node name="Enemy" type="CharacterBody2D"]
 collision_layer = 4
 script = ExtResource("1_md0e3")
+jump_arc_height = 100
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("2_4ra3w")
+texture_filter = 1
+scale = Vector2(3, 3)
+texture = ExtResource("2_md0e3")
+hframes = 11
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-0.5, 0.5)
+position = Vector2(1, 33)
 shape = SubResource("RectangleShape2D_5uy6h")
 
 [node name="HealthBar" type="ProgressBar" parent="."]
@@ -35,17 +95,25 @@ show_percentage = false
 collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea"]
+position = Vector2(0, -1)
 shape = SubResource("CircleShape2D_md0e3")
 
 [node name="AttackArea" type="Area2D" parent="."]
 collision_layer = 8
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
+position = Vector2(2, 19)
 shape = SubResource("RectangleShape2D_md0e3")
 debug_color = Color(0.854902, 0, 0, 0.647059)
 
 [node name="WindUpBar" type="ProgressBar" parent="."]
+visible = false
 offset_left = 83.0
 offset_top = -65.0
 offset_right = 87.0
 offset_bottom = -38.0
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_xwavj")
+}

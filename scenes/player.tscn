@@ -1,8 +1,8 @@
 [gd_scene load_steps=21 format=3 uid="uid://hqa6411o6hsf"]
 
 [ext_resource type="Script" uid="uid://dqw7kqxhj2hen" path="res://scripts/player.gd" id="1_g2els"]
-[ext_resource type="Texture2D" uid="uid://bbtlix5m7kq1u" path="res://Snoblin_Prototype_Character/Assets/Prototype_Character/prototype_character.png" id="2_qhqgy"]
-[ext_resource type="Texture2D" uid="uid://cvgyqoppxmv27" path="res://oubliette_weapons - free/spr_wep_iron_baxe_3.png" id="3_dqkch"]
+[ext_resource type="Texture2D" uid="uid://bbtlix5m7kq1u" path="res://Assets/Snoblin_Prototype_Character/Assets/Prototype_Character/prototype_character.png" id="2_qhqgy"]
+[ext_resource type="Texture2D" uid="uid://c8ksvvk7g2kpf" path="res://Assets/oubliette_weapons - free/spr_wep_steel_falcon_0.png" id="3_dqkch"]
 [ext_resource type="Script" uid="uid://cyfvy2j00ira6" path="res://scenes/trail_effect.gd" id="4_dqkch"]
 
 [sub_resource type="Animation" id="Animation_dqkch"]
@@ -234,10 +234,10 @@ _data = {
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
-size = Vector2(68, 83)
+size = Vector2(33, 51)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_dqkch"]
-radius = 65.123
+radius = 50.04
 
 [sub_resource type="Curve" id="Curve_dqkch"]
 
@@ -264,6 +264,7 @@ libraries = {
 }
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0.5, 0.5)
 shape = SubResource("RectangleShape2D_g2els")
 
 [node name="AttackArea" type="Area2D" parent="."]
