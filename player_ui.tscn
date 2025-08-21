@@ -1,0 +1,126 @@
+[gd_scene load_steps=2 format=3 uid="uid://cqk6unim2ftgo"]
+
+[ext_resource type="Script" uid="uid://bov65j62y0be8" path="res://scripts/PlayerUI.gd" id="1_lwipk"]
+
+[node name="PlayerUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("1_lwipk")
+
+[node name="HealthContainer" type="HBoxContainer" parent="."]
+texture_filter = 1
+layout_mode = 1
+offset_left = 86.0
+offset_top = 86.0
+offset_right = 160.0
+offset_bottom = 113.0
+scale = Vector2(5, 5)
+
+[node name="HealthIcon" type="TextureRect" parent="HealthContainer"]
+layout_mode = 2
+expand_mode = 3
+stretch_mode = 3
+
+[node name="HealthBar" type="ProgressBar" parent="HealthContainer"]
+custom_minimum_size = Vector2(50, 12)
+layout_mode = 2
+show_percentage = false
+
+[node name="HealthLabel" type="Label" parent="HealthContainer"]
+visible = false
+custom_minimum_size = Vector2(60, 24)
+layout_mode = 2
+text = "100/100"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="WeaponContainer" type="VBoxContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -639.0
+offset_top = 75.0
+offset_right = -339.0
+offset_bottom = 229.0
+grow_horizontal = 0
+scale = Vector2(2, 2)
+alignment = 1
+
+[node name="WeaponIcon" type="TextureRect" parent="WeaponContainer"]
+texture_filter = 1
+custom_minimum_size = Vector2(1, 50)
+layout_mode = 2
+expand_mode = 2
+stretch_mode = 5
+
+[node name="WeaponInfo" type="VBoxContainer" parent="WeaponContainer"]
+custom_minimum_size = Vector2(150, 50)
+layout_mode = 2
+
+[node name="WeaponName" type="Label" parent="WeaponContainer/WeaponInfo"]
+layout_mode = 2
+text = "Iron Sword"
+horizontal_alignment = 1
+
+[node name="WeaponDamage" type="Label" parent="WeaponContainer/WeaponInfo"]
+layout_mode = 2
+text = "DMG: 1"
+horizontal_alignment = 1
+
+[node name="CooldownBar" type="ProgressBar" parent="WeaponContainer"]
+visible = false
+custom_minimum_size = Vector2(150, 6)
+layout_mode = 2
+max_value = 1.0
+
+[node name="InventoryContainer" type="VBoxContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -591.0
+offset_right = 1000.0
+grow_vertical = 0
+alignment = 1
+
+[node name="InventoryLabel" type="Label" parent="InventoryContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Inventory
+"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="InventoryGrid" type="GridContainer" parent="InventoryContainer"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+columns = 4
+
+[node name="NotificationContainer" type="VBoxContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_top = 33.0
+offset_right = 20.0
+offset_bottom = 73.0
+grow_horizontal = 2
+
+[node name="NotificationLabel" type="Label" parent="NotificationContainer"]
+visible = false
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 3

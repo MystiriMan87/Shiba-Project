@@ -275,6 +275,8 @@ collision_mask = 8
 shape = SubResource("CircleShape2D_dqkch")
 
 [node name="HealthBar" type="ProgressBar" parent="."]
+visible = false
+texture_filter = 1
 offset_left = -47.0
 offset_top = -69.0
 offset_right = 47.0

@@ -10,7 +10,7 @@ size = Vector2(52, 38)
 radius = 234.214
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_md0e3"]
-size = Vector2(75.5, 68.5)
+size = Vector2(123.75, 116.25)
 
 [sub_resource type="Animation" id="Animation_5uy6h"]
 length = 0.001
@@ -102,7 +102,6 @@ shape = SubResource("CircleShape2D_md0e3")
 collision_layer = 8
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
-position = Vector2(2, 19)
 shape = SubResource("RectangleShape2D_md0e3")
 debug_color = Color(0.854902, 0, 0, 0.647059)
 

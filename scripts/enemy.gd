@@ -18,7 +18,7 @@ extends CharacterBody2D
 # Walking settings
 @export var walk_acceleration = 300
 @export var walk_friction = 200
-@export var walk_animation_speed = 1.0  # Speed multiplier for walk animation
+@export var walk_animation_speed = 1.0
 
 # Health and state
 var current_health
@@ -43,14 +43,19 @@ var jump_windup_timer = 0.0
 var target_velocity = Vector2.ZERO
 var is_moving = false
 
+# State management - ADD THESE VARIABLES
+var landing_timer = 0.0
+var landing_duration = 0.5  # How long to stay in landing state
+var state_timer = 0.0  # Generic timer for state management
+
 # AI States for slime behavior
 enum SlimeState {
 	IDLE,
-	WALKING,       # Walking towards player
-	JUMP_WINDUP,   # Preparing to jump attack
-	JUMPING,       # Attack jump in the air
-	LANDING,       # Just landed from attack
-	COOLDOWN       # Post-jump recovery
+	WALKING,
+	JUMP_WINDUP,
+	JUMPING,
+	LANDING,
+	COOLDOWN
 }
 
 var current_state = SlimeState.IDLE
@@ -168,6 +173,9 @@ func _physics_process(delta):
 	if attack_timer > 0:
 		attack_timer -= delta
 	
+	# Update state timer
+	state_timer += delta
+	
 	# Handle knockback (but not during jumps)
 	if knockback_velocity.length() > 5 and not is_jumping:
 		velocity = knockback_velocity
@@ -215,12 +223,12 @@ func handle_idle_state(delta):
 	# Check if player is in range to start chasing
 	if player_in_detection_range and player:
 		print("IDLE → WALKING: Player detected, starting to walk")
-		current_state = SlimeState.WALKING
+		change_state(SlimeState.WALKING)
 		chase_timer = chase_duration
 
 func handle_walking_state(delta):
 	if not player:
-		current_state = SlimeState.IDLE
+		change_state(SlimeState.IDLE)
 		return
 	
 	var distance_to_player = global_position.distance_to(player.global_position)
@@ -261,7 +269,7 @@ func handle_walking_state(delta):
 		print_rich("[color=green]Walking towards player - Speed: %.1f[/color]" % velocity.length())
 	else:
 		print("WALKING → IDLE: Lost player")
-		current_state = SlimeState.IDLE
+		change_state(SlimeState.IDLE)
 
 func handle_jump_windup_state(delta):
 	# Stop moving during windup
@@ -310,6 +318,7 @@ func handle_jumping_state(delta):
 	if jump_progress >= 1.0:
 		land_jump()
 
+# FIXED LANDING STATE HANDLER
 func handle_landing_state(delta):
 	target_velocity = Vector2.ZERO
 	velocity = Vector2.ZERO
@@ -317,11 +326,15 @@ func handle_landing_state(delta):
 	
 	play_animation("jump_land")
 	
-	# Brief landing state, then go to cooldown
-	if not animation_player or not animation_player.is_playing():
-		print("LANDING → COOLDOWN")
-		current_state = SlimeState.COOLDOWN
+	# Use timer-based transition instead of animation check
+	landing_timer += delta
+	
+	# Transition to cooldown after landing duration
+	if landing_timer >= landing_duration:
+		print("LANDING → COOLDOWN (timer-based)")
+		change_state(SlimeState.COOLDOWN)
 		attack_timer = jump_cooldown
+		landing_timer = 0.0
 
 func handle_cooldown_state(delta):
 	target_velocity = Vector2.ZERO
@@ -330,9 +343,42 @@ func handle_cooldown_state(delta):
 	
 	play_animation("idle")
 	
+	# FIXED: Use more reliable condition to exit cooldown
 	if attack_timer <= 0:
 		print("COOLDOWN → IDLE: Ready to act again")
-		current_state = SlimeState.IDLE
+		change_state(SlimeState.IDLE)
+
+# NEW FUNCTION: Centralized state changing
+func change_state(new_state: SlimeState):
+	var old_state_name = SlimeState.keys()[current_state]
+	var new_state_name = SlimeState.keys()[new_state]
+	
+	print("State change: %s → %s" % [old_state_name, new_state_name])
+	
+	# Reset state timer when changing states
+	state_timer = 0.0
+	
+	# Exit current state cleanup
+	match current_state:
+		SlimeState.JUMP_WINDUP:
+			if windup_bar:
+				windup_bar.visible = false
+		SlimeState.JUMPING:
+			is_jumping = false
+			sprite.rotation = 0
+			sprite.modulate = Color.WHITE
+			if animation_player:
+				animation_player.speed_scale = 1.0
+		SlimeState.LANDING:
+			landing_timer = 0.0
+	
+	# Set new state
+	current_state = new_state
+	
+	# Enter new state setup
+	match new_state:
+		SlimeState.LANDING:
+			landing_timer = 0.0
 
 func play_walking_animation():
 	"""Play the appropriate walking animation with speed synchronization"""
@@ -363,7 +409,7 @@ func play_walking_animation():
 
 func start_jump_windup():
 	print("=== STARTING JUMP WINDUP ===")
-	current_state = SlimeState.JUMP_WINDUP
+	change_state(SlimeState.JUMP_WINDUP)
 	jump_windup_timer = jump_windup_duration
 	
 	# Show windup bar
@@ -388,7 +434,7 @@ func start_jump_windup():
 
 func execute_jump():
 	print("=== EXECUTING JUMP ===")
-	current_state = SlimeState.JUMPING
+	change_state(SlimeState.JUMPING)
 	is_jumping = true
 	jump_progress = 0.0
 	jump_start_position = global_position
@@ -405,7 +451,7 @@ func execute_jump():
 
 func land_jump():
 	print("=== SLIME LANDED ===")
-	current_state = SlimeState.LANDING
+	change_state(SlimeState.LANDING)
 	is_jumping = false
 	jump_progress = 0.0
 	
@@ -538,7 +584,7 @@ func take_damage(amount: int):
 
 func cancel_jump_windup():
 	print("Jump windup cancelled by damage!")
-	current_state = SlimeState.IDLE
+	change_state(SlimeState.IDLE)
 	
 	if windup_bar:
 		windup_bar.visible = false

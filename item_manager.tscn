@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://cp1bwl56erjpg"]
+
+[ext_resource type="Script" uid="uid://cleam8kbwkwhb" path="res://scripts/ItemManager.gd" id="1_vdaic"]
+
+[node name="ItemManager" type="Node2D"]
+script = ExtResource("1_vdaic")

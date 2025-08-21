@@ -9,7 +9,7 @@ extends CharacterBody2D
 
 # Player health system
 @export var max_health = 5
-@export var damage_immunity_duration = 1.0
+@export var damage_immunity_duration = 0.3
 @export var knockback_resistance = 0.5
 
 # Animation speed settings
@@ -57,7 +57,8 @@ var damage_immunity_timer = 0.0
 var damage_flash_timer = 0.0
 var damage_flash_duration = 0.1
 var player_knockback_velocity = Vector2.ZERO
-var knockback_friction = 0.2
+var knockback_friction = 0.8  # Increased from 0.2 for faster recovery
+var knockback_threshold = 15.0  # Minimum knockback speed to override input
 
 # Animation variables
 var current_animation = ""
@@ -80,6 +81,9 @@ func _ready():
 	# Initialize health
 	current_health = max_health
 	update_health_display()
+	
+	  # Make sure player is in the "player" group for UI to find it
+	add_to_group("player")
 	
 	# Set up attack area
 	if attack_area:
@@ -151,20 +155,31 @@ func _physics_process(delta):
 		mouse_attack_direction = (mouse_pos - global_position).normalized()
 		start_attack()
 	
-	# Handle knockback
-	if player_knockback_velocity.length() > 0:
-		velocity = velocity.lerp(player_knockback_velocity, 0.3)
+	# Handle movement
+	var direction = get_input()
+	
+	# Check if player is moving
+	is_moving = direction.length() > 0
+	
+	# Update last direction for animations (only when moving and not attacking)
+	if direction.length() > 0 and not is_attacking:
+		last_direction = direction.normalized()
+	
+	# Handle knockback with improved logic to prevent getting stuck
+	if player_knockback_velocity.length() > knockback_threshold:
+		# Apply knockback but allow some player input influence
+		var knockback_influence = 0.7  # How much knockback affects movement (0.0 = no knockback, 1.0 = full knockback)
+		var input_influence = 1.0 - knockback_influence
+		
+		# Blend knockback with player input
+		var target_velocity = (player_knockback_velocity * knockback_influence) + (direction.normalized() * speed * input_influence)
+		velocity = velocity.lerp(target_velocity, acceleration)
+		
+		# Reduce knockback over time
 		player_knockback_velocity = player_knockback_velocity.lerp(Vector2.ZERO, knockback_friction)
 	else:
-		# Handle movement
-		var direction = get_input()
-		
-		# Check if player is moving
-		is_moving = direction.length() > 0
-		
-		# Update last direction for animations (only when moving and not attacking)
-		if direction.length() > 0 and not is_attacking:
-			last_direction = direction.normalized()
+		# Normal movement - no significant knockback
+		player_knockback_velocity = Vector2.ZERO  # Clear any remaining weak knockback
 		
 		if direction.length() > 0:
 			velocity = velocity.lerp(direction.normalized() * speed, acceleration)
@@ -258,7 +273,7 @@ func play_animation(animation_name: String):
 			animation_player.play("Idle_down")
 			current_animation = "Idle_down"
 
-# Take damage function with better enemy interaction
+# Take damage function with better enemy interaction - FIXED to prevent movement lock
 func take_damage(amount: int, source: Node = null):
 	print("=== PLAYER TAKE_DAMAGE CALLED ===")
 	print("Damage amount: ", amount)
@@ -275,7 +290,7 @@ func take_damage(amount: int, source: Node = null):
 	
 	# Start immunity frames
 	damage_immunity_timer = damage_immunity_duration
-	damage_flash_timer = 0.0
+	damage_flash_timer = damage_flash_duration
 	
 	# Update health display
 	update_health_display()
@@ -287,8 +302,12 @@ func take_damage(amount: int, source: Node = null):
 	# Apply knockback if damage came from an enemy
 	if source and source.has_method("get_knockback_force"):
 		var knockback_direction = (global_position - source.global_position).normalized()
-		var knockback_force = source.get_knockback_force() if source.has_method("get_knockback_force") else 200
+		var knockback_force = source.get_knockback_force() if source.has_method("get_knockback_force") else 150
 		apply_knockback(knockback_direction, knockback_force)
+	elif source:
+		# Apply default knockback even if enemy doesn't have get_knockback_force method
+		var knockback_direction = (global_position - source.global_position).normalized()
+		apply_knockback(knockback_direction, 150)
 	
 	# Check if dead
 	if current_health <= 0:
@@ -321,7 +340,10 @@ func die():
 	# Reset immunity (in case of respawn)
 	damage_immunity_timer = 0.0
 	
-	# Optional: Reset position to spawn point
+	# Clear any remaining knockback
+	player_knockback_velocity = Vector2.ZERO
+	
+	# Reset position to spawn point
 	# global_position = Vector2(100, 100)  # Set to your spawn position
 
 # Heal player (useful for health pickups)
@@ -330,9 +352,13 @@ func heal(amount: int):
 	print("Player healed for ", amount, "! Health: ", current_health, "/", max_health)
 	update_health_display()
 
-# Add knockback to player
+# FIXED: Add knockback to player with proper force limiting
 func apply_knockback(direction: Vector2, force: float):
-	player_knockback_velocity = direction.normalized() * (force * knockback_resistance)
+	# Apply knockback with resistance and ensure it's not too weak or strong
+	var knockback_force = force * knockback_resistance
+	# Clamp knockback to reasonable values to prevent getting stuck or flying away
+	knockback_force = clamp(knockback_force, 80, 250)
+	player_knockback_velocity = direction.normalized() * knockback_force
 	print("Player knocked back with force: ", player_knockback_velocity.length())
 
 func start_attack():
