@@ -267,7 +267,7 @@ func play_animation(animation_name: String):
 		current_animation = animation_name
 		print("Playing animation: ", animation_name)
 	else:
-		print("Animation not found: ", animation_name)
+		#print("Animation not found: ", animation_name)
 		# Fallback to a basic animation
 		if animation_player.has_animation("Idle_down"):
 			animation_player.play("Idle_down")

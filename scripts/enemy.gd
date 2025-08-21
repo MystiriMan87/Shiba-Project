@@ -1,5 +1,7 @@
 extends CharacterBody2D
 
+@export var scene_path = "res://scenes/enemy.tscn"
+
 @export var max_health = 3
 @export var speed = 50
 @export var damage = 1
@@ -599,6 +601,7 @@ func flash_sprite(color: Color, duration: float):
 	damage_timer = duration
 
 func die():
+	
 	is_dead = true
 	is_jumping = false
 	is_moving = false
@@ -610,11 +613,16 @@ func die():
 	
 	collision_shape.disabled = true
 	
+	var respawn_manager = get_tree().get_first_node_in_group("respawn_manager")
+	if respawn_manager:
+			respawn_manager.register_enemy_death(self)
+		
 	# Death animation
 	var tween = create_tween()
 	tween.parallel().tween_property(sprite, "modulate:a", 0.0, 0.5)
 	tween.parallel().tween_property(sprite, "scale", Vector2(1.5, 0.5), 0.5)
 	tween.tween_callback(queue_free)
+	
 
 func _on_detection_area_entered(body):
 	if body.is_in_group("player"):
