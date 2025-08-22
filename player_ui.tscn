@@ -83,13 +83,13 @@ layout_mode = 2
 max_value = 1.0
 
 [node name="InventoryContainer" type="VBoxContainer" parent="."]
-visible = false
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_top = -591.0
+offset_top = -656.0
 offset_right = 1000.0
+offset_bottom = -65.0
 grow_vertical = 0
 alignment = 1
 
@@ -102,8 +102,9 @@ horizontal_alignment = 1
 uppercase = true
 
 [node name="InventoryGrid" type="GridContainer" parent="InventoryContainer"]
-custom_minimum_size = Vector2(80, 80)
+custom_minimum_size = Vector2(80, 400)
 layout_mode = 2
+size_flags_vertical = 3
 columns = 4
 
 [node name="NotificationContainer" type="VBoxContainer" parent="."]

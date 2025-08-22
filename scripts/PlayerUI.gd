@@ -24,9 +24,9 @@ var is_inventory_open = false
 var weapon_database = {
 	"sword": {
 		"name": "Iron Sword",
-		"icon": "res://Assets/oubliette_weapons - free/spr_wep_iron_sci_0.png",
+		"icon": "res://Assets/oubliette_weapons - free/spr_wep_iron_axe_2.png",
 		"damage": 1,
-		"description": "A basic iron sword"
+		"description": "A basic iron axe"
 	}
 }
 

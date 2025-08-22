@@ -154,11 +154,11 @@ sources/0 = SubResource("TileSetAtlasSource_71j4m")
 [node name="World" type="Node2D"]
 
 [node name="Enemy2" parent="." instance=ExtResource("1_rwgxs")]
-position = Vector2(620, 1005)
+position = Vector2(612, 805)
 
 [node name="Enemy" parent="." instance=ExtResource("1_rwgxs")]
-position = Vector2(494, 1104)
-max_health = 5
+self_modulate = Color(1, 0, 0, 1)
+position = Vector2(649, 1142)
 
 [node name="Player" parent="." groups=["player"] instance=ExtResource("1_nnsk1")]
 position = Vector2(63, 49)
@@ -193,3 +193,6 @@ position = Vector2(63, 1099)
 [node name="EnemyRespawnManager" type="Node2D" parent="."]
 script = ExtResource("7_i7141")
 max_respawns = 3
+
+[node name="Enemy4" parent="." instance=ExtResource("1_rwgxs")]
+position = Vector2(52, 806)

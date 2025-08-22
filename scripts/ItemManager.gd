@@ -26,15 +26,15 @@ func load_weapons_database():
 	# You can load this from JSON files later
 	weapons_database = {
 		"iron_sword": {
-			"id": "iron_sword",
-			"name": "Iron Sword",
+			"id": "iron_axe",
+			"name": "Iron Axe",
 			"type": "weapon",
 			"damage": 1,
 			"attack_speed": 1.0,
 			"attack_range": 50,
-			"icon_path": "res://Assets/oubliette_weapons - free/spr_wep_iron_sci_0.png",
-			"sprite_path": "res://Assets/oubliette_weapons - free/spr_wep_iron_sci_0.png",
-			"description": "A sturdy iron sword. Reliable and sharp.",
+			"icon_path": "res://Assets/oubliette_weapons - free/spr_wep_iron_axe_2.png",
+			"sprite_path": "res://Assets/oubliette_weapons - free/spr_wep_iron_axe_2.png",
+			"description": "A sturdy iron axe. Reliable and sharp.",
 			"rarity": "common",
 			#"durability": 100,
 			#"max_durability": 100
