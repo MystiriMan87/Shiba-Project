@@ -1,5 +1,6 @@
-[gd_scene load_steps=10 format=4 uid="uid://dpcl1dclvepl8"]
+[gd_scene load_steps=11 format=4 uid="uid://dpcl1dclvepl8"]
 
+[ext_resource type="Script" uid="uid://c4k4k8r5ebb5c" path="res://scenes/world.gd" id="1_4mrxx"]
 [ext_resource type="PackedScene" uid="uid://hqa6411o6hsf" path="res://scenes/player.tscn" id="1_nnsk1"]
 [ext_resource type="PackedScene" uid="uid://drik1twhweam8" path="res://scenes/enemy.tscn" id="1_rwgxs"]
 [ext_resource type="PackedScene" uid="uid://ny2bd86mtevm" path="res://player_camera.tscn" id="3_i7141"]
@@ -152,6 +153,7 @@ physics_layer_0/collision_mask = 7
 sources/0 = SubResource("TileSetAtlasSource_71j4m")
 
 [node name="World" type="Node2D"]
+script = ExtResource("1_4mrxx")
 
 [node name="Enemy2" parent="." instance=ExtResource("1_rwgxs")]
 position = Vector2(612, 805)

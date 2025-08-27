@@ -56,6 +56,7 @@ scale = Vector2(2, 2)
 alignment = 1
 
 [node name="WeaponIcon" type="TextureRect" parent="WeaponContainer"]
+visible = false
 texture_filter = 1
 custom_minimum_size = Vector2(1, 50)
 layout_mode = 2
@@ -63,6 +64,7 @@ expand_mode = 2
 stretch_mode = 5
 
 [node name="WeaponInfo" type="VBoxContainer" parent="WeaponContainer"]
+visible = false
 custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
 
@@ -83,17 +85,15 @@ layout_mode = 2
 max_value = 1.0
 
 [node name="InventoryContainer" type="VBoxContainer" parent="."]
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_top = -656.0
+visible = false
+layout_mode = 0
+offset_top = 481.0
 offset_right = 1000.0
-offset_bottom = -65.0
-grow_vertical = 0
+offset_bottom = 1072.0
 alignment = 1
 
 [node name="InventoryLabel" type="Label" parent="InventoryContainer"]
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
 text = "Inventory
@@ -102,6 +102,7 @@ horizontal_alignment = 1
 uppercase = true
 
 [node name="InventoryGrid" type="GridContainer" parent="InventoryContainer"]
+visible = false
 custom_minimum_size = Vector2(80, 400)
 layout_mode = 2
 size_flags_vertical = 3

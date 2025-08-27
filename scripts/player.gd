@@ -12,7 +12,7 @@ extends CharacterBody2D
 @export var knockback_resistance = 0.5
 
 @export var min_animation_speed = 0.5
-@export var max_animation_speed = 2.0
+@export var max_animation_speed = 4.0
 @export var speed_threshold = 50
 
 @export var swing_arc_degrees = 120
@@ -23,6 +23,10 @@ extends CharacterBody2D
 
 @export var attack_range = 50
 @export var swing_arc_half_angle = 60
+
+# Pickup system variables
+@export var pickup_range = 40
+@export var auto_pickup_enabled = true
 
 var is_attacking = false
 var attack_timer = 0.0
@@ -62,11 +66,15 @@ var is_moving = false
 @onready var health_bar = $HealthBar if has_node("HealthBar") else null
 @onready var ui_health_bar = $"../UI/HealthBar" if has_node("../UI/HealthBar") else null
 
+# Pickup system nodes
+@onready var pickup_area = $PickupArea if has_node("PickupArea") else null
+@onready var pickup_collision = $PickupArea/CollisionShape2D if has_node("PickupArea/CollisionShape2D") else null
+
 func _ready():
 	add_to_group("player")
 	current_health = max_health
 	update_health_display()
-	add_to_group("player")
+	setup_pickup_system()
 	
 	if attack_area:
 		attack_area.monitoring = false
@@ -81,6 +89,71 @@ func _ready():
 	
 	if animation_player:
 		play_animation("Idle_down")
+
+func setup_pickup_system():
+	# Create pickup area if it doesn't exist
+	if not pickup_area:
+		pickup_area = Area2D.new()
+		pickup_area.name = "PickupArea"
+		pickup_area.collision_layer = 0
+		pickup_area.collision_mask = 8  # Items should be on layer 4 (bit 3)
+		add_child(pickup_area)
+		
+		# Create collision shape for pickup area
+		pickup_collision = CollisionShape2D.new()
+		pickup_collision.name = "CollisionShape2D"
+		var circle_shape = CircleShape2D.new()
+		circle_shape.radius = pickup_range
+		pickup_collision.shape = circle_shape
+		pickup_area.add_child(pickup_collision)
+	
+	# Connect pickup signals
+	if pickup_area:
+		if not pickup_area.area_entered.is_connected(_on_pickup_area_entered):
+			pickup_area.area_entered.connect(_on_pickup_area_entered)
+		if not pickup_area.body_entered.is_connected(_on_pickup_body_entered):
+			pickup_area.body_entered.connect(_on_pickup_body_entered)
+		
+		print("Pickup system initialized with range: ", pickup_range)
+
+func _on_pickup_area_entered(area: Area2D):
+	if area.has_method("pickup_item"):
+		var item_data = area.pickup_item()
+		if not item_data.is_empty():
+			add_item_to_inventory(item_data)
+
+func _on_pickup_body_entered(body: Node2D):
+	if body.has_method("pickup_item"):
+		var item_data = body.pickup_item()
+		if not item_data.is_empty():
+			add_item_to_inventory(item_data)
+
+func add_item_to_inventory(item_data: Dictionary):
+	var item_manager = get_node("/root/ItemManager") if has_node("/root/ItemManager") else null
+	
+	if item_manager:
+		var success = item_manager.add_item_to_inventory(item_data.get("id", ""), item_data.get("quantity", 1))
+		if success:
+			show_pickup_notification(item_data)
+			print("Picked up item: ", item_data.get("name", item_data.get("id", "Unknown")))
+	else:
+		# Fallback for direct UI management
+		var ui = get_node("../UI") if has_node("../UI") else null
+		if ui and ui.has_method("add_item_to_inventory"):
+			var success = ui.add_item_to_inventory(item_data.get("id", ""), item_data.get("quantity", 1))
+			if success:
+				show_pickup_notification(item_data)
+				print("Picked up item: ", item_data.get("name", item_data.get("id", "Unknown")))
+
+func show_pickup_notification(item_data: Dictionary):
+	var ui = get_node("../UI") if has_node("../UI") else null
+	if ui and ui.has_method("show_notification"):
+		var item_name = item_data.get("name", item_data.get("id", "Unknown Item"))
+		var quantity = item_data.get("quantity", 1)
+		var message = "Picked up: " + item_name
+		if quantity > 1:
+			message += " x" + str(quantity)
+		ui.show_notification(message, 2.0)
 
 func get_input():
 	var input = Vector2()
@@ -150,6 +223,7 @@ func _physics_process(delta):
 	
 	move_and_slide()
 
+# Rest of the existing functions remain the same...
 func update_animation():
 	if is_attacking:
 		return
@@ -416,3 +490,16 @@ func can_take_damage() -> bool:
 
 func get_knockback_resistance() -> float:
 	return knockback_resistance
+
+# Utility functions for pickup system
+func set_pickup_range(new_range: float):
+	pickup_range = new_range
+	if pickup_collision and pickup_collision.shape is CircleShape2D:
+		pickup_collision.shape.radius = pickup_range
+
+func get_pickup_range() -> float:
+	return pickup_range
+
+func toggle_auto_pickup():
+	auto_pickup_enabled = !auto_pickup_enabled
+	print("Auto pickup: ", "enabled" if auto_pickup_enabled else "disabled")

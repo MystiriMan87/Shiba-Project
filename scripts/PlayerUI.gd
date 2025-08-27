@@ -1,467 +1,83 @@
+# PlayerUI.gd - Fixed complete script
 extends Control
 
-# UI node references
-@onready var health_bar = $HealthContainer/HealthBar
-@onready var health_label = $HealthContainer/HealthLabel
-@onready var weapon_icon = $WeaponContainer/WeaponIcon
-@onready var weapon_name_label = $WeaponContainer/WeaponInfo/WeaponName
-@onready var weapon_damage_label = $WeaponContainer/WeaponInfo/WeaponDamage
-@onready var attack_cooldown_bar = $WeaponContainer/CooldownBar
-@onready var inventory_slots = $InventoryContainer/InventoryGrid
+# FIXED: Added missing variables
+@export var slot_size: Vector2 = Vector2(64, 64)
+@export var max_inventory_slots: int = 20
 
-@onready var weapon_container = $WeaponContainer
-@onready var inventory_container = $InventoryContainer
+var inventory_slots: Array = []
+var selected_slot_index: int = -1
+var item_manager: Node = null
 
-var player: CharacterBody2D
-var current_weapon_data: Dictionary = {}
-
-var is_inventory_open = false
-
-var slot_normal_texture = "res://path/to/slot_normal.png"  
-var slot_selected_texture = "res://path/to/slot_selected.png"  
-var slot_equipped_texture = "res://path/to/slot_equipped.png" 
-
-var weapon_database = {
-	"sword": {
-		"id": "sword",
-		"name": "Iron Sword",
-		"icon": "res://Assets/oubliette_weapons - free/spr_wep_iron_axe_2.png",
-		"damage": 1,
-		"description": "A basic iron sword"
-	},
-	"axe": {
-		"id": "axe", 
-		"name": "Iron Axe",
-		"icon": "res://Assets/oubliette_weapons - free/spr_wep_iron_axe_2.png",
-		"damage": 2,
-		"description": "A heavy iron axe"
-	},
-	"bow": {
-		"id": "bow",
-		"name": "Wooden Bow",
-		"icon": "res://Assets/oubliette_weapons - free/spr_wep_wooden_bow.png", 
-		"damage": 1,
-		"description": "A simple wooden bow"
-	}
-}
-
-var inventory_items = []
-var max_inventory_slots = 9 
-var selected_slot_index = -1
+# Node references - adjust these paths to match your scene structure
+@onready var inventory_grid: GridContainer = $InventoryPanel/ScrollContainer/InventoryGrid if has_node("InventoryPanel/ScrollContainer/InventoryGrid") else null
+@onready var inventory_panel: Control = $InventoryPanel if has_node("InventoryPanel") else null
 
 func _ready():
-	find_player()
-	setup_ui()
-	hide_inventory_ui()
-	create_inventory_slots()
-	connect_item_manager()
-	sync_weapon_from_player() 
-	update_inventory_display()
-
-func find_player():
-	var players = get_tree().get_nodes_in_group("player")
-	if players.size() > 0:
-		player = players[0]
-		print("Found player: ", player.name)
-	else:
-		player = get_tree().get_first_node_in_group("player")
-		if not player:
-			print("WARNING: Player not found! Make sure player is in 'player' group")
-
-func setup_ui():
-	if not player:
-		return
+	# Get ItemManager reference
+	item_manager = get_node("/root/ItemManager") if has_node("/root/ItemManager") else null
+	if not item_manager:
+		print("Warning: ItemManager not found at /root/ItemManager")
 	
-	if health_bar:
-		health_bar.max_value = player.max_health if player.has_method("get") or "max_health" in player else 100
-		health_bar.value = player.current_health if player.has_method("get") or "current_health" in player else 100
+	setup_inventory_ui()
 	
-	update_health_display()
-
-func connect_item_manager():
-	if has_node("/root/ItemManager") or get_tree().get_nodes_in_group("ItemManager").size() > 0:
-		var item_manager = get_node("/root/ItemManager")
-		if item_manager:
-			item_manager.weapon_changed.connect(_on_weapon_changed)
+	# Connect to ItemManager signals if available
+	if item_manager:
+		if not item_manager.inventory_updated.is_connected(_on_inventory_updated):
 			item_manager.inventory_updated.connect(_on_inventory_updated)
-			print("Connected to ItemManager")
-			
-			var equipped = item_manager.get_equipped_weapon()
-			if not equipped.is_empty():
-				current_weapon_data = equipped
-				update_weapon_display()
-	else:
-		set_current_weapon("sword")
 
-func sync_weapon_from_player():
-	if not player:
-		print("No player found to sync weapon from")
-		return
+func setup_inventory_ui():
+	# Create inventory grid if it doesn't exist
+	if not inventory_grid:
+		create_inventory_ui()
 	
-	if "attack_damage" in player:
-		var weapon_id = "sword"  
+	# Create initial inventory slots
+	create_inventory_slots()
+	refresh_inventory_display()
+
+func create_inventory_ui():
+	# Create basic UI structure if nodes don't exist
+	if not inventory_panel:
+		inventory_panel = Panel.new()
+		inventory_panel.name = "InventoryPanel"
+		inventory_panel.size = Vector2(400, 300)
+		inventory_panel.position = Vector2(50, 50)
+		add_child(inventory_panel)
+	
+	if not inventory_grid:
+		var scroll_container = ScrollContainer.new()
+		scroll_container.name = "ScrollContainer"
+		scroll_container.anchor_left = 0.0
+		scroll_container.anchor_top = 0.0
+		scroll_container.anchor_right = 1.0
+		scroll_container.anchor_bottom = 1.0
+		inventory_panel.add_child(scroll_container)
 		
-		if "current_weapon_id" in player:
-			weapon_id = player.current_weapon_id
-		
-		if weapon_id in weapon_database:
-			current_weapon_data = weapon_database[weapon_id].duplicate()
-			current_weapon_data["damage"] = player.attack_damage
-			current_weapon_data["id"] = weapon_id
-		else:
-			current_weapon_data = {
-				"id": weapon_id,
-				"name": "Current Weapon",
-				"icon": "res://Assets/oubliette_weapons - free/spr_wep_iron_axe_2.png",
-				"damage": player.attack_damage,
-				"description": "Player's equipped weapon"
-			}
-		
-		print("Synced weapon from player - ID: ", weapon_id, ", Damage: ", player.attack_damage)
-		print("Current weapon data: ", current_weapon_data)
-	else:
-		print("Player doesn't have attack_damage property")
-		current_weapon_data = {
-			"id": "sword",
-			"name": "Default Sword", 
-			"icon": "res://Assets/oubliette_weapons - free/spr_wep_iron_axe_2.png",
-			"damage": 1,
-			"description": "Basic starting weapon"
-		}
-
-func on_player_weapon_changed(new_weapon_id: String):
-	if new_weapon_id in weapon_database:
-		current_weapon_data = weapon_database[new_weapon_id].duplicate()
-		current_weapon_data["id"] = new_weapon_id
-		
-		if player and "attack_damage" in player:
-			player.attack_damage = current_weapon_data["damage"]
-			if "current_weapon_id" in player:
-				player.current_weapon_id = new_weapon_id
-		
-		if is_inventory_open:
-			update_inventory_display()
-			update_weapon_display()
-		
-		print("Player weapon changed to: ", current_weapon_data["name"])
-
-func hide_inventory_ui():
-	if inventory_container:
-		inventory_container.visible = false
-	if weapon_container:
-		weapon_container.visible = false
-	is_inventory_open = false
-
-func show_inventory_ui():
-	if inventory_container:
-		inventory_container.visible = true
-	if weapon_container:
-		weapon_container.visible = true
-	is_inventory_open = true
-
-func _process(delta):
-	if not player:
-		return
-	
-	update_health_display()
-	
-	if weapon_container and weapon_container.visible:
-		update_attack_cooldown()
-		update_weapon_display()
-
-func update_health_display():
-	if not player:
-		return
-	
-	var current_hp = 100
-	var max_hp = 100
-	
-	if "current_health" in player:
-		current_hp = player.current_health
-	if "max_health" in player:
-		max_hp = player.max_health
-	
-	if health_bar:
-		health_bar.max_value = max_hp
-		health_bar.value = current_hp
-		
-		var health_percent = float(current_hp) / float(max_hp) if max_hp > 0 else 0.0
-		if health_percent > 0.6:
-			health_bar.modulate = Color.GREEN
-		elif health_percent > 0.3:
-			health_bar.modulate = Color.YELLOW
-		else:
-			health_bar.modulate = Color.RED
-	
-	if health_label:
-		health_label.text = str(current_hp) + "/" + str(max_hp)
-
-func update_attack_cooldown():
-	if not player or not attack_cooldown_bar:
-		return
-	
-	if "cooldown_timer" in player and "attack_cooldown" in player:
-		if player.cooldown_timer > 0:
-			attack_cooldown_bar.visible = true
-			attack_cooldown_bar.value = (player.attack_cooldown - player.cooldown_timer) / player.attack_cooldown
-		else:
-			attack_cooldown_bar.visible = false
-	else:
-		attack_cooldown_bar.visible = false
-
-func _on_weapon_changed(weapon_data: Dictionary):
-	current_weapon_data = weapon_data
-	if weapon_container and weapon_container.visible:
-		update_weapon_display()
-	update_inventory_display()
-
-func _on_inventory_updated():
-	if inventory_container and inventory_container.visible:
-		update_inventory_display()
-
-func set_current_weapon(weapon_id: String):
-	if has_node("/root/ItemManager"):
-		var item_manager = get_node("/root/ItemManager")
-		item_manager.equip_weapon(weapon_id)
-		return
-	
-	if weapon_id in weapon_database:
-		current_weapon_data = weapon_database[weapon_id].duplicate()
-		if weapon_container and weapon_container.visible:
-			update_weapon_display()
-		update_inventory_display()
-		
-		if player and "attack_damage" in player:
-			player.attack_damage = current_weapon_data.get("damage", 1)
-	else:
-		print("Weapon not found in database: ", weapon_id)
-
-func update_weapon_display():
-	if current_weapon_data.is_empty():
-		return
-	
-	if weapon_icon:
-		var icon_path = current_weapon_data.get("icon", current_weapon_data.get("icon_path", ""))
-		if icon_path != "":
-			var texture = load(icon_path)
-			if texture:
-				weapon_icon.texture = texture
-			else:
-				print("Could not load weapon icon: ", icon_path)
-	
-	if weapon_name_label:
-		weapon_name_label.text = current_weapon_data.get("name", "Unknown Weapon")
-	
-	if weapon_damage_label:
-		weapon_damage_label.text = "DMG: " + str(current_weapon_data.get("damage", 1))
+		inventory_grid = GridContainer.new()
+		inventory_grid.name = "InventoryGrid"
+		inventory_grid.columns = 5
+		scroll_container.add_child(inventory_grid)
 
 func create_inventory_slots():
-	if not inventory_slots:
-		print("Warning: inventory_slots not found")
-		return
+	# Clear existing slots
+	for slot in inventory_slots:
+		if is_instance_valid(slot):
+			slot.queue_free()
+	inventory_slots.clear()
 	
-	for child in inventory_slots.get_children():
-		child.queue_free()
+	# Clear grid children
+	if inventory_grid:
+		for child in inventory_grid.get_children():
+			child.queue_free()
 	
-	await get_tree().process_frame
-	
-	if inventory_slots is GridContainer:
-		inventory_slots.columns = 3  
-	
+	# Create new slots
 	for i in range(max_inventory_slots):
 		var slot = create_enhanced_inventory_slot(i)
-		inventory_slots.add_child(slot)
+		inventory_slots.append(slot)
+		if inventory_grid:
+			inventory_grid.add_child(slot)
 
-func create_enhanced_inventory_slot(index: int) -> Control:
-	var slot = Control.new()
-	slot.custom_minimum_size = Vector2(64, 64)
-	slot.name = "InventorySlot" + str(index)
-	
-	var background = NinePatchRect.new() 
-	background.name = "Background"
-	background.anchor_left = 0.0
-	background.anchor_top = 0.0
-	background.anchor_right = 1.0
-	background.anchor_bottom = 1.0
-	
-	if ResourceLoader.exists(slot_normal_texture):
-		background.texture = load(slot_normal_texture)
-	else:
-		var panel = Panel.new()
-		panel.name = "Panel"
-		panel.anchor_left = 0.0
-		panel.anchor_top = 0.0
-		panel.anchor_right = 1.0
-		panel.anchor_bottom = 1.0
-		
-		var style_box = StyleBoxFlat.new()
-		style_box.bg_color = Color(0.3, 0.2, 0.1, 0.9) 
-		style_box.border_width_top = 2
-		style_box.border_width_bottom = 2
-		style_box.border_width_left = 2
-		style_box.border_width_right = 2
-		style_box.border_color = Color(0.6, 0.4, 0.2) 
-		style_box.corner_radius_top_left = 4
-		style_box.corner_radius_top_right = 4
-		style_box.corner_radius_bottom_left = 4
-		style_box.corner_radius_bottom_right = 4
-		panel.add_theme_stylebox_override("panel", style_box)
-		slot.add_child(panel)
-	
-	if background.texture:
-		slot.add_child(background)
-	
-	var item_icon = TextureRect.new()
-	item_icon.name = "ItemIcon"
-	item_icon.anchor_left = 0.1
-	item_icon.anchor_top = 0.1
-	item_icon.anchor_right = 0.9
-	item_icon.anchor_bottom = 0.9
-	item_icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
-	item_icon.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
-	slot.add_child(item_icon)
-	
-	var count_label = Label.new()
-	count_label.name = "CountLabel"
-	count_label.anchor_left = 0.6
-	count_label.anchor_top = 0.6
-	count_label.anchor_right = 1.0
-	count_label.anchor_bottom = 1.0
-	count_label.add_theme_font_size_override("font_size", 12)
-	count_label.add_theme_color_override("font_color", Color.WHITE)
-	count_label.add_theme_color_override("font_shadow_color", Color.BLACK)
-	count_label.add_theme_constant_override("shadow_offset_x", 1)
-	count_label.add_theme_constant_override("shadow_offset_y", 1)
-	count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	count_label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
-	count_label.text = ""
-	slot.add_child(count_label)
-	
-	var selection_highlight = NinePatchRect.new()
-	selection_highlight.name = "SelectionHighlight"
-	selection_highlight.anchor_left = 0.0
-	selection_highlight.anchor_top = 0.0
-	selection_highlight.anchor_right = 1.0
-	selection_highlight.anchor_bottom = 1.0
-	selection_highlight.modulate = Color.YELLOW
-	selection_highlight.visible = false
-	
-	if ResourceLoader.exists(slot_selected_texture):
-		selection_highlight.texture = load(slot_selected_texture)
-	else:
-		var highlight_style = StyleBoxFlat.new()
-		highlight_style.bg_color = Color.TRANSPARENT
-		highlight_style.border_width_top = 3
-		highlight_style.border_width_bottom = 3
-		highlight_style.border_width_left = 3
-		highlight_style.border_width_right = 3
-		highlight_style.border_color = Color.YELLOW
-		var highlight_panel = Panel.new()
-		highlight_panel.name = "SelectionHighlight"
-		highlight_panel.anchor_left = 0.0
-		highlight_panel.anchor_top = 0.0
-		highlight_panel.anchor_right = 1.0
-		highlight_panel.anchor_bottom = 1.0
-		highlight_panel.add_theme_stylebox_override("panel", highlight_style)
-		highlight_panel.visible = false
-		slot.add_child(highlight_panel)
-		selection_highlight = highlight_panel
-	
-	if selection_highlight.get_parent() == null:
-		slot.add_child(selection_highlight)
-	
-	var button = Button.new()
-	button.name = "ClickDetector"
-	button.anchor_left = 0.0
-	button.anchor_top = 0.0
-	button.anchor_right = 1.0
-	button.anchor_bottom = 1.0
-	button.flat = true
-	button.pressed.connect(_on_slot_clicked.bind(index))
-	slot.add_child(button)
-	
-	return slot
-
-func _on_slot_clicked(slot_index: int):
-	print("Slot clicked: ", slot_index)
-	select_inventory_slot(slot_index)
-
-func update_inventory_display():
-	if not inventory_slots:
-		print("ERROR: inventory_slots not found")
-		return
-	
-	var slots = inventory_slots.get_children()
-	if slots.is_empty():
-		print("ERROR: No inventory slots found")
-		return
-	
-	print("=== UPDATING INVENTORY DISPLAY ===")
-	print("Total slots: ", slots.size())
-	print("Current weapon data: ", current_weapon_data)
-	
-	for i in range(slots.size()):
-		var slot = slots[i]
-		clear_slot(slot)
-		update_slot_selection(slot, i == selected_slot_index)
-	
-	var current_slot_index = 0
-	
-	if not current_weapon_data.is_empty() and current_slot_index < slots.size():
-		print("Displaying equipped weapon in slot 0")
-		var equipped_weapon_item = {
-			"data": current_weapon_data,
-			"quantity": 1,
-			"equipped": true
-		}
-		display_item_in_slot(slots[current_slot_index], equipped_weapon_item, current_slot_index)
-		current_slot_index += 1
-	else:
-		print("No equipped weapon to display or no slots available")
-	
-	var items_to_show = []
-	if has_node("/root/ItemManager"):
-		var item_manager = get_node("/root/ItemManager")
-		items_to_show = item_manager.get_inventory_items()
-		print("Using ItemManager inventory: ", items_to_show)
-	else:
-		items_to_show = inventory_items
-		print("Using local inventory: ", items_to_show)
-	
-	for item in items_to_show:
-		if current_slot_index >= slots.size():
-			print("No more slots available")
-			break
-		
-		var item_id = ""
-		if "data" in item:
-			item_id = item.data.get("id", "")
-		else:
-			item_id = item.get("id", "")
-		
-		var equipped_weapon_id = current_weapon_data.get("id", "")
-		if item_id == equipped_weapon_id and item.get("equipped", false):
-			print("Skipping duplicate equipped weapon: ", item_id)
-			continue  
-		
-		print("Displaying inventory item in slot ", current_slot_index, ": ", item)
-		display_item_in_slot(slots[current_slot_index], item, current_slot_index)
-		current_slot_index += 1
-	
-	print("=== INVENTORY DISPLAY UPDATE COMPLETE ===")
-	print("Used ", current_slot_index, " of ", slots.size(), " slots")
-
-func clear_slot(slot: Control):
-	if slot.has_node("ItemIcon"):
-		slot.get_node("ItemIcon").texture = null
-	if slot.has_node("CountLabel"):
-		slot.get_node("CountLabel").text = ""
-
-func update_slot_selection(slot: Control, is_selected: bool):
-	var highlight = slot.get_node("SelectionHighlight") if slot.has_node("SelectionHighlight") else null
-	if highlight:
-		highlight.visible = is_selected
-
+# FIXED: Updated display_item_in_slot function with all missing references
 func display_item_in_slot(slot: Control, item: Dictionary, slot_index: int):
 	if not slot.has_node("ItemIcon") or not slot.has_node("CountLabel"):
 		print("Slot missing ItemIcon or CountLabel: ", slot.name)
@@ -473,40 +89,54 @@ func display_item_in_slot(slot: Control, item: Dictionary, slot_index: int):
 	var icon_path = ""
 	var quantity = 1
 	var is_equipped = false
+	var item_data = {}
 	
 	if "data" in item:  
+		item_data = item.data
 		icon_path = item.data.get("icon_path", item.data.get("icon", ""))
 		quantity = item.get("quantity", 1)
 		is_equipped = item.get("equipped", false)
 		print("ItemManager format - icon_path: ", icon_path, ", equipped: ", is_equipped)
 	else: 
+		item_data = item
 		if "icon" in item:
 			icon_path = item.icon
-		elif "id" in item and item.id in weapon_database:
-			icon_path = weapon_database[item.id].get("icon", "")
+		elif "id" in item and item_manager:
+			# FIXED: Use item_manager instead of undefined weapon_database
+			var weapon_data = item_manager.get_weapon_data(item.id)
+			if not weapon_data.is_empty():
+				icon_path = weapon_data.get("icon_path", "")
 		
 		quantity = item.get("count", item.get("quantity", 1))
 		is_equipped = item.get("equipped", false)
 		print("Local format - icon_path: ", icon_path, ", equipped: ", is_equipped)
 	
+	# Load and set icon with better fitting
 	if icon_path != "":
 		print("Attempting to load texture: ", icon_path)
 		if ResourceLoader.exists(icon_path):
 			var texture = load(icon_path)
 			if texture:
 				icon.texture = texture
-				print("Successfully loaded texture for slot ", slot_index)
+				
+				# Enhanced sprite fitting to slot
+				fit_sprite_to_slot(icon, texture, slot_size)
+				
+				print("Successfully loaded and fitted texture for slot ", slot_index)
 			else:
 				print("Failed to load texture: ", icon_path)
 		else:
 			print("Texture file doesn't exist: ", icon_path)
 			var fallback_path = "res://icon.svg"   
 			if ResourceLoader.exists(fallback_path):
-				icon.texture = load(fallback_path)
+				var texture = load(fallback_path)
+				icon.texture = texture
+				fit_sprite_to_slot(icon, texture, slot_size)
 				print("Using fallback icon")
 	else:
 		print("No icon path provided for slot ", slot_index)
 	
+	# Set quantity/equipped label
 	if is_equipped:
 		count_label.text = "E"
 		count_label.add_theme_color_override("font_color", Color.GOLD)
@@ -517,208 +147,368 @@ func display_item_in_slot(slot: Control, item: Dictionary, slot_index: int):
 	else:
 		count_label.text = ""
 	
-	if is_equipped:
-		if slot.has_node("Panel"):
-			var panel = slot.get_node("Panel")
-			var style_box = panel.get_theme_stylebox("panel")
-			if style_box is StyleBoxFlat:
-				var new_style = style_box.duplicate()
-				new_style.border_color = Color.GOLD
-				panel.add_theme_stylebox_override("panel", new_style)
-				print("Applied gold border to equipped weapon slot")
+	# Apply rarity-based styling
+	var rarity = item_data.get("rarity", "common")
+	var rarity_color = get_rarity_color(rarity)
+	
+	# Apply visual effects based on rarity
+	apply_rarity_effects(slot, rarity_color, is_equipped)
 
-func add_item_to_inventory(item_id: String, count: int = 1) -> bool:
-	if has_node("/root/ItemManager"):
-		var item_manager = get_node("/root/ItemManager")
-		return item_manager.add_item_to_inventory(item_id, count)
+func fit_sprite_to_slot(icon: TextureRect, texture: Texture2D, target_slot_size: Vector2):
+	"""Fit sprite to inventory slot with proper scaling and centering"""
+	if not texture:
+		return
 	
-	for i in range(inventory_items.size()):
-		if inventory_items[i].id == item_id:
-			inventory_items[i].count += count
-			if is_inventory_open:
-				update_inventory_display()
-			return true
+	var texture_size = texture.get_size()
+	if texture_size.x <= 0 or texture_size.y <= 0:
+		return
 	
-	if inventory_items.size() < max_inventory_slots:
-		var item_data = {
-			"id": item_id,
-			"count": count,
-			"icon": weapon_database.get(item_id, {}).get("icon", "")
-		}
-		inventory_items.append(item_data)
-		if is_inventory_open:
-			update_inventory_display()
-		return true
+	# Calculate the available area (leaving some padding)
+	var padding = 8  # 4 pixels padding on each side
+	var available_size = target_slot_size - Vector2(padding, padding)
 	
-	print("Inventory full!")
+	# Calculate scale to fit within available area while maintaining aspect ratio
+	var scale_x = available_size.x / texture_size.x
+	var scale_y = available_size.y / texture_size.y
+	var scale_factor = min(scale_x, scale_y)  # Use smaller scale to maintain aspect ratio
+	
+	# Clamp scale factor to reasonable limits
+	scale_factor = clamp(scale_factor, 0.1, 2.0)
+	
+	# Set the texture rect properties for proper fitting
+	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	
+	# Apply custom scaling if needed
+	var final_size = texture_size * scale_factor
+	if final_size.x > available_size.x or final_size.y > available_size.y:
+		# If still too big, force it to fit
+		icon.expand_mode = TextureRect.EXPAND_FIT_HEIGHT_PROPORTIONAL
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	
+	print("Fitted sprite - Original: ", texture_size, " Scale: ", scale_factor, " Final: ", final_size)
+
+# FIXED: Added missing get_rarity_color function
+func get_rarity_color(rarity: String) -> Color:
+	"""Get color based on item rarity"""
+	match rarity:
+		"common":
+			return Color(0.7, 0.7, 0.7)  # Gray
+		"uncommon":
+			return Color(0.3, 0.8, 0.3)  # Green
+		"rare":
+			return Color(0.3, 0.3, 1.0)  # Blue
+		"epic":
+			return Color(0.8, 0.3, 0.8)  # Purple
+		"legendary":
+			return Color(1.0, 0.6, 0.0)  # Orange
+		_:
+			return Color(0.7, 0.7, 0.7)  # Default gray
+
+func apply_rarity_effects(slot: Control, rarity_color: Color, is_equipped: bool):
+	"""Apply visual effects based on item rarity"""
+	if not slot.has_node("Background"):
+		return
+		
+	var background = slot.get_node("Background")
+	var style_box = background.get_theme_stylebox("panel")
+	
+	if style_box is StyleBoxFlat:
+		var new_style = style_box.duplicate()
+		
+		if is_equipped:
+			# Equipped items get gold border
+			new_style.border_color = Color.GOLD
+			new_style.border_width_top = 3
+			new_style.border_width_bottom = 3
+			new_style.border_width_left = 3
+			new_style.border_width_right = 3
+			
+			# Add equipped glow effect
+			if slot.has_node("InnerGlow"):
+				var inner_glow = slot.get_node("InnerGlow")
+				var glow_style = inner_glow.get_theme_stylebox("panel")
+				if glow_style is StyleBoxFlat:
+					var new_glow = glow_style.duplicate()
+					new_glow.bg_color = Color.GOLD * 0.3
+					inner_glow.add_theme_stylebox_override("panel", new_glow)
+		else:
+			# Non-equipped items get rarity-colored border
+			new_style.border_color = rarity_color
+			new_style.border_width_top = 2
+			new_style.border_width_bottom = 2
+			new_style.border_width_left = 2
+			new_style.border_width_right = 2
+			
+			# Add subtle rarity glow for rare+ items
+			var rarity_name = get_rarity_name(rarity_color)
+			if rarity_name in ["rare", "epic", "legendary"] and slot.has_node("InnerGlow"):
+				var inner_glow = slot.get_node("InnerGlow")
+				var glow_style = inner_glow.get_theme_stylebox("panel")
+				if glow_style is StyleBoxFlat:
+					var new_glow = glow_style.duplicate()
+					new_glow.bg_color = rarity_color * 0.2
+					inner_glow.add_theme_stylebox_override("panel", new_glow)
+		
+		background.add_theme_stylebox_override("panel", new_style)
+
+func get_rarity_name(rarity_color: Color) -> String:
+	"""Get rarity name from color for effect application"""
+	if rarity_color.is_equal_approx(Color(0.7, 0.7, 0.7)):
+		return "common"
+	elif rarity_color.is_equal_approx(Color(0.3, 0.8, 0.3)):
+		return "uncommon" 
+	elif rarity_color.is_equal_approx(Color(0.3, 0.3, 1.0)):
+		return "rare"
+	elif rarity_color.is_equal_approx(Color(0.8, 0.3, 0.8)):
+		return "epic"
+	elif rarity_color.is_equal_approx(Color(1.0, 0.6, 0.0)):
+		return "legendary"
+	else:
+		return "common"
+
+# Enhanced version of the create_enhanced_inventory_slot function with better icon handling
+func create_enhanced_inventory_slot(index: int) -> Control:
+	var slot = Control.new()
+	slot.custom_minimum_size = slot_size
+	slot.name = "InventorySlot" + str(index)
+	
+	# Enhanced background with gradient effect
+	var background = Panel.new()
+	background.name = "Background"
+	background.anchor_left = 0.0
+	background.anchor_top = 0.0
+	background.anchor_right = 1.0
+	background.anchor_bottom = 1.0
+	
+	# Create stylish background with gradient
+	var style_box = StyleBoxFlat.new()
+	style_box.bg_color = Color(0.15, 0.12, 0.08, 0.95)  # Rich dark brown
+	style_box.border_width_top = 2
+	style_box.border_width_bottom = 3
+	style_box.border_width_left = 2
+	style_box.border_width_right = 3
+	style_box.border_color = Color(0.4, 0.3, 0.2, 0.8)  # Bronze border
+	style_box.corner_radius_top_left = 6
+	style_box.corner_radius_top_right = 6
+	style_box.corner_radius_bottom_left = 6
+	style_box.corner_radius_bottom_right = 6
+	
+	# Add subtle shadow effect
+	style_box.shadow_color = Color(0, 0, 0, 0.3)
+	style_box.shadow_size = 2
+	style_box.shadow_offset = Vector2(2, 2)
+	
+	background.add_theme_stylebox_override("panel", style_box)
+	slot.add_child(background)
+	
+	# Inner glow effect
+	var inner_glow = Panel.new()
+	inner_glow.name = "InnerGlow"
+	inner_glow.anchor_left = 0.05
+	inner_glow.anchor_top = 0.05
+	inner_glow.anchor_right = 0.95
+	inner_glow.anchor_bottom = 0.95
+	
+	var glow_style = StyleBoxFlat.new()
+	glow_style.bg_color = Color(0.25, 0.2, 0.15, 0.3)
+	glow_style.corner_radius_top_left = 4
+	glow_style.corner_radius_top_right = 4
+	glow_style.corner_radius_bottom_left = 4
+	glow_style.corner_radius_bottom_right = 4
+	inner_glow.add_theme_stylebox_override("panel", glow_style)
+	slot.add_child(inner_glow)
+	
+	# Item icon with better scaling and positioning
+	var item_icon = TextureRect.new()
+	item_icon.name = "ItemIcon"
+	item_icon.anchor_left = 0.1
+	item_icon.anchor_top = 0.1
+	item_icon.anchor_right = 0.9
+	item_icon.anchor_bottom = 0.9
+	item_icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	item_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	slot.add_child(item_icon)
+	
+	# Quantity label with better styling
+	var count_label = Label.new()
+	count_label.name = "CountLabel"
+	count_label.anchor_left = 0.6
+	count_label.anchor_top = 0.6
+	count_label.anchor_right = 1.0
+	count_label.anchor_bottom = 1.0
+	count_label.add_theme_font_size_override("font_size", 14)
+	count_label.add_theme_color_override("font_color", Color.WHITE)
+	count_label.add_theme_color_override("font_shadow_color", Color.BLACK)
+	count_label.add_theme_constant_override("shadow_offset_x", 1)
+	count_label.add_theme_constant_override("shadow_offset_y", 1)
+	count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	count_label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+	count_label.text = ""
+	slot.add_child(count_label)
+	
+	# Enhanced selection highlight with animation
+	var selection_highlight = Panel.new()
+	selection_highlight.name = "SelectionHighlight"
+	selection_highlight.anchor_left = 0.0
+	selection_highlight.anchor_top = 0.0
+	selection_highlight.anchor_right = 1.0
+	selection_highlight.anchor_bottom = 1.0
+	selection_highlight.visible = false
+	
+	var highlight_style = StyleBoxFlat.new()
+	highlight_style.bg_color = Color.TRANSPARENT
+	highlight_style.border_width_top = 3
+	highlight_style.border_width_bottom = 3
+	highlight_style.border_width_left = 3
+	highlight_style.border_width_right = 3
+	highlight_style.border_color = Color(1.0, 0.8, 0.0, 0.9)  # Golden highlight
+	highlight_style.corner_radius_top_left = 6
+	highlight_style.corner_radius_top_right = 6
+	highlight_style.corner_radius_bottom_left = 6
+	highlight_style.corner_radius_bottom_right = 6
+	selection_highlight.add_theme_stylebox_override("panel", highlight_style)
+	slot.add_child(selection_highlight)
+	
+	# Hover effect panel
+	var hover_highlight = Panel.new()
+	hover_highlight.name = "HoverHighlight"
+	hover_highlight.anchor_left = 0.0
+	hover_highlight.anchor_top = 0.0
+	hover_highlight.anchor_right = 1.0
+	hover_highlight.anchor_bottom = 1.0
+	hover_highlight.visible = false
+	
+	var hover_style = StyleBoxFlat.new()
+	hover_style.bg_color = Color(0.3, 0.25, 0.2, 0.4)
+	hover_style.border_width_top = 2
+	hover_style.border_width_bottom = 2
+	hover_style.border_width_left = 2
+	hover_style.border_width_right = 2
+	hover_style.border_color = Color(0.6, 0.5, 0.4, 0.7)
+	hover_style.corner_radius_top_left = 6
+	hover_style.corner_radius_top_right = 6
+	hover_style.corner_radius_bottom_left = 6
+	hover_style.corner_radius_bottom_right = 6
+	hover_highlight.add_theme_stylebox_override("panel", hover_style)
+	slot.add_child(hover_highlight)
+	
+	# Interactive button
+	var button = Button.new()
+	button.name = "ClickDetector"
+	button.anchor_left = 0.0
+	button.anchor_top = 0.0
+	button.anchor_right = 1.0
+	button.anchor_bottom = 1.0
+	button.flat = true
+	# FIXED: Connect to proper callback functions
+	button.pressed.connect(_on_slot_clicked.bind(index))
+	button.mouse_entered.connect(_on_slot_hover_start.bind(index))
+	button.mouse_exited.connect(_on_slot_hover_end.bind(index))
+	slot.add_child(button)
+	
+	return slot
+
+# FIXED: Added missing callback functions
+func _on_slot_clicked(slot_index: int):
+	print("Slot clicked: ", slot_index)
+	selected_slot_index = slot_index
+	update_slot_selection()
+	
+	# Handle item interactions
+	if item_manager:
+		var inventory_items = item_manager.get_inventory_items()
+		if slot_index < inventory_items.size():
+			var item = inventory_items[slot_index]
+			handle_item_interaction(item, slot_index)
+
+func _on_slot_hover_start(slot_index: int):
+	if slot_index >= 0 and slot_index < inventory_slots.size():
+		var slot = inventory_slots[slot_index]
+		if slot.has_node("HoverHighlight"):
+			slot.get_node("HoverHighlight").visible = true
+
+func _on_slot_hover_end(slot_index: int):
+	if slot_index >= 0 and slot_index < inventory_slots.size():
+		var slot = inventory_slots[slot_index]
+		if slot.has_node("HoverHighlight"):
+			slot.get_node("HoverHighlight").visible = false
+
+func handle_item_interaction(item: Dictionary, slot_index: int):
+	# Right-click or double-click logic for using items
+	var item_type = item.get("data", {}).get("type", "")
+	
+	if item_type == "consumable":
+		# Use consumable item
+		if item_manager:
+			item_manager.use_item(item.get("id", ""))
+	elif item_type == "weapon":
+		# Equip/unequip weapon
+		if item_manager:
+			item_manager.equip_weapon(item.get("id", ""))
+
+func update_slot_selection():
+	for i in range(inventory_slots.size()):
+		var slot = inventory_slots[i]
+		if slot.has_node("SelectionHighlight"):
+			slot.get_node("SelectionHighlight").visible = (i == selected_slot_index)
+
+func refresh_inventory_display():
+	if not item_manager:
+		return
+	
+	var inventory_items = item_manager.get_inventory_items()
+	
+	# Clear all slots first
+	for slot in inventory_slots:
+		clear_slot(slot)
+	
+	# Display items in slots
+	for i in range(min(inventory_items.size(), inventory_slots.size())):
+		var item = inventory_items[i]
+		var slot = inventory_slots[i]
+		display_item_in_slot(slot, item, i)
+
+func clear_slot(slot: Control):
+	if slot.has_node("ItemIcon"):
+		slot.get_node("ItemIcon").texture = null
+	if slot.has_node("CountLabel"):
+		slot.get_node("CountLabel").text = ""
+
+func _on_inventory_updated():
+	refresh_inventory_display()
+
+# Function to spawn test pickup items for debugging
+func debug_spawn_pickup_items():
+	# FIXED: Use proper ItemManager reference and get_tree() method
+	if not item_manager:
+		print("ItemManager not found for spawning test items")
+		return
+	
+	var item_ids = item_manager.get_all_item_ids()
+	var spawn_positions = [
+		Vector2(100, 100),
+		Vector2(150, 100), 
+		Vector2(200, 100),
+		Vector2(100, 150),
+		Vector2(150, 150)
+	]
+	
+	for i in range(min(item_ids.size(), spawn_positions.size())):
+		var pickup_item = PickupItem.create_pickup_item(item_ids[i], spawn_positions[i])
+		get_tree().current_scene.add_child(pickup_item)
+		print("Spawned pickup item: ", item_ids[i], " at ", spawn_positions[i])
+
+# Public API functions for external interaction
+func add_item_to_inventory(item_id: String, quantity: int = 1) -> bool:
+	if item_manager:
+		return item_manager.add_item_to_inventory(item_id, quantity)
 	return false
-
-func remove_item_from_inventory(item_id: String, count: int = 1) -> bool:
-	if has_node("/root/ItemManager"):
-		var item_manager = get_node("/root/ItemManager")
-		return item_manager.remove_item_from_inventory(item_id, count)
-	
-	for i in range(inventory_items.size()):
-		if inventory_items[i].id == item_id:
-			inventory_items[i].count -= count
-			if inventory_items[i].count <= 0:
-				inventory_items.remove_at(i)
-			if is_inventory_open:
-				update_inventory_display()
-			return true
-	return false
-
-func _input(event):
-	if event.is_action_pressed("ui_select"):
-		toggle_inventory()
-	
-	for i in range(1, 10):
-		var action_name = "slot_" + str(i)
-		if InputMap.has_action(action_name) and event.is_action_pressed(action_name):
-			select_inventory_slot(i - 1)
 
 func toggle_inventory():
-	print("Toggling inventory")
-	
-	if is_inventory_open:
-		hide_inventory_ui()
-		selected_slot_index = -1  
-	else:
-		show_inventory_ui()
-		update_inventory_display()
-		update_weapon_display()
+	if inventory_panel:
+		inventory_panel.visible = !inventory_panel.visible
 
-func select_inventory_slot(index: int):
-	if not is_inventory_open or index >= max_inventory_slots:
-		return
-	
-	selected_slot_index = index
-	update_inventory_display()  
-	
-	if index == 0:
-		if not current_weapon_data.is_empty():
-			var weapon_name = current_weapon_data.get("name", "Unknown Weapon")
-			print("Selected equipped weapon: ", weapon_name)
-			show_notification("Equipped: " + weapon_name, 2.0)
-		return
-	
-	var items_to_show = []
-	if has_node("/root/ItemManager"):
-		var item_manager = get_node("/root/ItemManager")
-		items_to_show = item_manager.get_inventory_items()
-	else:
-		items_to_show = inventory_items
-	
-	var inventory_index = index - 1
-	
-	if inventory_index >= 0 and inventory_index < items_to_show.size():
-		var item = items_to_show[inventory_index]
-		var item_name = ""
-		
-		if "data" in item:
-			item_name = item.data.get("name", "Unknown Item")
-		elif "id" in item and item.id in weapon_database:
-			item_name = weapon_database[item.id].get("name", item.id)
-		else:
-			item_name = item.get("name", item.get("id", "Unknown"))
-		
-		print("Selected item: ", item_name)
-		show_notification("Selected: " + item_name, 2.0)
-		
-		if Input.is_action_just_pressed("ui_accept"): 
-			use_or_equip_item_at_inventory_index(inventory_index)
-
-func use_or_equip_item_at_inventory_index(inventory_index: int):
-	var items_to_show = []
-	if has_node("/root/ItemManager"):
-		var item_manager = get_node("/root/ItemManager")
-		items_to_show = item_manager.get_inventory_items()
-	else:
-		items_to_show = inventory_items
-	
-	if inventory_index >= items_to_show.size():
-		return
-	
-	var item = items_to_show[inventory_index]
-	var item_id = ""
-	
-	if "data" in item:
-		item_id = item.data.get("id", "")
-	else:
-		item_id = item.get("id", "")
-	
-	if item_id in weapon_database:
-		on_player_weapon_changed(item_id)
-		show_notification("Equipped: " + weapon_database[item_id].get("name", item_id))
-	else:
-		print("Used item: ", item_id)
-		show_notification("Used: " + item_id)
-
-func show_damage_number(damage: int, position: Vector2):
-	var damage_label = Label.new()
-	damage_label.text = str(damage)
-	damage_label.add_theme_font_size_override("font_size", 24)
-	damage_label.add_theme_color_override("font_color", Color.RED)
-	damage_label.add_theme_color_override("font_shadow_color", Color.BLACK)
-	damage_label.add_theme_constant_override("shadow_offset_x", 2)
-	damage_label.add_theme_constant_override("shadow_offset_y", 2)
-	damage_label.position = position
-	add_child(damage_label)
-	
-	var tween = create_tween()
-	tween.parallel().tween_property(damage_label, "position:y", position.y - 50, 1.0)
-	tween.parallel().tween_property(damage_label, "modulate:a", 0.0, 1.0)
-	tween.tween_callback(damage_label.queue_free)
-
-func show_notification(text: String, duration: float = 3.0):
-	print("Notification: ", text)
-	
-	var notification_label = Label.new()
-	notification_label.text = text
-	notification_label.add_theme_font_size_override("font_size", 16)
-	notification_label.add_theme_color_override("font_color", Color.WHITE)
-	notification_label.add_theme_color_override("font_shadow_color", Color.BLACK)
-	notification_label.add_theme_constant_override("shadow_offset_x", 1)
-	notification_label.add_theme_constant_override("shadow_offset_y", 1)
-	notification_label.position = Vector2(50, 100)
-	add_child(notification_label)
-	
-	var tween = create_tween()
-	tween.tween_delay(duration - 1.0)
-	tween.tween_property(notification_label, "modulate:a", 0.0, 1.0)
-	tween.tween_callback(notification_label.queue_free)
-
-func is_inventory_ui_open() -> bool:
-	return is_inventory_open
-
-func is_weapon_ui_visible() -> bool:
-	return weapon_container.visible if weapon_container else false
-
-func get_selected_slot_index() -> int:
-	return selected_slot_index
-
-func get_inventory_item_at_index(index: int) -> Dictionary:
-	var items_to_show = []
-	if has_node("/root/ItemManager"):
-		var item_manager = get_node("/root/ItemManager")
-		items_to_show = item_manager.get_inventory_items()
-	else:
-		items_to_show = inventory_items
-	
-	if index >= 0 and index < items_to_show.size():
-		return items_to_show[index]
-	return {}
-
-func debug_add_random_items():
-	var item_ids = weapon_database.keys()
-	for i in range(3): 
-		var random_id = item_ids[i % item_ids.size()]
-		add_item_to_inventory(random_id, randi_range(1, 2))
-	print("Added test weapons to inventory")
-
-func force_update_display():
-	if is_inventory_open:
-		sync_weapon_from_player()
-		update_inventory_display()
-		update_weapon_display()
-		print("Forced UI update")
+func show_notification(message: String, duration: float = 2.0):
+	print("Notification: ", message)
+	# You can implement a proper notification system here

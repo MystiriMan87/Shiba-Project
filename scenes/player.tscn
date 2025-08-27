@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://hqa6411o6hsf"]
+[gd_scene load_steps=22 format=3 uid="uid://hqa6411o6hsf"]
 
 [ext_resource type="Script" uid="uid://dqw7kqxhj2hen" path="res://scripts/player.gd" id="1_g2els"]
 [ext_resource type="Texture2D" uid="uid://bbtlix5m7kq1u" path="res://Assets/Snoblin_Prototype_Character/Assets/Prototype_Character/prototype_character.png" id="2_qhqgy"]
@@ -241,6 +241,9 @@ radius = 50.04
 
 [sub_resource type="Curve" id="Curve_dqkch"]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_qlg0r"]
+radius = 44.0
+
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_g2els")
 
@@ -288,3 +291,10 @@ visible = false
 width_curve = SubResource("Curve_dqkch")
 script = ExtResource("4_dqkch")
 trail_color = Color(1, 1, 1, 1)
+
+[node name="PickupArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 255
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea"]
+shape = SubResource("CircleShape2D_qlg0r")
