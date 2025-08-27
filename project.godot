@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 ItemManager="*res://item_manager.tscn"
 ParticleEffectsManager="res://scripts/Particle_Effects_Manager.gd"
+AdvancedDropSystem="*res://scripts/AdvancedDropSystem.gd"
 
 [display]
 

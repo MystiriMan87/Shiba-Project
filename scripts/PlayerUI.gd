@@ -480,7 +480,6 @@ func _on_inventory_updated():
 
 # Function to spawn test pickup items for debugging
 func debug_spawn_pickup_items():
-	# FIXED: Use proper ItemManager reference and get_tree() method
 	if not item_manager:
 		print("ItemManager not found for spawning test items")
 		return

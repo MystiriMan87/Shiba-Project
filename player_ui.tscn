@@ -21,7 +21,7 @@ offset_left = 86.0
 offset_top = 86.0
 offset_right = 160.0
 offset_bottom = 113.0
-scale = Vector2(5, 5)
+scale = Vector2(6, 6)
 
 [node name="HealthIcon" type="TextureRect" parent="HealthContainer"]
 layout_mode = 2

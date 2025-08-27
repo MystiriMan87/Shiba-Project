@@ -8,6 +8,18 @@ extends CharacterBody2D
 @export var detection_range = 150
 @export var attack_range = 100
 
+#@export var drop_chance: float = 0.7
+#@export var rare_drop_chance: float = 0.1
+#@export var min_drop_quantity: int = 1
+#@export var max_drop_quantity: int = 3
+
+#Place holders
+#@export var common_drops: Array[String] = ["health_potion", "mana_potion", "coin"]
+#@export var uncommon_drops: Array[String] = ["steel_sword", "magic_ring"]
+#@export var rare_drops: Array[String] = ["legendary_sword", "ancient_artifact"]
+
+@export var enemy_type: String = "slime" 
+
 @export var jump_force = 300
 @export var jump_windup_duration = 0.8
 @export var jump_duration = 0.6
@@ -479,6 +491,9 @@ func die():
 	is_jumping = false
 	is_moving = false
 	current_state = SlimeState.IDLE
+	#drop_items()
+	DropSystem.handle_enemy_death(enemy_type, global_position, get_tree())
+	#queue_free()
 	
 	if windup_bar:
 		windup_bar.visible = false
@@ -493,6 +508,49 @@ func die():
 	tween.parallel().tween_property(sprite, "modulate:a", 0.0, 0.5)
 	tween.parallel().tween_property(sprite, "scale", Vector2(1.5, 0.5), 0.5)
 	tween.tween_callback(queue_free)
+	
+	
+#func drop_items():
+	#"""Handle item dropping when enemy dies"""
+	#print("Rolling for item drops...")
+#
+	#if randf() > drop_chance:
+		#print("No items dropped")
+		#return
+	#
+	#var dropped_items: Array[Dictionary] = []
+	#var drop_pool: Array[String] = []
+	#var rarity_roll = randf()
+	#
+	#if rarity_roll < rare_drop_chance:
+		## Rare drop (10% chance)
+		#drop_pool = rare_drops
+		#print("Rolling for rare drop!")
+	#elif rarity_roll < rare_drop_chance + 0.2:  # 20% chance for uncommon
+		## Uncommon drop
+		#drop_pool = uncommon_drops
+		#print("Rolling for uncommon drop!")
+	#else:
+		## Common drop
+		#drop_pool = common_drops
+		#print("Rolling for common drop!")
+	#if drop_pool.size() > 0:
+		#var random_item = drop_pool[randi() % drop_pool.size()]
+		#var quantity = randi_range(min_drop_quantity, max_drop_quantity)
+	#
+	#var drop_data = {
+			#"item_id": random_item,
+			#"quantity": quantity,
+			#"position": global_position
+		#}
+		#dropped_items.append(drop_data)
+		#
+		#print("Dropping: ", random_item, " x", quantity)
+		#
+		## Spawn the pickup item in the world
+		#spawn_pickup_item(drop_data)
+
+
 
 func _on_detection_area_entered(body):
 	if body.is_in_group("player"):
