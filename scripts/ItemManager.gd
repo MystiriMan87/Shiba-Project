@@ -1,9 +1,10 @@
-# ItemManager.gd - Fixed version
+# ItemManager.gd - Fixed version with proper scaling
 extends Node
 
 signal weapon_changed(weapon_data)
 signal item_picked_up(item_data)
 signal inventory_updated()
+signal weapon_equipped(weapon_data)
 
 var weapons_database = {}
 var items_database = {}
@@ -14,23 +15,24 @@ var max_inventory_size = 20
 func _ready():
 	load_weapons_database()
 	load_items_database()
-	equip_weapon("iron_axe")  # Start with iron axe since iron_sword is commented out
+	equip_weapon("iron_axe")
 
 func load_weapons_database():
 	weapons_database = {
-		"iron_sword": {  # FIXED: Uncommented iron_sword
+		"iron_sword": {
 			"id": "iron_sword",
 			"name": "Iron Sword",
 			"type": "weapon",
 			"damage": 1,
 			"attack_speed": 1.0,
 			"attack_range": 50,
-			"icon_path": "res://icon.svg",  # Using fallback since original path may not exist
-			"sprite_path": "res://icon.svg",
+			"icon_path": "res://textures/items/weapons/iron_sword.png",
+			"sprite_path": "res://textures/items/weapons/iron_sword.png",
 			"description": "A basic iron sword",
 			"rarity": "common",
 			"stackable": false,
-			"max_stack": 1
+			"max_stack": 1,
+			"weapon_scale": 2  # NEW: Scale for when used as weapon
 		},
 		"iron_axe": {
 			"id": "iron_axe",
@@ -44,21 +46,68 @@ func load_weapons_database():
 			"description": "A heavy iron axe",
 			"rarity": "uncommon",
 			"stackable": false,
-			"max_stack": 1
+			"max_stack": 1,
+			"weapon_scale": 2.5  # Larger weapon
 		},
-		"wooden_bow": {  # FIXED: Uncommented wooden_bow
+		"wooden_bow": {
 			"id": "wooden_bow",
 			"name": "Wooden Bow",
 			"type": "weapon",
 			"damage": 1,
 			"attack_speed": 1.2,
 			"attack_range": 80,
-			"icon_path": "res://icon.svg",  # Using fallback
-			"sprite_path": "res://icon.svg",
+			"icon_path": "res://textures/items/weapons/wooden_bow.png",
+			"sprite_path": "res://textures/items/weapons/wooden_bow.png",
 			"description": "A simple wooden bow",
 			"rarity": "common",
 			"stackable": false,
-			"max_stack": 1
+			"max_stack": 1,
+			"weapon_scale": 1.6
+		},
+		"rusty_dagger": {
+			"id": "rusty_dagger",
+			"name": "Rusty Dagger",
+			"type": "weapon",
+			"damage": 3,
+			"attack_speed": 1.5,
+			"attack_range": 35,
+			"icon_path": "res://textures/items/weapons/rusty_dagger.png",
+			"sprite_path": "res://textures/items/weapons/rusty_dagger.png",
+			"description": "An old, worn dagger. Still sharp enough to be dangerous.",
+			"rarity": "common",
+			"stackable": false,
+			"max_stack": 1,
+			"weapon_scale": 1.2  # Smaller weapon
+		},
+		"steel_sword": {
+			"id": "steel_sword",
+			"name": "Steel Sword",
+			"type": "weapon",
+			"damage": 5,
+			"attack_speed": 1.1,
+			"attack_range": 55,
+			"icon_path": "res://textures/items/weapons/steel_sword.png",
+			"sprite_path": "res://textures/items/weapons/steel_sword.png",
+			"description": "A well-crafted steel blade.",
+			"rarity": "uncommon",
+			"stackable": false,
+			"max_stack": 1,
+			"weapon_scale": 1.5
+		},
+		"legendary_sword": {
+			"id": "legendary_sword",
+			"name": "Legendary Sword",
+			"type": "weapon",
+			"damage": 15,
+			"attack_speed": 1.3,
+			"attack_range": 60,
+			"icon_path": "res://textures/items/weapons/legendary_sword.png",
+			"sprite_path": "res://textures/items/weapons/legendary_sword.png",
+			"description": "A blade of legend, humming with ancient power.",
+			"rarity": "legendary",
+			"stackable": false,
+			"max_stack": 1,
+			"weapon_scale": 2.0  # Large legendary weapon
 		}
 	}
 
@@ -70,8 +119,20 @@ func load_items_database():
 			"type": "consumable",
 			"effect": "heal",
 			"effect_value": 2,
-			"icon_path": "res://icon.svg",
+			"icon_path": "res://textures/items/consumables/health_potion.png",
 			"description": "Restores 2 health points",
+			"rarity": "common",
+			"stackable": true,
+			"max_stack": 5
+		},
+		"mana_potion": {
+			"id": "mana_potion",
+			"name": "Mana Potion",
+			"type": "consumable",
+			"effect": "restore_mana",
+			"effect_value": 3,
+			"icon_path": "res://textures/items/consumables/mana_potion.png",
+			"description": "Restores 3 mana points",
 			"rarity": "common",
 			"stackable": true,
 			"max_stack": 5
@@ -80,19 +141,331 @@ func load_items_database():
 			"id": "magic_crystal",
 			"name": "Magic Crystal",
 			"type": "material",
-			"icon_path": "res://icon.svg",
+			"icon_path": "res://textures/items/materials/magic_crystal.png",
 			"description": "A mysterious glowing crystal",
 			"rarity": "rare",
 			"stackable": true,
 			"max_stack": 10
+		},
+		"coin": {
+			"id": "coin",
+			"name": "Gold Coin",
+			"type": "currency",
+			"icon_path": "res://textures/items/currency/coin.png",
+			"description": "Standard currency of the realm.",
+			"rarity": "common",
+			"stackable": true,
+			"max_stack": 99,
+			"value": 1
+		},
+		"iron_ore": {
+			"id": "iron_ore",
+			"name": "Iron Ore",
+			"type": "material",
+			"icon_path": "res://textures/items/materials/iron_ore.png",
+			"description": "Raw iron ore, useful for crafting.",
+			"rarity": "common",
+			"stackable": true,
+			"max_stack": 20
+		},
+		"dragon_scale": {
+			"id": "dragon_scale",
+			"name": "Dragon Scale",
+			"type": "material",
+			"icon_path": "res://textures/items/materials/dragon_scale.png",
+			"description": "A scale from an ancient dragon.",
+			"rarity": "legendary",
+			"stackable": true,
+			"max_stack": 5
+		},
+		"magic_ring": {
+			"id": "magic_ring",
+			"name": "Magic Ring",
+			"type": "accessory",
+			"icon_path": "res://textures/items/accessories/magic_ring.png",
+			"description": "A ring imbued with magical energy.",
+			"rarity": "rare",
+			"stackable": false,
+			"max_stack": 1,
+			"magic_bonus": 10
+		},
+		"ancient_artifact": {
+			"id": "ancient_artifact",
+			"name": "Ancient Artifact",
+			"type": "artifact",
+			"icon_path": "res://textures/items/artifacts/ancient_artifact.png",
+			"description": "An artifact of unknown origin and immense power.",
+			"rarity": "legendary",
+			"stackable": false,
+			"max_stack": 1
+		},
+		"fire_gem": {
+			"id": "fire_gem",
+			"name": "Fire Gem",
+			"type": "gem",
+			"icon_path": "res://textures/items/gems/fire_gem.png",
+			"description": "A gem that radiates intense heat.",
+			"rarity": "epic",
+			"stackable": true,
+			"max_stack": 10,
+			"element": "fire"
 		}
 	}
 
+# FIXED: Function to handle weapon switching from inventory
+func equip_weapon_from_inventory(item_id: String) -> bool:
+	"""Equip weapon from inventory and return old weapon to inventory"""
+	print("Attempting to equip weapon from inventory: ", item_id)
+	
+	var weapon_data = get_weapon_data(item_id)
+	if weapon_data.is_empty():
+		print("Item is not a weapon or doesn't exist: ", item_id)
+		return false
+	
+	# Check if player has this weapon in inventory
+	var has_weapon = false
+	for inventory_item in player_inventory:
+		if inventory_item.data.id == item_id and inventory_item.quantity > 0:
+			has_weapon = true
+			break
+	
+	if not has_weapon:
+		print("Player doesn't have weapon in inventory: ", item_id)
+		return false
+	
+	# Store current equipped weapon to return to inventory
+	var old_weapon = equipped_weapon
+	
+	# Remove the new weapon from inventory
+	if not remove_item_from_inventory(item_id, 1):
+		print("Failed to remove weapon from inventory")
+		return false
+	
+	# Equip the new weapon
+	equipped_weapon = weapon_data.duplicate()
+	
+	# Return old weapon to inventory if there was one
+	if old_weapon and not old_weapon.is_empty():
+		add_item_to_inventory(old_weapon.id, 1)
+		print("Returned old weapon to inventory: ", old_weapon.name)
+	
+	# Update player stats and notify systems
+	var player = get_tree().get_first_node_in_group("player")
+	if player:
+		update_player_weapon_stats(player, equipped_weapon)
+		update_player_weapon_sprite(player, equipped_weapon)
+	
+	# Emit signals
+	weapon_changed.emit(equipped_weapon)
+	weapon_equipped.emit(equipped_weapon)
+	inventory_updated.emit()
+	
+	print("Successfully equipped weapon: ", weapon_data.name)
+	return true
+
+# FIXED: Function to update player's weapon sprite with proper scaling
+func update_player_weapon_sprite(player: CharacterBody2D, weapon_data: Dictionary):
+	"""Update the player's attack sprite to show the new weapon with proper scale"""
+	var attack_sprite = null
+	
+	# Try to find the attack sprite node
+	if player.has_node("AttackSprite"):
+		attack_sprite = player.get_node("AttackSprite")
+	elif player.has_node("WeaponSprite"):
+		attack_sprite = player.get_node("WeaponSprite")
+	elif player.has_node("Sword"):
+		attack_sprite = player.get_node("Sword")
+	
+	if not attack_sprite:
+		print("No attack sprite found on player")
+		return
+	
+	# Load the weapon sprite
+	var sprite_path = weapon_data.get("sprite_path", weapon_data.get("icon_path", ""))
+	if sprite_path != "" and ResourceLoader.exists(sprite_path):
+		var weapon_texture = load(sprite_path)
+		if weapon_texture:
+			attack_sprite.texture = weapon_texture
+			print("Updated player weapon sprite to: ", sprite_path)
+			
+			# FIXED: Use weapon-specific scale for combat
+			var weapon_scale = weapon_data.get("weapon_scale", 1.5)
+			attack_sprite.scale = Vector2(weapon_scale, weapon_scale)
+			print("Set weapon scale to: ", weapon_scale)
+		else:
+			print("Failed to load weapon texture: ", sprite_path)
+	else:
+		print("Weapon sprite path not found or doesn't exist: ", sprite_path)
+
+# FIXED: Enhanced texture loading with proper inventory scaling
+func get_item_texture(item_id: String) -> Texture2D:
+	"""Load and return item texture with fallback support"""
+	var item_data = get_item_data(item_id)
+	var icon_path = item_data.get("icon_path", "")
+	
+	if icon_path != "" and ResourceLoader.exists(icon_path):
+		var texture = load(icon_path)
+		if texture is Texture2D:
+			print("Loaded custom texture for ", item_id, ": ", icon_path)
+			return texture
+		else:
+			print("Invalid texture format for: ", icon_path)
+	else:
+		print("Custom texture not found: ", icon_path, " for item: ", item_id)
+	
+	# Try fallback texture based on item type/rarity
+	var fallback_texture = get_fallback_texture(item_data)
+	if fallback_texture:
+		return fallback_texture
+	
+	# Final fallback to Godot's default icon
+	var default_path = "res://icon.svg"
+	if ResourceLoader.exists(default_path):
+		return load(default_path)
+	
+	return null
+
+func get_fallback_texture(item_data: Dictionary) -> Texture2D:
+	"""Generate fallback texture based on item type and rarity"""
+	var item_type = item_data.get("type", "unknown")
+	var rarity = item_data.get("rarity", "common")
+	
+	# Try type-specific fallbacks first
+	var type_fallbacks = {
+		"weapon": "res://textures/fallbacks/weapon_default.png",
+		"consumable": "res://textures/fallbacks/potion_default.png",
+		"material": "res://textures/fallbacks/material_default.png",
+		"currency": "res://textures/fallbacks/coin_default.png"
+	}
+	
+	if type_fallbacks.has(item_type):
+		var fallback_path = type_fallbacks[item_type]
+		if ResourceLoader.exists(fallback_path):
+			return load(fallback_path)
+	
+	# Generate colored texture based on rarity if no fallback exists
+	return create_rarity_texture(rarity)
+
+func create_rarity_texture(rarity: String) -> ImageTexture:
+	"""Create a simple colored texture based on rarity"""
+	var colors = {
+		"common": Color.LIGHT_GRAY,
+		"uncommon": Color.GREEN,
+		"rare": Color.BLUE,
+		"epic": Color.PURPLE,
+		"legendary": Color.ORANGE
+	}
+	
+	var color = colors.get(rarity, Color.WHITE)
+	var size = Vector2i(24, 24)  # FIXED: Smaller default size for inventory
+	
+	var image = Image.create(size.x, size.y, false, Image.FORMAT_RGBA8)
+	
+	# Fill with transparent background
+	image.fill(Color.TRANSPARENT)
+	
+	# Create border
+	var border_width = 1  # FIXED: Thinner border
+	for x in range(size.x):
+		for y in range(size.y):
+			if x < border_width or x >= size.x - border_width or y < border_width or y >= size.y - border_width:
+				image.set_pixel(x, y, Color.BLACK)
+			elif x < border_width + 1 or x >= size.x - border_width - 1 or y < border_width + 1 or y >= size.y - border_width - 1:
+				image.set_pixel(x, y, color.darkened(0.3))
+			else:
+				image.set_pixel(x, y, color)
+	
+	var texture = ImageTexture.new()
+	texture.set_image(image)
+	return texture
+
+# FIXED: Function to create properly scaled sprites for inventory items
+func create_item_sprite(item_id: String, target_size: Vector2 = Vector2(28, 28)) -> Sprite2D:
+	"""Create a properly configured Sprite2D for an item in inventory"""
+	var sprite = Sprite2D.new()
+	var texture = get_item_texture(item_id)
+	
+	if texture:
+		sprite.texture = texture
+		
+		# FIXED: Better scaling calculation for inventory slots
+		var texture_size = texture.get_size()
+		if texture_size.x > 0 and texture_size.y > 0:
+			# Calculate scale to fit within target size with some padding
+			var padding = 4  # Leave some space around the edges
+			var available_size = target_size - Vector2(padding, padding)
+			
+			var scale_x = available_size.x / texture_size.x
+			var scale_y = available_size.y / texture_size.y
+			var scale_factor = min(scale_x, scale_y)
+			
+			# Clamp the scale to reasonable bounds
+			scale_factor = clamp(scale_factor, 0.1, 2.0)
+			
+			sprite.scale = Vector2(scale_factor, scale_factor)
+			print("Created inventory sprite for ", item_id, " with scale: ", scale_factor)
+	
+	return sprite
+
+# NEW: Function specifically for creating inventory item sprites
+func create_inventory_item_sprite(item_id: String, slot_size: Vector2 = Vector2(32, 32)) -> Sprite2D:
+	"""Create a sprite specifically sized for inventory slots"""
+	var sprite = Sprite2D.new()
+	var texture = get_item_texture(item_id)
+	
+	if texture:
+		sprite.texture = texture
+		
+		var texture_size = texture.get_size()
+		if texture_size.x > 0 and texture_size.y > 0:
+			# For inventory, we want items to fit nicely in slots
+			var max_size = slot_size * 0.8  # Use 80% of slot size
+			
+			var scale_x = max_size.x / texture_size.x
+			var scale_y = max_size.y / texture_size.y
+			var scale_factor = min(scale_x, scale_y)
+			
+			# Ensure minimum visibility
+			scale_factor = max(scale_factor, 0.3)
+			
+			sprite.scale = Vector2(scale_factor, scale_factor)
+	
+	return sprite
+
+# Function to validate all texture paths
+func validate_all_textures():
+	"""Debug function to check which textures are missing"""
+	print("=== TEXTURE VALIDATION ===")
+	
+	var all_items = {}
+	all_items.merge(weapons_database)
+	all_items.merge(items_database)
+	
+	var missing_count = 0
+	var found_count = 0
+	
+	for item_id in all_items.keys():
+		var item_data = all_items[item_id]
+		var icon_path = item_data.get("icon_path", "")
+		
+		if icon_path == "":
+			print("❌ ", item_id, " - No icon_path specified")
+			missing_count += 1
+		elif ResourceLoader.exists(icon_path):
+			print("✅ ", item_id, " - Found: ", icon_path)
+			found_count += 1
+		else:
+			print("❌ ", item_id, " - Missing: ", icon_path)
+			missing_count += 1
+	
+	print("Found: ", found_count, " | Missing: ", missing_count)
+	print("==========================")
+
+# Existing functions remain unchanged
 func get_weapon_data(weapon_id: String) -> Dictionary:
 	return weapons_database.get(weapon_id, {})
 
 func get_item_data(item_id: String) -> Dictionary:
-	# Check both weapons and items databases
 	var data = weapons_database.get(item_id, {})
 	if data.is_empty():
 		data = items_database.get(item_id, {})
@@ -110,6 +483,7 @@ func equip_weapon(weapon_id: String) -> bool:
 	var player = get_tree().get_first_node_in_group("player")
 	if player:
 		update_player_weapon_stats(player, equipped_weapon)
+		update_player_weapon_sprite(player, equipped_weapon)
 	
 	print("Equipped weapon: ", weapon_data.name)
 	return true
@@ -124,6 +498,7 @@ func update_player_weapon_stats(player: CharacterBody2D, weapon_data: Dictionary
 	if "attack_speed" in weapon_data:
 		player.attack_duration = 0.4 / weapon_data.attack_speed
 
+# All other existing functions remain the same...
 func add_item_to_inventory(item_id: String, quantity: int = 1) -> bool:
 	var item_data = get_item_data(item_id)
 	if item_data.is_empty():
@@ -178,7 +553,6 @@ func add_item_to_inventory(item_id: String, quantity: int = 1) -> bool:
 	print("Successfully added all items to inventory")
 	return true
 
-# Rest of the methods remain the same...
 func remove_item_from_inventory(item_id: String, quantity: int = 1) -> bool:
 	print("Removing from inventory: ", item_id, " x", quantity)
 	
@@ -240,7 +614,6 @@ func use_item(item_id: String) -> bool:
 			print("Unknown item effect: ", effect)
 			return false
 	
-	# Remove the used item
 	remove_item_from_inventory(item_id, 1)
 	return true
 
@@ -308,7 +681,6 @@ func switch_to_previous_weapon():
 	
 	equip_weapon(weapon_ids[prev_index])
 
-# Debug functions
 func debug_print_inventory():
 	print("=== INVENTORY DEBUG ===")
 	print("Total items in inventory: ", player_inventory.size())
@@ -317,3 +689,15 @@ func debug_print_inventory():
 		print("Slot ", i, ": ", item.data.name, " x", item.quantity, " (", item.data.id, ")")
 	print("Equipped weapon: ", equipped_weapon.get("name", "None") if equipped_weapon else "None")
 	print("=======================")
+
+func debug_add_test_items():
+	"""Add various items for testing purposes"""
+	print("Adding test items...")
+	add_item_to_inventory("health_potion", 3)
+	add_item_to_inventory("coin", 15)
+	add_item_to_inventory("iron_ore", 5)
+	add_item_to_inventory("fire_gem", 2)
+	add_item_to_inventory("rusty_dagger", 1)
+	add_item_to_inventory("steel_sword", 1)
+	add_item_to_inventory("wooden_bow", 1)
+	print("Test items added!")

@@ -13,6 +13,22 @@ func _ready():
 	spawn_pickup_item("wooden_bow", Vector2(600, 300))
 	
 	print("Spawned test pickup items")
+	
+		# Test texture loading
+	ItemManager.validate_all_textures()
+	
+	# Add some items to inventory
+	ItemManager.debug_add_test_items()
+	
+	# Test individual texture loading
+	var texture = ItemManager.get_item_texture("health_potion")
+	if texture:
+		print("Successfully loaded health potion texture!")
+	
+	# Create a sprite for testing
+	var test_sprite = ItemManager.create_item_sprite("coin", Vector2(64, 64))
+	add_child(test_sprite)
+	test_sprite.position = Vector2(100, 100)
 
 func spawn_pickup_item(item_id: String, position: Vector2, quantity: int = 1):
 	# FIXED: Use the static create function instead of trying to load a .tscn file

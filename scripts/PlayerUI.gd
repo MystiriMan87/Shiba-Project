@@ -266,6 +266,24 @@ func get_rarity_name(rarity_color: Color) -> String:
 		return "legendary"
 	else:
 		return "common"
+		
+		
+func _on_inventory_slot_clicked(slot_index: int):
+	var item_manager = get_node("/root/ItemManager")
+	if not item_manager:
+		return
+	
+	var inventory_items = item_manager.get_inventory_items()
+	if slot_index >= inventory_items.size():
+		return
+	
+	var clicked_item = inventory_items[slot_index]
+	
+	# Check if it's a weapon
+	if clicked_item.data.get("type", "") == "weapon":
+		item_manager.equip_weapon_from_inventory(clicked_item.data.id)
+	elif clicked_item.data.get("type", "") == "consumable":
+		item_manager.use_item(clicked_item.data.id)
 
 # Enhanced version of the create_enhanced_inventory_slot function with better icon handling
 func create_enhanced_inventory_slot(index: int) -> Control:

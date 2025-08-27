@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://pfq6sxnk6ju"
-path="res://.godot/imported/spr_wep_iron_long_0.png-966cb5a37831740ffd5ca1635e6714bb.ctex"
+uid="uid://ct0bamx0ra7en"
+path="res://.godot/imported/rusty_dagger.png-c7a0b961a364cda4c4340578d909afc3.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/oubliette_weapons - free/spr_wep_iron_long_0.png"
-dest_files=["res://.godot/imported/spr_wep_iron_long_0.png-966cb5a37831740ffd5ca1635e6714bb.ctex"]
+source_file="res://textures/items/weapons/rusty_dagger.png"
+dest_files=["res://.godot/imported/rusty_dagger.png-c7a0b961a364cda4c4340578d909afc3.ctex"]
 
 [params]
 

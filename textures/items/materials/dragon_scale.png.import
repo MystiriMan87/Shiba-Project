@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bn71f30t4rck2"
-path="res://.godot/imported/spr_wep_brnz_sword_2.png-1ea420983ac7d928fb820c24aaaa04d5.ctex"
+uid="uid://5j4bb8k8kfak"
+path="res://.godot/imported/dragon_scale.png-16c226c5a6868402ad0c23f72bf76217.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/oubliette_weapons - free/spr_wep_brnz_sword_2.png"
-dest_files=["res://.godot/imported/spr_wep_brnz_sword_2.png-1ea420983ac7d928fb820c24aaaa04d5.ctex"]
+source_file="res://textures/items/materials/dragon_scale.png"
+dest_files=["res://.godot/imported/dragon_scale.png-16c226c5a6868402ad0c23f72bf76217.ctex"]
 
 [params]
 
