@@ -28,6 +28,9 @@ extends CharacterBody2D
 @export var pickup_range = 40
 @export var auto_pickup_enabled = true
 
+# ADD THIS SIGNAL - This is what was missing!
+signal health_changed(new_health: int)
+
 var is_attacking = false
 var attack_timer = 0.0
 var cooldown_timer = 0.0
@@ -64,7 +67,8 @@ var is_moving = false
 @onready var attack_collision = $AttackArea/CollisionShape2D if has_node("AttackArea/CollisionShape2D") else null
 @onready var attack_sprite = $AttackSprite if has_node("AttackSprite") else null
 @onready var health_bar = $HealthBar if has_node("HealthBar") else null
-@onready var ui_health_bar = $"../UI/HealthBar" if has_node("../UI/HealthBar") else null
+# Remove this line - it's causing conflicts with the UI health bar
+# @onready var ui_health_bar = $"../UI/HealthBar" if has_node("../UI/HealthBar") else null
 
 # Pickup system nodes
 @onready var pickup_area = $PickupArea if has_node("PickupArea") else null
@@ -287,6 +291,10 @@ func take_damage(amount: int, source: Node = null):
 	current_health -= amount
 	damage_immunity_timer = damage_immunity_duration
 	damage_flash_timer = damage_flash_duration
+	
+	# EMIT THE SIGNAL HERE - This was missing!
+	health_changed.emit(current_health)
+	
 	update_health_display()
 	
 	if sprite:
@@ -306,23 +314,31 @@ func take_damage(amount: int, source: Node = null):
 	return true
 
 func update_health_display():
+	# Only update the player's local health bar if it exists
 	if health_bar:
 		health_bar.max_value = max_health
 		health_bar.value = current_health
 	
-	if ui_health_bar:
-		ui_health_bar.max_value = max_health
-		ui_health_bar.value = current_health
+	# Don't directly update UI health bar - let the signal handle it
+	print("Player health updated: ", current_health, "/", max_health)
 
 func die():
 	current_health = max_health
+	# EMIT SIGNAL ON RESPAWN TOO
+	health_changed.emit(current_health)
 	update_health_display()
 	damage_immunity_timer = 0.0
 	player_knockback_velocity = Vector2.ZERO
 
 func heal(amount: int):
+	var old_health = current_health
 	current_health = min(current_health + amount, max_health)
-	update_health_display()
+	
+	# Only emit signal if health actually changed
+	if current_health != old_health:
+		health_changed.emit(current_health)
+		update_health_display()
+		print("Player healed: ", current_health, "/", max_health)
 
 func apply_knockback(direction: Vector2, force: float):
 	var knockback_force = force * knockback_resistance
@@ -484,6 +500,9 @@ func get_current_health() -> int:
 
 func get_max_health() -> int:
 	return max_health
+
+func get_health() -> int:
+	return current_health
 
 func can_take_damage() -> bool:
 	return damage_immunity_timer <= 0

@@ -30,7 +30,9 @@ func _ready():
 	setup_ui_layout()
 	setup_inventory_ui()
 	
-	# Connect signals
+	# Connect signals - WAIT FOR PLAYER TO BE READY
+	await get_tree().process_frame  # Wait one frame to ensure player is fully initialized
+	
 	if item_manager:
 		if not item_manager.inventory_updated.is_connected(_on_inventory_updated):
 			item_manager.inventory_updated.connect(_on_inventory_updated)
@@ -38,10 +40,13 @@ func _ready():
 			item_manager.item_picked_up.connect(_on_item_picked_up)
 	
 	if player:
-		# Connect player health changes if the signal exists
+		# Connect player health changes - the signal should exist now
 		if player.has_signal("health_changed"):
 			if not player.health_changed.is_connected(_on_player_health_changed):
 				player.health_changed.connect(_on_player_health_changed)
+				print("Connected to player health_changed signal")
+		else:
+			print("Warning: Player doesn't have health_changed signal")
 	
 	# Initial UI updates
 	update_health_display()
@@ -166,9 +171,11 @@ func update_health_display():
 	var current_health = 100
 	var max_health = 100
 	
-	# Get health from player if available
+	# Get health from player using the proper methods
 	if player.has_method("get_health"):
 		current_health = player.get_health()
+	elif player.has_method("get_current_health"):
+		current_health = player.get_current_health()
 	elif "health" in player:
 		current_health = player.health
 	elif "current_health" in player:
@@ -183,6 +190,8 @@ func update_health_display():
 	health_bar.max_value = max_health
 	health_bar.value = current_health
 	health_label.text = "Health: " + str(current_health) + "/" + str(max_health)
+	
+	print("UI Health updated: ", current_health, "/", max_health)
 	
 	# Change color based on health percentage
 	var health_percentage = float(current_health) / float(max_health)
@@ -205,6 +214,7 @@ func update_health_display():
 
 func _on_player_health_changed(new_health: int):
 	"""Called when player health changes"""
+	print("Health changed signal received: ", new_health)
 	update_health_display()
 
 func _on_item_picked_up(item_data: Dictionary):
@@ -231,7 +241,7 @@ func handle_item_interaction(item: Dictionary, slot_index: int):
 				match effect:
 					"heal":
 						show_notification("Used " + item_name + " (+%d HP)" % effect_value, Color.GREEN)
-						# Force update health display
+						# Force update health display after a small delay
 						await get_tree().process_frame  # Wait one frame for ItemManager to process
 						update_health_display()
 					"restore_mana":
@@ -549,7 +559,7 @@ func clear_slot(slot: Control):
 
 func _on_inventory_updated():
 	refresh_inventory_display()
-	update_health_display()  # Update health when inventory changes
+	# Don't automatically update health here - it should only update from player signals
 
 # Public API
 func add_item_to_inventory(item_id: String, quantity: int = 1) -> bool:

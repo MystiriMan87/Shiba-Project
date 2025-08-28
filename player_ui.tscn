@@ -15,6 +15,7 @@ mouse_filter = 1
 script = ExtResource("1_lwipk")
 
 [node name="HealthContainer" type="HBoxContainer" parent="."]
+visible = false
 texture_filter = 1
 layout_mode = 1
 offset_left = 86.0
@@ -24,11 +25,13 @@ offset_bottom = 113.0
 scale = Vector2(6, 6)
 
 [node name="HealthIcon" type="TextureRect" parent="HealthContainer"]
+visible = false
 layout_mode = 2
 expand_mode = 3
 stretch_mode = 3
 
 [node name="HealthBar" type="ProgressBar" parent="HealthContainer"]
+visible = false
 custom_minimum_size = Vector2(50, 12)
 layout_mode = 2
 show_percentage = false
