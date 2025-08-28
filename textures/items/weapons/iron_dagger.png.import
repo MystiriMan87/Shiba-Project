@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://btbayqpjwe48l"
-path="res://.godot/imported/spr_wep_stone_sword_0.png-6788cf3df92d3e55e545793b83093211.ctex"
+uid="uid://cakbxnp81l8ed"
+path="res://.godot/imported/iron_dagger.png-231d6c05b2722b9e40f07963f9f3f9b6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/oubliette_weapons - free/spr_wep_stone_sword_0.png"
-dest_files=["res://.godot/imported/spr_wep_stone_sword_0.png-6788cf3df92d3e55e545793b83093211.ctex"]
+source_file="res://textures/items/weapons/iron_dagger.png"
+dest_files=["res://.godot/imported/iron_dagger.png-231d6c05b2722b9e40f07963f9f3f9b6.ctex"]
 
 [params]
 

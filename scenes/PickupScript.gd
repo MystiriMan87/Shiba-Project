@@ -88,7 +88,7 @@ func setup_sprite():
 			print("Loaded sprite texture: ", icon_path)
 			
 			# Scale sprite to appropriate size for pickup items
-			var target_size = Vector2(32, 32)
+			var target_size = Vector2(48, 48)
 			if texture.get_size().x > 0 and texture.get_size().y > 0:
 				var scale_x = target_size.x / texture.get_size().x
 				var scale_y = target_size.y / texture.get_size().y

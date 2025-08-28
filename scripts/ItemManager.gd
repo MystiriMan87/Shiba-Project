@@ -49,35 +49,50 @@ func load_weapons_database():
 			"max_stack": 1,
 			"weapon_scale": 2.5  # Larger weapon
 		},
-		"wooden_bow": {
-			"id": "wooden_bow",
-			"name": "Wooden Bow",
-			"type": "weapon",
-			"damage": 1,
-			"attack_speed": 1.2,
-			"attack_range": 80,
-			"icon_path": "res://textures/items/weapons/wooden_bow.png",
-			"sprite_path": "res://textures/items/weapons/wooden_bow.png",
-			"description": "A simple wooden bow",
-			"rarity": "common",
-			"stackable": false,
-			"max_stack": 1,
-			"weapon_scale": 1.6
-		},
-		"rusty_dagger": {
-			"id": "rusty_dagger",
-			"name": "Rusty Dagger",
+		#"wooden_bow": {
+			#"id": "wooden_bow",
+			#"name": "Wooden Bow",
+			#"type": "weapon",
+			#"damage": 1,
+			#"attack_speed": 1.2,
+			#"attack_range": 80,
+			#"icon_path": "res://textures/items/weapons/wooden_bow.png",
+			#"sprite_path": "res://textures/items/weapons/wooden_bow.png",
+			#"description": "A simple wooden bow",
+			#"rarity": "common",
+			#"stackable": false,
+			#"max_stack": 1,
+			#"weapon_scale": 1.6
+		#},
+		"iron_dagger": {
+			"id": "iron_dagger",
+			"name": "Iron Dagger",
 			"type": "weapon",
 			"damage": 3,
 			"attack_speed": 1.5,
 			"attack_range": 35,
-			"icon_path": "res://textures/items/weapons/rusty_dagger.png",
-			"sprite_path": "res://textures/items/weapons/rusty_dagger.png",
+			"icon_path": "res://textures/items/weapons/iron_dagger.png",
+			"sprite_path": "res://textures/items/weapons/iron_dagger.png",
 			"description": "An old, worn dagger. Still sharp enough to be dangerous.",
 			"rarity": "common",
 			"stackable": false,
 			"max_stack": 1,
 			"weapon_scale": 1.2  # Smaller weapon
+		},
+		"stone_sword_huge": {
+			"id": "stone_sword_huge",
+			"name": "Huge Stone Sword",
+			"type": "weapon",
+			"damage": 6,
+			"attack_speed": 1.5,
+			"attack_range": 45,
+			"icon_path": "res://textures/items/weapons/stone_sword_huge.png",
+			"sprite_path": "res://textures/items/weapons/stone_sword_huge.png",
+			"description": "An old, worn dagger. Still sharp enough to be dangerous.",
+			"rarity": "common",
+			"stackable": false,
+			"max_stack": 1,
+			"weapon_scale": 4 
 		},
 		"steel_sword": {
 			"id": "steel_sword",
@@ -92,7 +107,7 @@ func load_weapons_database():
 			"rarity": "uncommon",
 			"stackable": false,
 			"max_stack": 1,
-			"weapon_scale": 1.5
+			"weapon_scale": 2.5
 		},
 		"legendary_sword": {
 			"id": "legendary_sword",
@@ -104,12 +119,43 @@ func load_weapons_database():
 			"icon_path": "res://textures/items/weapons/legendary_sword.png",
 			"sprite_path": "res://textures/items/weapons/legendary_sword.png",
 			"description": "A blade of legend, humming with ancient power.",
-			"rarity": "legendary",
+			"rarity": "common",
 			"stackable": false,
 			"max_stack": 1,
 			"weapon_scale": 2.0  # Large legendary weapon
+		},
+		"legendary_mace": {
+			"id": "legendary_mace",
+			"name": "Legendary Mace",
+			"type": "weapon",
+			"damage": 15,
+			"attack_speed": 1.3,
+			"attack_range": 60,
+			"icon_path": "res://textures/items/weapons/legendary_mace.png",
+			"sprite_path": "res://textures/items/weapons/legendary_mace.png",
+			"description": "A blade of legend, humming with ancient power.",
+			"rarity": "common",
+			"stackable": false,
+			"max_stack": 1,
+			"weapon_scale": 2.5  # Large legendary weapon
+		},
+		"steel_hammer": {
+			"id": "steel_hammer",
+			"name": "Steel Hammer",
+			"type": "weapon",
+			"damage": 4,
+			"attack_speed": 1.3,
+			"attack_range": 60,
+			"icon_path": "res://textures/items/weapons/steel_hammer.png",
+			"sprite_path": "res://textures/items/weapons/steel_hammer.png",
+			"description": "A blade of legend, humming with ancient power.",
+			"rarity": "uncommon",
+			"stackable": false,
+			"max_stack": 1,
+			"weapon_scale": 3.0  # Large legendary weapon
 		}
 	}
+	
 
 func load_items_database():
 	items_database = {
@@ -123,7 +169,8 @@ func load_items_database():
 			"description": "Restores 2 health points",
 			"rarity": "common",
 			"stackable": true,
-			"max_stack": 5
+			"max_stack": 5,
+			"weapon_scale": 1.5
 		},
 		"mana_potion": {
 			"id": "mana_potion",
@@ -135,7 +182,8 @@ func load_items_database():
 			"description": "Restores 3 mana points",
 			"rarity": "common",
 			"stackable": true,
-			"max_stack": 5
+			"max_stack": 5,
+			"weapon_scale": 1.5
 		},
 		"magic_crystal": {
 			"id": "magic_crystal",
@@ -145,7 +193,8 @@ func load_items_database():
 			"description": "A mysterious glowing crystal",
 			"rarity": "rare",
 			"stackable": true,
-			"max_stack": 10
+			"max_stack": 10,
+			"weapon_scale": 1.5
 		},
 		"coin": {
 			"id": "coin",
@@ -156,7 +205,8 @@ func load_items_database():
 			"rarity": "common",
 			"stackable": true,
 			"max_stack": 99,
-			"value": 1
+			"value": 1,
+			"weapon_scale": 1.5
 		},
 		"iron_ore": {
 			"id": "iron_ore",
@@ -166,7 +216,8 @@ func load_items_database():
 			"description": "Raw iron ore, useful for crafting.",
 			"rarity": "common",
 			"stackable": true,
-			"max_stack": 20
+			"max_stack": 20,
+			"weapon_scale": 1.5
 		},
 		"dragon_scale": {
 			"id": "dragon_scale",
@@ -176,7 +227,8 @@ func load_items_database():
 			"description": "A scale from an ancient dragon.",
 			"rarity": "legendary",
 			"stackable": true,
-			"max_stack": 5
+			"max_stack": 5,
+			"weapon_scale": 1.5
 		},
 		"magic_ring": {
 			"id": "magic_ring",
@@ -187,7 +239,8 @@ func load_items_database():
 			"rarity": "rare",
 			"stackable": false,
 			"max_stack": 1,
-			"magic_bonus": 10
+			"magic_bonus": 10,
+			"weapon_scale": 1.5
 		},
 		"ancient_artifact": {
 			"id": "ancient_artifact",
@@ -197,7 +250,8 @@ func load_items_database():
 			"description": "An artifact of unknown origin and immense power.",
 			"rarity": "legendary",
 			"stackable": false,
-			"max_stack": 1
+			"max_stack": 1,
+			"weapon_scale": 1.5
 		},
 		"fire_gem": {
 			"id": "fire_gem",
@@ -208,7 +262,8 @@ func load_items_database():
 			"rarity": "epic",
 			"stackable": true,
 			"max_stack": 10,
-			"element": "fire"
+			"element": "fire",
+			"weapon_scale": 1.5
 		}
 	}
 

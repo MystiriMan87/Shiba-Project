@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://8r227wv818l4"
-path="res://.godot/imported/spr_wep_steel_hammer_0.png-1b1ed5dcb27e1734877a59a17476fb2f.ctex"
+uid="uid://btbayqpjwe48l"
+path="res://.godot/imported/stone_sword_huge.png-d9fa020962a973e8f774dc48de8e61b6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/oubliette_weapons - free/spr_wep_steel_hammer_0.png"
-dest_files=["res://.godot/imported/spr_wep_steel_hammer_0.png-1b1ed5dcb27e1734877a59a17476fb2f.ctex"]
+source_file="res://textures/items/weapons/stone_sword_huge.png"
+dest_files=["res://.godot/imported/stone_sword_huge.png-d9fa020962a973e8f774dc48de8e61b6.ctex"]
 
 [params]
 

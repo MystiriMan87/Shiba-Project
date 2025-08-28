@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dalooj04yslnc"
-path="res://.godot/imported/flasks_2_2.png-8193de120ee51c72c0387254cac1d85a.ctex"
+uid="uid://cvsoji4e3r8yo"
+path="res://.godot/imported/legendary_mace.png-2b224cffc681ed411c4660cb577dd2a5.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/flasks/flasks_2_2.png"
-dest_files=["res://.godot/imported/flasks_2_2.png-8193de120ee51c72c0387254cac1d85a.ctex"]
+source_file="res://textures/items/weapons/legendary_mace.png"
+dest_files=["res://.godot/imported/legendary_mace.png-2b224cffc681ed411c4660cb577dd2a5.ctex"]
 
 [params]
 

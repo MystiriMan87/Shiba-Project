@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ct0bamx0ra7en"
-path="res://.godot/imported/rusty_dagger.png-c7a0b961a364cda4c4340578d909afc3.ctex"
+uid="uid://bh3jp8vxtdtnw"
+path="res://.godot/imported/mana_potion2.png-1188b0ddf86e0bc1d9597ee876ae1a2e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://textures/items/weapons/rusty_dagger.png"
-dest_files=["res://.godot/imported/rusty_dagger.png-c7a0b961a364cda4c4340578d909afc3.ctex"]
+source_file="res://textures/items/consumables/mana_potion2.png"
+dest_files=["res://.godot/imported/mana_potion2.png-1188b0ddf86e0bc1d9597ee876ae1a2e.ctex"]
 
 [params]
 

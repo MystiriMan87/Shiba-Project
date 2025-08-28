@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cakbxnp81l8ed"
-path="res://.godot/imported/spr_wep_iron_daggers_0.png-77c9801f69b742365a5a0864deeb084a.ctex"
+uid="uid://8r227wv818l4"
+path="res://.godot/imported/steel_hammer.png-eb15ce29ce35065c18a3315b1fd44636.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/oubliette_weapons - free/spr_wep_iron_daggers_0.png"
-dest_files=["res://.godot/imported/spr_wep_iron_daggers_0.png-77c9801f69b742365a5a0864deeb084a.ctex"]
+source_file="res://textures/items/weapons/steel_hammer.png"
+dest_files=["res://.godot/imported/steel_hammer.png-eb15ce29ce35065c18a3315b1fd44636.ctex"]
 
 [params]
 
