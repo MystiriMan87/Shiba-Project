@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://cyldfa352ei1g"
+path="res://.godot/imported/01. Risk of Rain.mp3-ef91be85249544d2faabc40363a1891e.mp3str"
+
+[deps]
+
+source_file="res://audio/01. Risk of Rain.mp3"
+dest_files=["res://.godot/imported/01. Risk of Rain.mp3-ef91be85249544d2faabc40363a1891e.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

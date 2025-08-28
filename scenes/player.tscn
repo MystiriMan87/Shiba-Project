@@ -246,6 +246,12 @@ radius = 27.0185
 
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_g2els")
+hit_sound_path = "res://audio/hit_sound.mp3"
+hit_sound_volume = -10.0
+pickup_sound_path = "res://audio/pickup_sound.mp3"
+hurt_sound_path = "res://audio/hurt_sound.mp3"
+background_music_path = "res://audio/01. Risk of Rain.mp3"
+trail_color = Color(1, 1, 1, 1)
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture_filter = 1

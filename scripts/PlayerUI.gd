@@ -40,7 +40,6 @@ func _ready():
 			item_manager.item_picked_up.connect(_on_item_picked_up)
 	
 	if player:
-		# Connect player health changes - the signal should exist now
 		if player.has_signal("health_changed"):
 			if not player.health_changed.is_connected(_on_player_health_changed):
 				player.health_changed.connect(_on_player_health_changed)
@@ -284,7 +283,7 @@ func show_notification(message: String, color: Color = Color.WHITE, duration: fl
 
 # Input handling
 func _input(event):
-	if event.is_action_pressed("toggle_inventory"):  # You'll need to define this action
+	if event.is_action_pressed("toggle_inventory"):  
 		toggle_inventory()
 	elif event.is_action_pressed("ui_cancel") and inventory_panel and inventory_panel.visible:
 		inventory_panel.visible = false
@@ -454,7 +453,6 @@ func apply_rarity_effects(slot: Control, rarity_color: Color, is_equipped: bool)
 		
 		background.add_theme_stylebox_override("panel", new_style)
 
-# Keep all your existing slot creation functions...
 func create_enhanced_inventory_slot(index: int) -> Control:
 	var slot = Control.new()
 	slot.custom_minimum_size = slot_size
@@ -559,7 +557,6 @@ func clear_slot(slot: Control):
 
 func _on_inventory_updated():
 	refresh_inventory_display()
-	# Don't automatically update health here - it should only update from player signals
 
 # Public API
 func add_item_to_inventory(item_id: String, quantity: int = 1) -> bool:

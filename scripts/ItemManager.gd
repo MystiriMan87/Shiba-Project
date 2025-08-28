@@ -164,7 +164,7 @@ func load_items_database():
 			"name": "Health Potion",
 			"type": "consumable",
 			"effect": "heal",
-			"effect_value": 2,
+			"effect_value": 1,
 			"icon_path": "res://textures/items/consumables/health_potion.png",
 			"description": "Restores 2 health points",
 			"rarity": "common",

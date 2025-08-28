@@ -24,12 +24,28 @@ extends CharacterBody2D
 @export var attack_range = 50
 @export var swing_arc_half_angle = 60
 
-# Pickup system variables
 @export var pickup_range = 40
 @export var auto_pickup_enabled = true
 
-# ADD THIS SIGNAL - This is what was missing!
-signal health_changed(new_health: int)
+@export_group("Sound Effects")
+@export var hit_sound_path: String = "res://audio/hit_sound.wav"
+@export var hit_sound_volume: float = 0.0
+@export var hit_sound_base_pitch: float = 0.8
+@export var hit_sound_pitch_variation: float = 0.1
+
+@export var pickup_sound_path: String = "res://audio/pickup_sound.wav"
+@export var pickup_sound_volume: float = 0.0
+@export var pickup_sound_base_pitch: float = 1.0
+@export var pickup_sound_pitch_variation: float = 0.2
+
+@export var hurt_sound_path: String = "res://audio/hurt_sound.wav"
+@export var hurt_sound_volume: float = 0.0
+@export var hurt_sound_base_pitch: float = 1.0
+@export var hurt_sound_pitch_variation: float = 0.1
+
+@export var background_music_path: String = "res://audio/background_music.ogg"
+@export var background_music_volume: float = -10.0
+@export var music_autoplay: bool = true
 
 var is_attacking = false
 var attack_timer = 0.0
@@ -61,16 +77,20 @@ var knockback_threshold = 15.0
 var current_animation = ""
 var is_moving = false
 
+signal health_changed(new_health: int)
+
 @onready var sprite = $Sprite2D
 @onready var animation_player = $AnimationPlayer
 @onready var attack_area = $AttackArea if has_node("AttackArea") else null
 @onready var attack_collision = $AttackArea/CollisionShape2D if has_node("AttackArea/CollisionShape2D") else null
 @onready var attack_sprite = $AttackSprite if has_node("AttackSprite") else null
 @onready var health_bar = $HealthBar if has_node("HealthBar") else null
-# Remove this line - it's causing conflicts with the UI health bar
-# @onready var ui_health_bar = $"../UI/HealthBar" if has_node("../UI/HealthBar") else null
 
-# Pickup system nodes
+@onready var hit_audio_player: AudioStreamPlayer2D = null
+@onready var pickup_audio_player: AudioStreamPlayer2D = null
+@onready var hurt_audio_player: AudioStreamPlayer2D = null
+@onready var music_player: AudioStreamPlayer = null
+
 @onready var pickup_area = $PickupArea if has_node("PickupArea") else null
 @onready var pickup_collision = $PickupArea/CollisionShape2D if has_node("PickupArea/CollisionShape2D") else null
 
@@ -79,6 +99,8 @@ func _ready():
 	current_health = max_health
 	update_health_display()
 	setup_pickup_system()
+	setup_sound_effects()
+	setup_background_music()
 	
 	if attack_area:
 		attack_area.monitoring = false
@@ -94,16 +116,127 @@ func _ready():
 	if animation_player:
 		play_animation("Idle_down")
 
+func setup_sound_effects():
+	hit_audio_player = AudioStreamPlayer2D.new()
+	hit_audio_player.name = "HitAudioPlayer"
+	add_child(hit_audio_player)
+	
+	if hit_sound_path != "" and ResourceLoader.exists(hit_sound_path):
+		var hit_sound = load(hit_sound_path)
+		if hit_sound is AudioStream:
+			hit_audio_player.stream = hit_sound
+			hit_audio_player.volume_db = hit_sound_volume
+			hit_audio_player.bus = "Master"
+			hit_audio_player.max_distance = 2000
+			hit_audio_player.attenuation = 0.0
+
+	pickup_audio_player = AudioStreamPlayer2D.new()
+	pickup_audio_player.name = "PickupAudioPlayer"
+	add_child(pickup_audio_player)
+	
+	if pickup_sound_path != "" and ResourceLoader.exists(pickup_sound_path):
+		var pickup_sound = load(pickup_sound_path)
+		if pickup_sound is AudioStream:
+			pickup_audio_player.stream = pickup_sound
+			pickup_audio_player.volume_db = pickup_sound_volume
+			pickup_audio_player.bus = "Master"
+			pickup_audio_player.max_distance = 2000
+			pickup_audio_player.attenuation = 0.0
+
+	hurt_audio_player = AudioStreamPlayer2D.new()
+	hurt_audio_player.name = "HurtAudioPlayer"
+	add_child(hurt_audio_player)
+	
+	if hurt_sound_path != "" and ResourceLoader.exists(hurt_sound_path):
+		var hurt_sound = load(hurt_sound_path)
+		if hurt_sound is AudioStream:
+			hurt_audio_player.stream = hurt_sound
+			hurt_audio_player.volume_db = hurt_sound_volume
+			hurt_audio_player.bus = "Master"
+			hurt_audio_player.max_distance = 2000
+			hurt_audio_player.attenuation = 0.0
+
+func play_hit_sound():
+	if not hit_audio_player or not hit_audio_player.stream:
+		return
+	
+	if hit_audio_player.playing:
+		hit_audio_player.stop()
+	
+	var final_pitch = hit_sound_base_pitch
+	if hit_sound_pitch_variation > 0.0:
+		var pitch_offset = randf_range(-hit_sound_pitch_variation, hit_sound_pitch_variation)
+		final_pitch += pitch_offset
+	
+	hit_audio_player.pitch_scale = clamp(final_pitch, 0.1, 3.0)
+	hit_audio_player.play()
+
+func play_pickup_sound():
+	if not pickup_audio_player or not pickup_audio_player.stream:
+		return
+	
+	if pickup_audio_player.playing:
+		pickup_audio_player.stop()
+	
+	var final_pitch = pickup_sound_base_pitch
+	if pickup_sound_pitch_variation > 0.0:
+		var pitch_offset = randf_range(-pickup_sound_pitch_variation, pickup_sound_pitch_variation)
+		final_pitch += pitch_offset
+	
+	pickup_audio_player.pitch_scale = clamp(final_pitch, 0.1, 3.0)
+	pickup_audio_player.play()
+
+func play_hurt_sound():
+	if not hurt_audio_player or not hurt_audio_player.stream:
+		return
+	
+	if hurt_audio_player.playing:
+		hurt_audio_player.stop()
+	
+	var final_pitch = hurt_sound_base_pitch
+	if hurt_sound_pitch_variation > 0.0:
+		var pitch_offset = randf_range(-hurt_sound_pitch_variation, hurt_sound_pitch_variation)
+		final_pitch += pitch_offset
+	
+	hurt_audio_player.pitch_scale = clamp(final_pitch, 0.1, 3.0)
+	hurt_audio_player.play()
+
+func setup_background_music():
+	music_player = AudioStreamPlayer.new()
+	music_player.name = "MusicPlayer"
+	add_child(music_player)
+	
+	if background_music_path != "" and ResourceLoader.exists(background_music_path):
+		var music = load(background_music_path)
+		if music is AudioStream:
+			music_player.stream = music
+			music_player.volume_db = background_music_volume
+			music_player.bus = "Master"
+			music_player.autoplay = music_autoplay
+			
+			if music_autoplay:
+				music_player.play()
+
+func play_background_music():
+	if music_player and music_player.stream and not music_player.playing:
+		music_player.play()
+
+func stop_background_music():
+	if music_player and music_player.playing:
+		music_player.stop()
+
+func set_music_volume(volume_db: float):
+	if music_player:
+		music_player.volume_db = volume_db
+
 func setup_pickup_system():
-	# Create pickup area if it doesn't exist
 	if not pickup_area:
 		pickup_area = Area2D.new()
 		pickup_area.name = "PickupArea"
 		pickup_area.collision_layer = 0
-		pickup_area.collision_mask = 8  # Items should be on layer 4 (bit 3)
+		pickup_area.collision_mask = 8
 		add_child(pickup_area)
 		
-		# Create collision shape for pickup area
 		pickup_collision = CollisionShape2D.new()
 		pickup_collision.name = "CollisionShape2D"
 		var circle_shape = CircleShape2D.new()
@@ -111,14 +244,11 @@ func setup_pickup_system():
 		pickup_collision.shape = circle_shape
 		pickup_area.add_child(pickup_collision)
 	
-	# Connect pickup signals
 	if pickup_area:
 		if not pickup_area.area_entered.is_connected(_on_pickup_area_entered):
 			pickup_area.area_entered.connect(_on_pickup_area_entered)
 		if not pickup_area.body_entered.is_connected(_on_pickup_body_entered):
 			pickup_area.body_entered.connect(_on_pickup_body_entered)
-		
-		print("Pickup system initialized with range: ", pickup_range)
 
 func _on_pickup_area_entered(area: Area2D):
 	if area.has_method("pickup_item"):
@@ -138,16 +268,15 @@ func add_item_to_inventory(item_data: Dictionary):
 	if item_manager:
 		var success = item_manager.add_item_to_inventory(item_data.get("id", ""), item_data.get("quantity", 1))
 		if success:
+			play_pickup_sound()
 			show_pickup_notification(item_data)
-			print("Picked up item: ", item_data.get("name", item_data.get("id", "Unknown")))
 	else:
-		# Fallback for direct UI management
 		var ui = get_node("../UI") if has_node("../UI") else null
 		if ui and ui.has_method("add_item_to_inventory"):
 			var success = ui.add_item_to_inventory(item_data.get("id", ""), item_data.get("quantity", 1))
 			if success:
+				play_pickup_sound()
 				show_pickup_notification(item_data)
-				print("Picked up item: ", item_data.get("name", item_data.get("id", "Unknown")))
 
 func show_pickup_notification(item_data: Dictionary):
 	var ui = get_node("../UI") if has_node("../UI") else null
@@ -227,7 +356,6 @@ func _physics_process(delta):
 	
 	move_and_slide()
 
-# Rest of the existing functions remain the same...
 func update_animation():
 	if is_attacking:
 		return
@@ -288,11 +416,12 @@ func take_damage(amount: int, source: Node = null):
 	if damage_immunity_timer > 0:
 		return false
 	
+	play_hurt_sound()
+	
 	current_health -= amount
 	damage_immunity_timer = damage_immunity_duration
 	damage_flash_timer = damage_flash_duration
 	
-	# EMIT THE SIGNAL HERE - This was missing!
 	health_changed.emit(current_health)
 	
 	update_health_display()
@@ -314,17 +443,12 @@ func take_damage(amount: int, source: Node = null):
 	return true
 
 func update_health_display():
-	# Only update the player's local health bar if it exists
 	if health_bar:
 		health_bar.max_value = max_health
 		health_bar.value = current_health
-	
-	# Don't directly update UI health bar - let the signal handle it
-	print("Player health updated: ", current_health, "/", max_health)
 
 func die():
 	current_health = max_health
-	# EMIT SIGNAL ON RESPAWN TOO
 	health_changed.emit(current_health)
 	update_health_display()
 	damage_immunity_timer = 0.0
@@ -334,11 +458,9 @@ func heal(amount: int):
 	var old_health = current_health
 	current_health = min(current_health + amount, max_health)
 	
-	# Only emit signal if health actually changed
 	if current_health != old_health:
 		health_changed.emit(current_health)
 		update_health_display()
-		print("Player healed: ", current_health, "/", max_health)
 
 func apply_knockback(direction: Vector2, force: float):
 	var knockback_force = force * knockback_resistance
@@ -477,9 +599,13 @@ func position_attack_hitbox(direction: Vector2):
 
 func _on_attack_area_body_entered(body):
 	if body.has_method("take_damage"):
-		var damage_dealt = body.take_damage(attack_damage)
+		body.take_damage(attack_damage)
+		play_hit_sound()
 	elif body.has_method("on_sword_hit"):
 		body.on_sword_hit()
+		play_hit_sound()
+	else:
+		play_hit_sound()
 
 func get_is_attacking() -> bool:
 	return is_attacking
@@ -510,7 +636,6 @@ func can_take_damage() -> bool:
 func get_knockback_resistance() -> float:
 	return knockback_resistance
 
-# Utility functions for pickup system
 func set_pickup_range(new_range: float):
 	pickup_range = new_range
 	if pickup_collision and pickup_collision.shape is CircleShape2D:
@@ -521,4 +646,3 @@ func get_pickup_range() -> float:
 
 func toggle_auto_pickup():
 	auto_pickup_enabled = !auto_pickup_enabled
-	print("Auto pickup: ", "enabled" if auto_pickup_enabled else "disabled")
