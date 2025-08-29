@@ -195,3 +195,12 @@ max_respawns = 3
 
 [node name="Enemy4" parent="." instance=ExtResource("1_rwgxs")]
 position = Vector2(52, 806)
+
+[node name="Enemy5" parent="." instance=ExtResource("1_rwgxs")]
+position = Vector2(343, 1123)
+
+[node name="Enemy6" parent="." instance=ExtResource("1_rwgxs")]
+position = Vector2(342, 813)
+
+[node name="Enemy7" parent="." instance=ExtResource("1_rwgxs")]
+position = Vector2(190, 970)

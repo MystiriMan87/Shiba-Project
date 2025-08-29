@@ -78,6 +78,8 @@ var current_animation = ""
 var is_moving = false
 
 signal health_changed(new_health: int)
+signal player_died
+signal enemy_killed
 
 @onready var sprite = $Sprite2D
 @onready var animation_player = $AnimationPlayer
@@ -448,11 +450,23 @@ func update_health_display():
 		health_bar.value = current_health
 
 func die():
-	current_health = max_health
-	health_changed.emit(current_health)
-	update_health_display()
-	damage_immunity_timer = 0.0
+	print("Player died!")
+	
+	is_attacking = false
+	is_swing_animating = false
+	velocity = Vector2.ZERO
 	player_knockback_velocity = Vector2.ZERO
+	
+	if animation_player:
+		animation_player.stop()
+	
+	if attack_sprite:
+		attack_sprite.visible = false
+	
+	if attack_area:
+		attack_area.monitoring = false
+	
+	player_died.emit()
 
 func heal(amount: int):
 	var old_health = current_health
@@ -601,6 +615,7 @@ func _on_attack_area_body_entered(body):
 	if body.has_method("take_damage"):
 		body.take_damage(attack_damage)
 		play_hit_sound()
+		enemy_killed.emit()
 	elif body.has_method("on_sword_hit"):
 		body.on_sword_hit()
 		play_hit_sound()
@@ -646,3 +661,9 @@ func get_pickup_range() -> float:
 
 func toggle_auto_pickup():
 	auto_pickup_enabled = !auto_pickup_enabled
+
+func on_enemy_killed():
+	enemy_killed.emit()
+
+func get_spawn_position() -> Vector2:
+	return Vector2(0, 0)
