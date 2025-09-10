@@ -250,6 +250,7 @@ radius = 45.2769
 
 [node name="SkeletonEnemyV2" type="CharacterBody2D"]
 script = ExtResource("1_skeleton")
+max_health = 8
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_idle")

@@ -7,6 +7,12 @@ extends CharacterBody2D
 @export var detection_range = 120
 @export var chase_duration = 5.0
 @export var attack_cooldown = 2.0
+@export var attack_hit_ratio = 0.45
+@export var min_animation_speed = 0.6
+@export var max_animation_speed = 1.6
+@export var attack_speed_multiplier = 1.25
+@export var separation_distance = 20.0
+@export var separation_force = 200.0
 @export var walk_acceleration = 300
 @export var walk_friction = 200
 
@@ -19,6 +25,7 @@ var chase_timer = 0.0
 var attack_timer = 0.0
 var target_velocity = Vector2.ZERO
 var is_moving = false
+var last_speed_ratio: float = 0.0
 
 # Manual animation system
 var animation_timer = 0.0
@@ -51,6 +58,8 @@ func _ready():
 	
 	if animation_player:
 		animation_player.play("idle")
+		if not animation_player.animation_finished.is_connected(_on_animation_finished):
+			animation_player.animation_finished.connect(_on_animation_finished)
 
 func setup_detection_area():
 	if detection_area:
@@ -80,6 +89,7 @@ func _physics_process(delta):
 			handle_death_state(delta)
 	
 	move_and_slide()
+	apply_player_separation(delta)
 
 func handle_idle_state(delta):
 	target_velocity = Vector2.ZERO
@@ -89,6 +99,7 @@ func handle_idle_state(delta):
 	if animation_player:
 		if animation_player.current_animation != "idle":
 			animation_player.play("idle")
+		animation_player.speed_scale = min_animation_speed
 	
 	if player_in_detection_range and player:
 		change_state(SkeletonState.WALKING)
@@ -117,6 +128,7 @@ func handle_walking_state(delta):
 		velocity = velocity.move_toward(target_velocity, walk_acceleration * delta)
 		
 		is_moving = velocity.length() > 5
+		last_speed_ratio = clamp(velocity.length() / speed, 0.0, 1.0)
 		
 		if sprite and direction_to_player.x != 0:
 			sprite.flip_h = direction_to_player.x < 0
@@ -130,9 +142,13 @@ func handle_walking_state(delta):
 					walk_anim = "move"
 				if animation_player.current_animation != walk_anim:
 					animation_player.play(walk_anim)
+				# speed-scale based on movement speed
+				var anim_speed = lerp(min_animation_speed, max_animation_speed, last_speed_ratio)
+				animation_player.speed_scale = anim_speed
 		else:
 			if animation_player and animation_player.current_animation != "idle":
 				animation_player.play("idle")
+			animation_player.speed_scale = min_animation_speed
 	else:
 		change_state(SkeletonState.IDLE)
 
@@ -158,20 +174,47 @@ func start_attack():
 	var attack_len := 0.5
 	if animation_player and animation_player.has_animation("attack"):
 		animation_player.play("attack")
+		# Make attack a bit faster, scaled by last movement speed
+		var base_speed = lerp(min_animation_speed, max_animation_speed, last_speed_ratio)
+		animation_player.speed_scale = base_speed * attack_speed_multiplier
 		attack_len = max(0.05, animation_player.get_animation("attack").length)
 	
-	var hit_time := attack_len * 0.4
+	var scaled: float = max(animation_player.speed_scale, 0.001)
+	var hit_time: float = (attack_len * attack_hit_ratio) / scaled
 	await get_tree().create_timer(hit_time).timeout
 	
 	if player and global_position.distance_to(player.global_position) <= attack_range:
 		player.take_damage(damage)
 	
-	await get_tree().create_timer(attack_len - hit_time).timeout
+	var rest_time: float = (attack_len - (attack_len * attack_hit_ratio)) / scaled
+	await get_tree().create_timer(rest_time).timeout
 	is_attacking = false
 	change_state(SkeletonState.WALKING)
 
+func apply_player_separation(delta):
+	if not player:
+		return
+	var offset: Vector2 = global_position - player.global_position
+	var dist: float = offset.length()
+	if dist <= 0.001:
+		return
+	var min_dist: float = separation_distance
+	if dist < min_dist:
+		var push_dir: Vector2 = offset / dist
+		var penetration: float = min_dist - dist
+		var push_speed: float = separation_force * penetration
+		velocity += push_dir * push_speed * delta
+		# Hard correction to prevent sticking
+		var max_correction: float = min(penetration, 8.0)
+		global_position += push_dir * max_correction
+
 func _noop():
 	pass
+
+func _on_animation_finished(anim_name: String) -> void:
+	if anim_name == "attack" and is_attacking:
+		is_attacking = false
+		change_state(SkeletonState.WALKING)
 
 func take_damage(amount: int):
 	if is_dead:
@@ -187,12 +230,15 @@ func take_damage(amount: int):
 		die()
 
 func die():
+	if is_dead:
+		return
 	is_dead = true
 	current_state = SkeletonState.DEATH
 	
 	var death_len := 0.6
 	if animation_player and animation_player.has_animation("death"):
-		animation_player.play("death")
+		if animation_player.current_animation != "death":
+			animation_player.play("death")
 		death_len = max(0.05, animation_player.get_animation("death").length)
 	
 	var respawn_manager = get_tree().get_first_node_in_group("respawn_manager")
