@@ -1,6 +1,6 @@
 extends Node
 
-@export var respawn_delay = 5.0
+@export var respawn_delay = 3.0
 @export var max_respawns = -1
 
 var respawn_data = []
@@ -42,17 +42,35 @@ func get_enemy_scene_path(enemy: Node) -> String:
 	if "scene_path" in enemy:
 		return enemy.scene_path
 	
+	# Check enemy_type property first (more reliable)
+	if "enemy_type" in enemy:
+		var enemy_type = enemy.enemy_type
+		print("Respawn Manager: Enemy has enemy_type: ", enemy_type)
+		var enemy_scene_map = {
+			"slime": "res://scenes/slime_enemy.tscn",
+			"skeleton": "res://scenes/skeleton_enemy.tscn",
+		}
+		if enemy_type in enemy_scene_map:
+			print("Respawn Manager: Found scene path for enemy_type: ", enemy_scene_map[enemy_type])
+			return enemy_scene_map[enemy_type]
+	
+	# Fallback: check enemy name
 	var enemy_name = enemy.name.to_lower()
+	print("Respawn Manager: Checking enemy name: ", enemy_name)
 	
 	var enemy_scene_map = {
-		"slime": "/Users/alimapekov/shiba-project-game/scenes/enemy.tscn",
+		"slime": "res://scenes/slime_enemy.tscn",
+		"skeleton": "res://scenes/skeleton_enemy.tscn",
 	}
 	
 	for enemy_type in enemy_scene_map:
 		if enemy_type in enemy_name:
+			print("Respawn Manager: Found scene path for enemy name: ", enemy_scene_map[enemy_type])
 			return enemy_scene_map[enemy_type]
 	
-	return "res://scenes/enemies/Enemy.tscn"
+	# Default fallback for any other enemies
+	print("Respawn Manager: Using default fallback scene path")
+	return "res://scenes/slime_enemy.tscn"
 
 func get_enemy_respawn_count(enemy: Node) -> int:
 	if enemy.has_meta("respawn_count"):

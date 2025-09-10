@@ -491,18 +491,20 @@ func die():
 	is_jumping = false
 	is_moving = false
 	current_state = SlimeState.IDLE
-	#drop_items()
+	
+	# Register for respawn BEFORE doing death effects
+	var respawn_manager = get_tree().get_first_node_in_group("respawn_manager")
+	if respawn_manager:
+		respawn_manager.register_enemy_death(self)
+	
+	# Handle drops (including keys)
 	DropSystem.handle_enemy_death(enemy_type, global_position, get_tree())
-	#queue_free()
+	drop_keys()
 	
 	if windup_bar:
 		windup_bar.visible = false
 	
 	collision_shape.disabled = true
-	
-	var respawn_manager = get_tree().get_first_node_in_group("respawn_manager")
-	if respawn_manager:
-			respawn_manager.register_enemy_death(self)
 		
 	var tween = create_tween()
 	tween.parallel().tween_property(sprite, "modulate:a", 0.0, 0.5)
@@ -510,6 +512,33 @@ func die():
 	tween.tween_callback(queue_free)
 	
 	
+func drop_keys():
+	"""Drop keys when enemy dies"""
+	var key_drop_chance = 0.3  # 30% chance to drop a key
+	
+	if randf() < key_drop_chance:
+		var key_type = "wooden"  # Default key type
+		
+		# Different enemies drop different keys
+		match enemy_type:
+			"skeleton":
+				key_type = "iron"  # Skeletons drop iron keys
+			"slime":
+				key_type = "wooden"  # Slimes drop wooden keys
+			_:
+				key_type = "wooden"  # Default to wooden
+		
+		# Spawn the key
+		var key_id = key_type + "_key"
+		var pickup_scene = load("res://scenes/PickupItem.tscn")
+		
+		if pickup_scene:
+			var pickup = pickup_scene.instantiate()
+			get_tree().current_scene.add_child(pickup)
+			pickup.global_position = global_position + Vector2(randf_range(-20, 20), -20)
+			pickup.set_item(key_id, 1)
+			print("Enemy dropped ", key_type, " key!")
+
 #func drop_items():
 	#"""Handle item dropping when enemy dies"""
 	#print("Rolling for item drops...")

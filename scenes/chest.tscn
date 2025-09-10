@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3 uid="uid://d14w75lwsi7ls"]
+
+[ext_resource type="Script" uid="uid://d2dvfwfocjyoi" path="res://scripts/chest.gd" id="1_chest"]
+[ext_resource type="Texture2D" uid="uid://bvdwa3wisfysb" path="res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/chest/chest_1.png" id="2_sy5e1"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_gqd3d"]
+radius = 6.675
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_yue2o"]
+radius = 27.3333
+
+[node name="Chest" type="StaticBody2D"]
+scale = Vector2(4, 4)
+script = ExtResource("1_chest")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_sy5e1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_gqd3d")
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 15
+collision_mask = 15
+
+[node name="AreaCollision" type="CollisionShape2D" parent="Area2D"]
+texture_filter = 1
+shape = SubResource("CircleShape2D_yue2o")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]

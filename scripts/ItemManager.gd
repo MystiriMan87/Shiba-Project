@@ -264,6 +264,42 @@ func load_items_database():
 			"max_stack": 10,
 			"element": "fire",
 			"weapon_scale": 1.5
+		},
+		"wooden_key": {
+			"id": "wooden_key",
+			"name": "Wooden Key",
+			"type": "key",
+			"icon_path": "res://Assets/2D Pixel Dungeon Asset Pack/items/keys/key_wooden.png",
+			"description": "A simple wooden key that can unlock basic chests.",
+			"rarity": "common",
+			"stackable": false,
+			"max_stack": 1,
+			"key_type": "wooden",
+			"weapon_scale": 1.5
+		},
+		"iron_key": {
+			"id": "iron_key",
+			"name": "Iron Key",
+			"type": "key",
+			"icon_path": "res://Assets/2D Pixel Dungeon Asset Pack/items/keys/key_iron.png",
+			"description": "A sturdy iron key for more secure locks.",
+			"rarity": "uncommon",
+			"stackable": false,
+			"max_stack": 1,
+			"key_type": "iron",
+			"weapon_scale": 1.5
+		},
+		"golden_key": {
+			"id": "golden_key",
+			"name": "Golden Key",
+			"type": "key",
+			"icon_path": "res://Assets/2D Pixel Dungeon Asset Pack/items/keys/key_golden.png",
+			"description": "A precious golden key that unlocks rare treasures.",
+			"rarity": "rare",
+			"stackable": false,
+			"max_stack": 1,
+			"key_type": "golden",
+			"weapon_scale": 1.5
 		}
 	}
 

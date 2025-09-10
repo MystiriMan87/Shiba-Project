@@ -302,6 +302,14 @@ func get_input():
 		input.y -= 1
 	return input
 
+func interact_with_chests():
+	var chests = get_tree().get_nodes_in_group("chests")
+	for chest in chests:
+		if chest.global_position.distance_to(global_position) < 50:
+			chest.interact()
+			break
+
+
 func _physics_process(delta):
 	if damage_immunity_timer > 0:
 		damage_immunity_timer -= delta
@@ -327,6 +335,10 @@ func _physics_process(delta):
 		var mouse_pos = get_global_mouse_position()
 		mouse_attack_direction = (mouse_pos - global_position).normalized()
 		start_attack()
+	
+	# Handle chest interaction with E key
+	if Input.is_action_just_pressed('interact'):
+		interact_with_chests()
 	
 	var direction = get_input()
 	is_moving = direction.length() > 0
