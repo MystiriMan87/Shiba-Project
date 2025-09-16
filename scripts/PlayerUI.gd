@@ -1,10 +1,11 @@
 extends Control
 
-@export var slot_size: Vector2 = Vector2(64, 64)
+@export var slot_size: Vector2 = Vector2(72, 72)
 @export var max_inventory_slots: int = 20
 @export var inventory_position: Vector2 = Vector2(100, 80)
 @export var health_bar_position: Vector2 = Vector2(20, 20)
 @export var weapon_scale_factor: float = 0.6
+@export var slot_padding: int = 8
 
 var inventory_slots: Array = []
 var selected_slot_index: int = -1
@@ -124,43 +125,77 @@ func create_health_bar():
 func create_inventory_panel():
 	inventory_panel = Panel.new()
 	inventory_panel.name = "InventoryPanel"
-	inventory_panel.size = Vector2(400, 300)
+	inventory_panel.size = Vector2(500, 390)
 	inventory_panel.position = inventory_position
 	
 	var panel_style = StyleBoxFlat.new()
-	panel_style.bg_color = Color(0.1, 0.08, 0.06, 0.95)
-	panel_style.border_width_top = 2
-	panel_style.border_width_bottom = 2
-	panel_style.border_width_left = 2
-	panel_style.border_width_right = 2
-	panel_style.border_color = Color(0.4, 0.3, 0.2)
-	panel_style.corner_radius_top_left = 8
-	panel_style.corner_radius_top_right = 8
-	panel_style.corner_radius_bottom_left = 8
-	panel_style.corner_radius_bottom_right = 8
+	panel_style.bg_color = Color(0.08, 0.06, 0.05, 0.96)
+	panel_style.border_width_top = 3
+	panel_style.border_width_bottom = 3
+	panel_style.border_width_left = 3
+	panel_style.border_width_right = 3
+	panel_style.border_color = Color(0.5, 0.4, 0.3)
+	panel_style.corner_radius_top_left = 10
+	panel_style.corner_radius_top_right = 10
+	panel_style.corner_radius_bottom_left = 10
+	panel_style.corner_radius_bottom_right = 10
 	inventory_panel.add_theme_stylebox_override("panel", panel_style)
 	
 	add_child(inventory_panel)
 	
+	var header = Panel.new()
+	header.name = "Header"
+	header.position = Vector2(10, 10)
+	header.size = Vector2(480, 34)
+	var header_style = StyleBoxFlat.new()
+	header_style.bg_color = Color(0.12, 0.1, 0.08, 1.0)
+	header_style.border_width_bottom = 2
+	header_style.border_color = Color(0.35, 0.28, 0.2)
+	header_style.corner_radius_top_left = 6
+	header_style.corner_radius_top_right = 6
+	header_style.corner_radius_bottom_left = 6
+	header_style.corner_radius_bottom_right = 6
+	header.add_theme_stylebox_override("panel", header_style)
+	inventory_panel.add_child(header)
+	
 	var title_label = Label.new()
 	title_label.name = "TitleLabel"
 	title_label.text = "Inventory"
-	title_label.position = Vector2(10, 5)
-	title_label.add_theme_font_size_override("font_size", 16)
+	title_label.position = Vector2(12, 6)
+	title_label.add_theme_font_size_override("font_size", 20)
 	title_label.add_theme_color_override("font_color", Color.WHITE)
-	inventory_panel.add_child(title_label)
+	header.add_child(title_label)
+	
+	var content = Panel.new()
+	content.name = "Content"
+	content.position = Vector2(10, 52)
+	content.size = Vector2(480, 326)
+	var content_style = StyleBoxFlat.new()
+	content_style.bg_color = Color(0.09, 0.07, 0.06, 0.9)
+	content_style.border_width_top = 2
+	content_style.border_width_bottom = 2
+	content_style.border_width_left = 2
+	content_style.border_width_right = 2
+	content_style.border_color = Color(0.28, 0.22, 0.16, 0.8)
+	content_style.corner_radius_top_left = 6
+	content_style.corner_radius_top_right = 6
+	content_style.corner_radius_bottom_left = 6
+	content_style.corner_radius_bottom_right = 6
+	content.add_theme_stylebox_override("panel", content_style)
+	inventory_panel.add_child(content)
 	
 	var scroll_container = ScrollContainer.new()
 	scroll_container.name = "ScrollContainer"
-	scroll_container.position = Vector2(10, 30)
-	scroll_container.size = Vector2(380, 260)
-	inventory_panel.add_child(scroll_container)
+	scroll_container.position = Vector2(8, 8)
+	scroll_container.size = Vector2(464, 306)
+	scroll_container.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	content.add_child(scroll_container)
 	
 	inventory_grid = GridContainer.new()
 	inventory_grid.name = "InventoryGrid"
-	inventory_grid.columns = 5
-	inventory_grid.add_theme_constant_override("h_separation", 4)
-	inventory_grid.add_theme_constant_override("v_separation", 4)
+	inventory_grid.columns = 6
+	inventory_grid.add_theme_constant_override("h_separation", 6)
+	inventory_grid.add_theme_constant_override("v_separation", 6)
 	scroll_container.add_child(inventory_grid)
 
 func setup_death_screen():
@@ -338,11 +373,14 @@ func create_enhanced_inventory_slot(index: int) -> Control:
 	
 	var item_icon = TextureRect.new()
 	item_icon.name = "ItemIcon"
-	item_icon.anchor_left = 0.1
-	item_icon.anchor_top = 0.1
-	item_icon.anchor_right = 0.9
-	item_icon.anchor_bottom = 0.9
-	item_icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+	item_icon.anchor_left = 0.0
+	item_icon.anchor_top = 0.0
+	item_icon.anchor_right = 1.0
+	item_icon.anchor_bottom = 1.0
+	item_icon.offset_left = slot_padding
+	item_icon.offset_top = slot_padding
+	item_icon.offset_right = -slot_padding
+	item_icon.offset_bottom = -slot_padding
 	item_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	slot.add_child(item_icon)
 	
@@ -660,8 +698,10 @@ func fit_weapon_sprite_to_slot(icon: TextureRect, texture: Texture2D, target_slo
 	if texture_size.x <= 0 or texture_size.y <= 0:
 		return
 	
-	var padding = 12
-	var available_size = target_slot_size - Vector2(padding, padding)
+	var padding = slot_padding + 6
+	var available_size = target_slot_size - Vector2(padding * 2, padding * 2)
+	available_size.x = max(1.0, available_size.x)
+	available_size.y = max(1.0, available_size.y)
 	
 	var scale_x = available_size.x / texture_size.x
 	var scale_y = available_size.y / texture_size.y
@@ -669,12 +709,11 @@ func fit_weapon_sprite_to_slot(icon: TextureRect, texture: Texture2D, target_slo
 	
 	scale_factor = clamp(scale_factor, 0.05, 1.5)
 	
-	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	
 	var final_size = texture_size * scale_factor
 	if final_size.x > available_size.x or final_size.y > available_size.y:
-		icon.expand_mode = TextureRect.EXPAND_FIT_HEIGHT_PROPORTIONAL
+		scale_factor = min(available_size.x / texture_size.x, available_size.y / texture_size.y)
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 
 func fit_sprite_to_slot(icon: TextureRect, texture: Texture2D, target_slot_size: Vector2):
@@ -685,8 +724,10 @@ func fit_sprite_to_slot(icon: TextureRect, texture: Texture2D, target_slot_size:
 	if texture_size.x <= 0 or texture_size.y <= 0:
 		return
 	
-	var padding = 8
-	var available_size = target_slot_size - Vector2(padding, padding)
+	var padding = slot_padding
+	var available_size = target_slot_size - Vector2(padding * 2, padding * 2)
+	available_size.x = max(1.0, available_size.x)
+	available_size.y = max(1.0, available_size.y)
 	
 	var scale_x = available_size.x / texture_size.x
 	var scale_y = available_size.y / texture_size.y
@@ -694,12 +735,11 @@ func fit_sprite_to_slot(icon: TextureRect, texture: Texture2D, target_slot_size:
 	
 	scale_factor = clamp(scale_factor, 0.1, 2.0)
 	
-	icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	
 	var final_size = texture_size * scale_factor
 	if final_size.x > available_size.x or final_size.y > available_size.y:
-		icon.expand_mode = TextureRect.EXPAND_FIT_HEIGHT_PROPORTIONAL
+		scale_factor = min(available_size.x / texture_size.x, available_size.y / texture_size.y)
 		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 
 func get_rarity_color(rarity: String) -> Color:

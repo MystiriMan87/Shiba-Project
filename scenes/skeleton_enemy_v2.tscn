@@ -7,7 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://dy5wwkftgjfoq" path="res://Assets/Enemy_Animations_Set/enemies-skeleton1_death.png" id="5_death"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
-radius = 16.0
+radius = 9.33928
 
 [sub_resource type="Animation" id="Animation_b3vox"]
 length = 0.001
@@ -249,8 +249,10 @@ _data = {
 radius = 45.2769
 
 [node name="SkeletonEnemyV2" type="CharacterBody2D"]
+scale = Vector2(3, 3)
 script = ExtResource("1_skeleton")
 max_health = 8
+lunge_duration = 0.1
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_idle")
@@ -277,7 +279,7 @@ metadata/_aseprite_wizard_interface_config_ = {
 }
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
+position = Vector2(-2.66667, 6)
 shape = SubResource("CircleShape2D_1")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
@@ -286,14 +288,13 @@ libraries = {
 }
 
 [node name="DetectionArea" type="Area2D" parent="."]
-visible = false
 
 [node name="DetectionCollision" type="CollisionShape2D" parent="DetectionArea"]
 shape = SubResource("CircleShape2D_2")
 
 [node name="AttackArea" type="Area2D" parent="."]
-visible = false
 
 [node name="AttackCollision" type="CollisionShape2D" parent="AttackArea"]
+position = Vector2(-2.66667, 5.66667)
 shape = SubResource("CircleShape2D_1")
 debug_color = Color(1, 0.00392157, 0, 0.419608)

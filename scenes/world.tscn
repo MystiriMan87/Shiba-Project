@@ -215,4 +215,4 @@ is_locked = false
 
 [node name="SkeletonEnemyV2" parent="." instance=ExtResource("10_w7kh3")]
 position = Vector2(537, 223)
-scale = Vector2(3, 3)
+scale = Vector2(4, 4)

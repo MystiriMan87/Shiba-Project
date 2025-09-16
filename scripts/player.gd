@@ -7,6 +7,16 @@ extends CharacterBody2D
 @export var attack_duration = 0.4
 @export var attack_cooldown = 0.1
 
+# Dash settings
+@export var dash_speed = 700
+@export var dash_duration = 0.10
+@export var dash_cooldown = 0.8
+@export var dash_iframe_duration = 0.1
+
+# Dash afterimage effect
+@export var dash_afterimage_interval = 0.03
+@export var dash_afterimage_lifetime = 0.2
+
 @export var max_health = 5
 @export var damage_immunity_duration = 0.3
 @export var knockback_resistance = 0.5
@@ -52,6 +62,14 @@ var attack_timer = 0.0
 var cooldown_timer = 0.0
 var last_direction = Vector2.DOWN
 
+var is_dashing = false
+var dash_timer = 0.0
+var dash_cooldown_timer = 0.0
+var dash_direction = Vector2.ZERO
+var is_dash_iframe = false
+var dash_flash_timer = 0.0
+var dash_afterimage_timer = 0.0
+
 var mouse_attack_direction = Vector2.RIGHT
 var swing_start_angle = 0.0
 var swing_end_angle = 0.0
@@ -88,6 +106,8 @@ signal enemy_killed
 @onready var attack_sprite = $AttackSprite if has_node("AttackSprite") else null
 @onready var health_bar = $HealthBar if has_node("HealthBar") else null
 
+@onready var dash_particles: CPUParticles2D = null
+
 @onready var hit_audio_player: AudioStreamPlayer2D = null
 @onready var pickup_audio_player: AudioStreamPlayer2D = null
 @onready var hurt_audio_player: AudioStreamPlayer2D = null
@@ -103,6 +123,14 @@ func _ready():
 	setup_pickup_system()
 	setup_sound_effects()
 	setup_background_music()
+	setup_dash_particles()
+	
+	# Ensure a "dash" action exists and is bound to Shift
+	if not InputMap.has_action("dash"):
+		InputMap.add_action("dash")
+		var ev := InputEventKey.new()
+		ev.physical_keycode = KEY_SHIFT
+		InputMap.action_add_event("dash", ev)
 	
 	if attack_area:
 		attack_area.monitoring = false
@@ -311,22 +339,44 @@ func interact_with_chests():
 
 
 func _physics_process(delta):
+	# Handle dash white flash (separate from damage flash)
+	if dash_flash_timer > 0.0:
+		dash_flash_timer -= delta
+		if dash_flash_timer <= 0.0 and sprite:
+			sprite.modulate = Color.WHITE
+
+	# Handle damage flash only when not in dash i-frames
 	if damage_immunity_timer > 0:
 		damage_immunity_timer -= delta
-		
-		damage_flash_timer -= delta
-		if damage_flash_timer <= 0:
-			damage_flash_timer = damage_flash_duration
-			if sprite:
-				sprite.modulate = Color.WHITE if sprite.modulate == Color.RED else Color.RED
+		if not is_dash_iframe:
+			damage_flash_timer -= delta
+			if damage_flash_timer <= 0:
+				damage_flash_timer = damage_flash_duration
+				if sprite:
+					sprite.modulate = Color.WHITE if sprite.modulate == Color.RED else Color.RED
 	else:
-		if sprite and sprite.modulate != Color.WHITE:
+		if sprite and sprite.modulate != Color.WHITE and dash_flash_timer <= 0.0:
 			sprite.modulate = Color.WHITE
+		is_dash_iframe = false
 	
 	if is_attacking:
 		attack_timer -= delta
 		if attack_timer <= 0:
 			end_attack()
+
+	# Dash timers
+	if dash_cooldown_timer > 0.0:
+		dash_cooldown_timer -= delta
+	if is_dashing:
+		dash_timer -= delta
+		if dash_timer <= 0.0:
+			is_dashing = false
+		else:
+			# spawn afterimages while dashing
+			dash_afterimage_timer -= delta
+			if dash_afterimage_timer <= 0.0:
+				emit_dash_afterimage()
+				dash_afterimage_timer = dash_afterimage_interval
 	
 	if cooldown_timer > 0:
 		cooldown_timer -= delta
@@ -345,8 +395,19 @@ func _physics_process(delta):
 	
 	if direction.length() > 0 and not is_attacking:
 		last_direction = direction.normalized()
+
+	# Start dash if Shift pressed
+	if Input.is_action_just_pressed('dash') and not is_dashing and dash_cooldown_timer <= 0.0 and not is_attacking:
+		var dash_dir = direction
+		if dash_dir.length() == 0:
+			# If no input, dash toward last faced direction
+			dash_dir = last_direction
+		start_dash(dash_dir.normalized())
 	
-	if player_knockback_velocity.length() > knockback_threshold:
+	if is_dashing:
+		velocity = dash_direction * dash_speed
+		player_knockback_velocity = Vector2.ZERO
+	elif player_knockback_velocity.length() > knockback_threshold:
 		var knockback_influence = 0.7
 		var input_influence = 1.0 - knockback_influence
 		
@@ -369,6 +430,114 @@ func _physics_process(delta):
 		update_sword_swing_animation(delta)
 	
 	move_and_slide()
+
+func start_dash(dir: Vector2):
+	is_dashing = true
+	dash_timer = dash_duration
+	dash_cooldown_timer = dash_cooldown
+	dash_direction = dir
+	# brief i-frames during dash start
+	damage_immunity_timer = max(damage_immunity_timer, dash_iframe_duration)
+	is_dash_iframe = true
+	flash_white(0.08)
+	emit_dash_particles()
+	dash_afterimage_timer = 0.0
+
+func setup_dash_particles():
+	if dash_particles:
+		return
+	
+	dash_particles = CPUParticles2D.new()
+	dash_particles.name = "DashParticles"
+	add_child(dash_particles)
+	
+	# Basic white burst behind the player
+	dash_particles.emitting = false
+	dash_particles.one_shot = true
+	dash_particles.amount = 24
+	dash_particles.lifetime = 0.20
+	dash_particles.preprocess = 0.0
+	dash_particles.explosiveness = 0.9
+	dash_particles.gravity = Vector2.ZERO
+	dash_particles.initial_velocity_min = 120
+	dash_particles.initial_velocity_max = 220
+	dash_particles.spread = 60
+	dash_particles.scale_amount_min = 0.5
+	dash_particles.scale_amount_max = 1.0
+	dash_particles.color = Color(1, 1, 1, 0.9)
+	dash_particles.z_index = -1
+	# Ensure particles stay in world space so they don't move with the player after emission
+	dash_particles.local_coords = false
+
+	# Generate a small white circle texture so particles are visible
+	var img := Image.create(8, 8, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0, 0, 0, 0))
+	var center := Vector2(3.5, 3.5)
+	for y in range(8):
+		for x in range(8):
+			var d = Vector2(x, y).distance_to(center)
+			if d <= 3.0:
+				img.set_pixel(x, y, Color(1, 1, 1, 1))
+	var tex := ImageTexture.create_from_image(img)
+	dash_particles.texture = tex
+
+func emit_dash_particles():
+	if not dash_particles:
+		return
+	
+	dash_particles.global_position = global_position
+	dash_particles.emitting = false
+	dash_particles.restart()
+	dash_particles.emitting = true
+
+func emit_dash_afterimage():
+	if not sprite:
+		return
+	
+	var ghost := Sprite2D.new()
+	ghost.texture = sprite.texture
+	ghost.hframes = sprite.hframes
+	ghost.vframes = sprite.vframes
+	ghost.frame = sprite.frame
+	ghost.centered = sprite.centered
+	ghost.flip_h = sprite.flip_h
+	ghost.flip_v = sprite.flip_v
+	ghost.scale = sprite.scale
+	ghost.rotation = sprite.rotation
+	ghost.z_index = sprite.z_index
+	ghost.modulate = Color(1, 1, 1, 0.8)
+	ghost.top_level = true
+	ghost.global_position = global_position
+
+	var mat := CanvasItemMaterial.new()
+	mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	ghost.material = mat
+
+	var parent := get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
+	if parent:
+		parent.add_child(ghost)
+		var t := create_tween()
+		t.tween_property(ghost, "modulate:a", 0.0, dash_afterimage_lifetime)
+		t.tween_callback(func(): ghost.queue_free())
+
+func flash_white(duration: float = 0.08):
+	if not sprite:
+		return
+	
+	var original_material: Material = sprite.material
+	var mat := CanvasItemMaterial.new()
+	mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	sprite.material = mat
+	sprite.modulate = Color(1, 1, 1, 1)
+	dash_flash_timer = duration
+	
+	var t = create_tween()
+	t.tween_interval(duration)
+	t.tween_callback(func():
+		sprite.material = original_material
+		if dash_flash_timer <= 0.0:
+			sprite.modulate = Color.WHITE
+	)
 
 func update_animation():
 	if is_attacking:

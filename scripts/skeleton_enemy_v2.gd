@@ -15,6 +15,8 @@ extends CharacterBody2D
 @export var separation_force = 200.0
 @export var walk_acceleration = 300
 @export var walk_friction = 200
+@export var lunge_speed: float = 150.0
+@export var lunge_duration: float = 0.12
 
 var current_health
 var is_dead = false
@@ -51,7 +53,7 @@ func _ready():
 	add_to_group("enemies")
 	current_health = max_health
 	collision_layer = 4
-	collision_mask = 1
+	collision_mask = 4
 	
 	setup_detection_area()
 	call_deferred("find_player")
@@ -88,8 +90,8 @@ func _physics_process(delta):
 		SkeletonState.DEATH:
 			handle_death_state(delta)
 	
-	move_and_slide()
 	apply_player_separation(delta)
+	move_and_slide()
 
 func handle_idle_state(delta):
 	target_velocity = Vector2.ZERO
@@ -186,8 +188,22 @@ func start_attack():
 	if player and global_position.distance_to(player.global_position) <= attack_range:
 		player.take_damage(damage)
 	
+	var dir: Vector2 = Vector2.ZERO
+	if player:
+		dir = (player.global_position - global_position).normalized()
+	if dir != Vector2.ZERO:
+		if sprite:
+			sprite.flip_h = dir.x < 0
+		velocity = dir * lunge_speed
+	
 	var rest_time: float = (attack_len - (attack_len * attack_hit_ratio)) / scaled
-	await get_tree().create_timer(rest_time).timeout
+	var lunge_time: float = min(lunge_duration, max(0.0, rest_time * 0.6))
+	if lunge_time > 0.0:
+		await get_tree().create_timer(lunge_time).timeout
+	velocity = Vector2.ZERO
+	var remain_time: float = max(0.0, rest_time - lunge_time)
+	if remain_time > 0.0:
+		await get_tree().create_timer(remain_time).timeout
 	is_attacking = false
 	change_state(SkeletonState.WALKING)
 
