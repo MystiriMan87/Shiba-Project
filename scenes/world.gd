@@ -1,34 +1,49 @@
 # Main.gd - Fixed main scene script
 extends Node2D
 
+@export var debug_spawn_startup_items: bool = false
+
 func _ready():
 	# Wait a frame to ensure all nodes are ready
 	await get_tree().process_frame
 	
-	# Spawn some test items around the world
-	spawn_pickup_item("iron_sword", Vector2(200, 300))
-	spawn_pickup_item("health_potion", Vector2(300, 300), 3)
-	spawn_pickup_item("iron_axe", Vector2(400, 300))
-	spawn_pickup_item("magic_crystal", Vector2(500, 300), 2)
-	spawn_pickup_item("wooden_bow", Vector2(600, 300))
-	
-	print("Spawned test pickup items")
-	
-		# Test texture loading
-	ItemManager.validate_all_textures()
-	
-	# Add some items to inventory
-	ItemManager.debug_add_test_items()
-	
-	# Test individual texture loading
-	var texture = ItemManager.get_item_texture("health_potion")
-	if texture:
-		print("Successfully loaded health potion texture!")
-	
-	# Create a sprite for testing
-	var test_sprite = ItemManager.create_item_sprite("coin", Vector2(64, 64))
-	add_child(test_sprite)
-	test_sprite.position = Vector2(100, 100)
+	if debug_spawn_startup_items:
+		# Spawn some test items around the world
+		spawn_pickup_item("iron_sword", Vector2(200, 300))
+		spawn_pickup_item("health_potion", Vector2(300, 300), 3)
+		spawn_pickup_item("iron_axe", Vector2(400, 300))
+		spawn_pickup_item("magic_crystal", Vector2(500, 300), 2)
+		spawn_pickup_item("wooden_bow", Vector2(600, 300))
+		
+		print("Spawned test pickup items")
+		
+			# Test texture loading
+		ItemManager.validate_all_textures()
+		
+		# Add some items to inventory
+		ItemManager.debug_add_test_items()
+		
+		# Test individual texture loading
+		var texture = ItemManager.get_item_texture("health_potion")
+		if texture:
+			print("Successfully loaded health potion texture!")
+		
+		# Create a sprite for testing
+		var test_sprite = ItemManager.create_item_sprite("coin", Vector2(64, 64))
+		add_child(test_sprite)
+		test_sprite.position = Vector2(100, 100)
+
+	# Ensure player starts without weapon and give starting consumables
+	var item_manager = get_node("/root/ItemManager") if has_node("/root/ItemManager") else null
+	if item_manager:
+		item_manager.add_item_to_inventory("health_potion", 3)
+		item_manager.add_item_to_inventory("dash_flask", 2)
+
+	# Spawn a starting weapon on the floor in the main room (near player)
+	var player = get_tree().get_first_node_in_group("player")
+	if player:
+		var spawn_pos = player.global_position + Vector2(120, 40)
+		spawn_pickup_item("iron_axe", spawn_pos, 1)
 
 func spawn_pickup_item(item_id: String, position: Vector2, quantity: int = 1):
 	# FIXED: Use the static create function instead of trying to load a .tscn file

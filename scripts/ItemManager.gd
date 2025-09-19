@@ -15,7 +15,7 @@ var max_inventory_size = 20
 func _ready():
 	load_weapons_database()
 	load_items_database()
-	equip_weapon("iron_axe")
+	# Start without an equipped weapon by default
 
 func load_weapons_database():
 	weapons_database = {
@@ -181,6 +181,19 @@ func load_items_database():
 			"icon_path": "res://textures/items/consumables/mana_potion.png",
 			"description": "Restores 3 mana points",
 			"rarity": "common",
+			"stackable": true,
+			"max_stack": 5,
+			"weapon_scale": 1.5
+		},
+		"dash_flask": {
+			"id": "dash_flask",
+			"name": "Dash Flask",
+			"type": "consumable",
+			"effect": "restore_dash",
+			"effect_value": 40,
+			"icon_path": "res://textures/items/consumables/mana_potion.png",
+			"description": "Restores dash energy",
+			"rarity": "uncommon",
 			"stackable": true,
 			"max_stack": 5,
 			"weapon_scale": 1.5
@@ -701,6 +714,10 @@ func use_item(item_id: String) -> bool:
 			if player.has_method("restore_mana"):
 				player.restore_mana(effect_value)
 				print("Restored ", effect_value, " mana")
+		"restore_dash":
+			if player.has_method("restore_dash"):
+				player.restore_dash(effect_value)
+				print("Restored ", effect_value, " dash energy")
 		_:
 			print("Unknown item effect: ", effect)
 			return false

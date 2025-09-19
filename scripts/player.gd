@@ -13,6 +13,11 @@ extends CharacterBody2D
 @export var dash_cooldown = 0.8
 @export var dash_iframe_duration = 0.1
 
+# Dash energy (meter)
+@export var max_dash_energy: int = 100
+@export var dash_cost: int = 25
+@export var dash_regen_rate: float = 20.0
+
 # Dash afterimage effect
 @export var dash_afterimage_interval = 0.03
 @export var dash_afterimage_lifetime = 0.2
@@ -70,6 +75,8 @@ var is_dash_iframe = false
 var dash_flash_timer = 0.0
 var dash_afterimage_timer = 0.0
 
+var dash_energy: int = 0
+
 var mouse_attack_direction = Vector2.RIGHT
 var swing_start_angle = 0.0
 var swing_end_angle = 0.0
@@ -98,6 +105,7 @@ var is_moving = false
 signal health_changed(new_health: int)
 signal player_died
 signal enemy_killed
+signal dash_energy_changed(new_energy: int)
 
 @onready var sprite = $Sprite2D
 @onready var animation_player = $AnimationPlayer
@@ -123,7 +131,11 @@ func _ready():
 	setup_pickup_system()
 	setup_sound_effects()
 	setup_background_music()
-	setup_dash_particles()
+	# Dash particles disabled
+	
+	# Initialize dash energy
+	dash_energy = max_dash_energy
+	dash_energy_changed.emit(dash_energy)
 	
 	# Ensure a "dash" action exists and is bound to Shift
 	if not InputMap.has_action("dash"):
@@ -396,8 +408,8 @@ func _physics_process(delta):
 	if direction.length() > 0 and not is_attacking:
 		last_direction = direction.normalized()
 
-	# Start dash if Shift pressed
-	if Input.is_action_just_pressed('dash') and not is_dashing and dash_cooldown_timer <= 0.0 and not is_attacking:
+	# Start dash if Shift pressed and we have energy
+	if Input.is_action_just_pressed('dash') and not is_dashing and dash_cooldown_timer <= 0.0 and not is_attacking and dash_energy >= dash_cost:
 		var dash_dir = direction
 		if dash_dir.length() == 0:
 			# If no input, dash toward last faced direction
@@ -431,16 +443,29 @@ func _physics_process(delta):
 	
 	move_and_slide()
 
+	# Regenerate dash energy when not dashing
+	if not is_dashing and dash_energy < max_dash_energy:
+		var before = dash_energy
+		dash_energy = min(max_dash_energy, int(round(dash_energy + dash_regen_rate * delta)))
+		if dash_energy != before:
+			dash_energy_changed.emit(dash_energy)
+
 func start_dash(dir: Vector2):
 	is_dashing = true
 	dash_timer = dash_duration
 	dash_cooldown_timer = dash_cooldown
 	dash_direction = dir
+
+	# Spend dash energy
+	var before = dash_energy
+	dash_energy = max(0, dash_energy - dash_cost)
+	if dash_energy != before:
+		dash_energy_changed.emit(dash_energy)
 	# brief i-frames during dash start
 	damage_immunity_timer = max(damage_immunity_timer, dash_iframe_duration)
 	is_dash_iframe = true
 	flash_white(0.08)
-	emit_dash_particles()
+	# Dash particles disabled
 	dash_afterimage_timer = 0.0
 
 func setup_dash_particles():
@@ -656,6 +681,18 @@ func heal(amount: int):
 	if current_health != old_health:
 		health_changed.emit(current_health)
 		update_health_display()
+
+func restore_dash(amount: int):
+	var before = dash_energy
+	dash_energy = min(max_dash_energy, dash_energy + amount)
+	if dash_energy != before:
+		dash_energy_changed.emit(dash_energy)
+
+func get_dash_energy() -> int:
+	return dash_energy
+
+func get_max_dash_energy() -> int:
+	return max_dash_energy
 
 func apply_knockback(direction: Vector2, force: float):
 	var knockback_force = force * knockback_resistance

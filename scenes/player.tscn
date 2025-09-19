@@ -287,6 +287,7 @@ offset_bottom = -52.0
 show_percentage = false
 
 [node name="AttackSprite" type="Sprite2D" parent="."]
+visible = false
 texture_filter = 1
 position = Vector2(77, -3.8147e-06)
 scale = Vector2(2.36667, 3.75417)

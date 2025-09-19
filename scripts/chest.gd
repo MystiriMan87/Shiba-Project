@@ -61,7 +61,23 @@ func update_sprite():
 		texture.set_image(image)
 		sprite.texture = texture
 
+func clamp_to_viewport(p: Vector2, margin: float = 32.0) -> Vector2:
+	var rect: Rect2 = get_viewport().get_visible_rect()
+	var min_v = rect.position + Vector2(margin, margin)
+	var max_v = rect.position + rect.size - Vector2(margin, margin)
+	var x = clamp(p.x, min_v.x, max_v.x)
+	var y = clamp(p.y, min_v.y, max_v.y)
+	return Vector2(x, y)
+
 # Remove _input - we'll handle this in the player script instead
+
+@export var loot_throw_delay: float = 2.0
+@export var loot_throw_spread_degrees: float = 70.0
+@export var loot_throw_speed_min: float = 120.0
+@export var loot_throw_speed_max: float = 180.0
+@export var loot_spawn_offset: Vector2 = Vector2(0, -16)
+@export var loot_spawn_radius_base: float = 24.0
+@export var loot_spawn_radius_step: float = 10.0
 
 func open_chest():
 	if is_locked:
@@ -98,25 +114,86 @@ func play_opening_animation():
 			tween.tween_callback(func(): sprite.texture = load(frames[i]))
 			tween.tween_interval(frame_duration)
 	
-	tween.tween_callback(finish_opening)
+	# Add a subtle bounce/flash for polish
+	tween.tween_callback(func():
+		if sprite:
+			var t = create_tween()
+			t.tween_property(sprite, "scale", sprite.scale * 1.06, 0.08)
+			t.tween_property(sprite, "modulate:a", 0.95, 0.08)
+			t.tween_property(sprite, "scale", sprite.scale, 0.08)
+			t.tween_property(sprite, "modulate:a", 1.0, 0.05)
+			t.tween_callback(finish_opening)
+		else:
+			finish_opening()
+	)
 
 func finish_opening():
 	is_open = true
 	is_animating = false
-	
-	# Drop loot
-	for item in loot_items:
-		spawn_item(item, global_position + Vector2(randf_range(-20, 20), -20))
+	var scene_root = get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
+	if not scene_root:
+		return
+	var count = loot_items.size()
+	if count <= 0:
+		return
+	var radius = clamp(loot_spawn_radius_base, 16.0, 40.0)
+	for i in range(count):
+		var angle = (i * TAU) / float(max(1, count))
+		var dir = Vector2(cos(angle), sin(angle))
+		var target_pos = global_position + loot_spawn_offset + dir * radius
+		var start_pos = global_position + Vector2(0, -6)
+		var up_pos = start_pos + Vector2(0, -20)
+		var pickup: Node = PickupItem.create_pickup_item(loot_items[i], start_pos, 1)
+		scene_root.add_child(pickup)
+		if pickup is Node2D:
+			pickup.z_as_relative = true
+			pickup.z_index = 0
+			pickup.top_level = false
+			(pickup as Node2D).global_position = start_pos
+			(pickup as Node2D).modulate.a = 0.0
+		if pickup.has_method("set_pickup_delay"):
+			pickup.set_pickup_delay(0.6)
+		if "auto_pickup" in pickup:
+			pickup.auto_pickup = true
+		var t = create_tween()
+		t.tween_property(pickup, "modulate:a", 1.0, 0.12)
+		t.tween_property(pickup, "global_position", up_pos, 0.10)
+		t.tween_property(pickup, "global_position", target_pos, 0.18)
+	print("Chest spawned ", count, " items at radius ", radius)
 
-func spawn_item(item_id: String, pos: Vector2):
-	var pickup_scene = load("res://scenes/PickupItem.tscn")
-	if pickup_scene:
-		var pickup = pickup_scene.instantiate()
-		get_tree().current_scene.add_child(pickup)
-		pickup.global_position = pos
-		pickup.collision_layer = 8
-		pickup.collision_mask = 0
+func spawn_and_throw_item(item_id: String, direction: Vector2):
+	var scene = load("res://scenes/PickupItem.tscn")
+	if not scene:
+		print("Pickup scene missing for ", item_id)
+		return
+	
+	var pickup = scene.instantiate()
+	# Add under the chest's parent so transforms remain consistent with chest scale
+	var parent = get_parent() if get_parent() else get_tree().current_scene
+	parent.add_child(pickup)
+	
+	# Compute spawn offset relative to chest's global scale
+	var scale_factor = (abs(global_scale.x) + abs(global_scale.y)) * 0.5
+	var offset_distance = 8.0 * max(1.0, scale_factor)
+	var spawn_pos = global_position + direction.normalized() * offset_distance
+	
+	if pickup is Node2D:
+		pickup.top_level = false
+		pickup.z_as_relative = true
+		pickup.z_index = 0
+		pickup.global_position = spawn_pos
+	else:
+		pickup.set("global_position", spawn_pos)
+
+	if pickup.has_method("set_item"):
 		pickup.set_item(item_id, 1)
+	if pickup.has_method("set_pickup_delay"):
+		pickup.set_pickup_delay(loot_throw_delay)
+	if pickup.has_method("throw_from"):
+		var speed = randf_range(loot_throw_speed_min, loot_throw_speed_max) * max(1.0, scale_factor)
+		pickup.throw_from(spawn_pos, direction, speed)
+
+	print("Spawned ", item_id, " at ", spawn_pos)
 
 func _on_body_entered(body):
 	if body.has_method("add_item_to_inventory"):
@@ -127,5 +204,7 @@ func _on_body_exited(body):
 		player_near = false
 
 func interact():
-	if player_near and not is_open and not is_animating:
+	# Player proximity is already checked by the player script,
+	# so open as long as we're close enough to interact.
+	if not is_open and not is_animating:
 		open_chest()

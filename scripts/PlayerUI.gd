@@ -20,6 +20,8 @@ var notification_spacing: float = 30.0
 @onready var health_bar: ProgressBar = null
 @onready var health_label: Label = null
 @onready var death_screen: Control = null
+@onready var dash_bar: ProgressBar = null
+@onready var dash_label: Label = null
 
 # Death screen variables
 var game_start_time: float = 0.0
@@ -66,6 +68,9 @@ func connect_signals():
 				print("Connected to player health_changed signal")
 		else:
 			print("Warning: Player doesn't have health_changed signal")
+		if player.has_signal("dash_energy_changed"):
+			if not player.dash_energy_changed.is_connected(_on_player_dash_changed):
+				player.dash_energy_changed.connect(_on_player_dash_changed)
 		
 		if player.has_signal("player_died"):
 			if not player.player_died.is_connected(_on_player_died):
@@ -77,6 +82,7 @@ func connect_signals():
 
 func setup_ui_layout():
 	create_health_bar()
+	create_dash_bar()
 	create_inventory_panel()
 
 func create_health_bar():
@@ -121,6 +127,49 @@ func create_health_bar():
 	health_bar.add_theme_stylebox_override("background", health_bg_style)
 	
 	health_container.add_child(health_bar)
+
+func create_dash_bar():
+	var dash_container = VBoxContainer.new()
+	dash_container.name = "DashContainer"
+	dash_container.position = health_bar_position + Vector2(200 + 16, 0)
+	dash_container.size = Vector2(200, 60)
+	add_child(dash_container)
+
+	dash_label = Label.new()
+	dash_label.name = "DashLabel"
+	dash_label.text = "Dash: 100/100"
+	dash_label.add_theme_font_size_override("font_size", 14)
+	dash_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
+	dash_label.add_theme_color_override("font_shadow_color", Color.BLACK)
+	dash_label.add_theme_constant_override("shadow_offset_x", 1)
+	dash_label.add_theme_constant_override("shadow_offset_y", 1)
+	dash_container.add_child(dash_label)
+
+	dash_bar = ProgressBar.new()
+	dash_bar.name = "DashBar"
+	dash_bar.min_value = 0
+	dash_bar.max_value = 100
+	dash_bar.value = 100
+	dash_bar.custom_minimum_size = Vector2(180, 20)
+	dash_bar.show_percentage = false
+
+	var dash_fill = StyleBoxFlat.new()
+	dash_fill.bg_color = Color(0.2, 0.5, 1.0)
+	dash_fill.corner_radius_top_left = 4
+	dash_fill.corner_radius_top_right = 4
+	dash_fill.corner_radius_bottom_left = 4
+	dash_fill.corner_radius_bottom_right = 4
+	dash_bar.add_theme_stylebox_override("fill", dash_fill)
+
+	var dash_bg = StyleBoxFlat.new()
+	dash_bg.bg_color = Color(0.08, 0.1, 0.18)
+	dash_bg.corner_radius_top_left = 4
+	dash_bg.corner_radius_top_right = 4
+	dash_bg.corner_radius_bottom_left = 4
+	dash_bg.corner_radius_bottom_right = 4
+	dash_bar.add_theme_stylebox_override("background", dash_bg)
+
+	dash_container.add_child(dash_bar)
 
 func create_inventory_panel():
 	inventory_panel = Panel.new()
@@ -456,10 +505,44 @@ func update_health_display():
 	health_bar_style.corner_radius_bottom_right = 4
 	health_bar.add_theme_stylebox_override("fill", health_bar_style)
 
+	update_dash_display()
+
+func update_dash_display():
+	if not player or not dash_bar or not dash_label:
+		return
+
+	var current_energy = 100
+	var max_energy = 100
+
+	if player.has_method("get_dash_energy"):
+		current_energy = player.get_dash_energy()
+	if player.has_method("get_max_dash_energy"):
+		max_energy = player.get_max_dash_energy()
+
+	dash_bar.max_value = max_energy
+	dash_bar.value = current_energy
+	dash_label.text = "Dash: " + str(current_energy) + "/" + str(max_energy)
+
+	var pct = float(current_energy) / float(max_energy)
+	var color: Color = Color(0.2, 0.5, 1.0)
+	if pct < 0.25:
+		color = Color(0.3, 0.3, 0.6)
+
+	var dash_fill = StyleBoxFlat.new()
+	dash_fill.bg_color = color
+	dash_fill.corner_radius_top_left = 4
+	dash_fill.corner_radius_top_right = 4
+	dash_fill.corner_radius_bottom_left = 4
+	dash_fill.corner_radius_bottom_right = 4
+	dash_bar.add_theme_stylebox_override("fill", dash_fill)
+
 # Signal handlers
 func _on_player_health_changed(new_health: int):
 	print("Health changed signal received: ", new_health)
 	update_health_display()
+
+func _on_player_dash_changed(new_energy: int):
+	update_dash_display()
 
 func _on_item_picked_up(item_data: Dictionary):
 	var item_name = item_data.get("name", "Unknown Item")

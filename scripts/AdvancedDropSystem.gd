@@ -9,6 +9,7 @@ var loot_tables = {
 		"possible_drops": [
 			{"item_id": "coin", "chance": 0.8, "min_qty": 1, "max_qty": 5},
 			{"item_id": "health_potion", "chance": 0.3, "min_qty": 1, "max_qty": 2},
+			{"item_id": "dash_flask", "chance": 0.25, "min_qty": 1, "max_qty": 1},
 			{"item_id": "iron_dagger", "chance": 0.1, "min_qty": 1, "max_qty": 1},
 			{"item_id": "legendary_mace", "chance": 0.1, "min_qty": 1, "max_qty": 1},
 			{"item_id": "steel_hammer", "chance": 0.1, "min_qty": 1, "max_qty": 1},
@@ -93,6 +94,12 @@ static func spawn_drops(drops: Array[Dictionary], spawn_position: Vector2, scene
 		
 		if pickup_item and scene_tree.current_scene:
 			scene_tree.current_scene.add_child(pickup_item)
+			if pickup_item is Node2D:
+				pickup_item.z_as_relative = true
+				pickup_item.z_index = 0
+				pickup_item.top_level = false
+			if pickup_item.has_method("set_pickup_delay"):
+				pickup_item.set_pickup_delay(0.6)
 			print("Spawned: ", drop.item_id, " x", drop.quantity, " at ", final_position)
 
 static func handle_enemy_death(enemy_type: String, death_position: Vector2, scene_tree: SceneTree):

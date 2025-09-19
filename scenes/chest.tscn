@@ -12,6 +12,9 @@ radius = 27.3333
 [node name="Chest" type="StaticBody2D"]
 scale = Vector2(4, 4)
 script = ExtResource("1_chest")
+loot_spawn_offset = Vector2(0, 0)
+loot_spawn_radius_base = 30.0
+loot_spawn_radius_step = 30.0
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_sy5e1")

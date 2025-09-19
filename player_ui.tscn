@@ -132,11 +132,14 @@ autowrap_mode = 3
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 0
-offset_left = 1442.0
-offset_top = 919.0
-offset_right = 1919.0
-offset_bottom = 1037.0
+offset_left = 1390.0
+offset_top = 872.0
+offset_right = 1954.0
+offset_bottom = 1057.0
 theme_override_font_sizes/font_size = 31
-text = "Tab - INVENTORY"
+text = "New AREA and boss coming soon!
+
+Tab - INVENTORY
+Shift - Dash"
 horizontal_alignment = 1
 uppercase = true
