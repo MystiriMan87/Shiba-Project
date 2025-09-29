@@ -27,8 +27,8 @@ extends CharacterBody2D
 @export var jump_arc_height = 150
 @export var land_damage_radius = 40
 
-@export var walk_acceleration = 300
-@export var walk_friction = 200
+@export var walk_acceleration: float = 300.0
+@export var walk_friction: float = 200.0
 @export var walk_animation_speed = 1.0
 
 var current_health
@@ -83,6 +83,11 @@ func _ready():
 	current_health = max_health
 	collision_layer = 4
 	collision_mask = 1
+	# Safety: ensure exported floats are valid even if scene serialized differently
+	if typeof(walk_friction) == TYPE_NIL:
+		walk_friction = 200.0
+	if typeof(walk_acceleration) == TYPE_NIL:
+		walk_acceleration = 300.0
 	
 	if health_bar:
 		health_bar.max_value = max_health
@@ -458,6 +463,12 @@ func take_damage(amount: int):
 		target_velocity = Vector2.ZERO
 	
 	current_health -= amount
+	if get_tree() and get_tree().current_scene and Engine.has_singleton("ParticleEffects") == false:
+		# no singleton; call static directly
+		if ResourceLoader.exists("res://scripts/Particle_Effects_Manager.gd"):
+			var root = get_tree().current_scene
+			if root and root.has_method("add_child"):
+				ParticleEffects.spawn_damage_number(root, global_position, amount)
 	
 	if health_bar:
 		health_bar.value = current_health

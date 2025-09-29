@@ -224,6 +224,8 @@ func change_skeleton_state(new_state: SkeletonState):
 
 func take_damage(amount: int):
 	super.take_damage(amount)
+	if get_tree() and get_tree().current_scene:
+		ParticleEffects.spawn_damage_number(get_tree().current_scene, global_position, amount)
 	
 	# Play hurt animation
 	if animation_player and animation_player.has_animation("hurt"):

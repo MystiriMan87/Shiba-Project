@@ -1,6 +1,23 @@
-## ParticleEffectsManager.gd
-#
-#extends Node
+extends Node
+class_name ParticleEffects
+
+static func spawn_damage_number(scene_root: Node, position: Vector2, amount: int, color: Color = Color(1, 0.85, 0.2)):
+	if not scene_root:
+		return
+	var label := Label.new()
+	label.text = str(amount)
+	label.add_theme_font_size_override("font_size", 16)
+	label.add_theme_color_override("font_color", color)
+	label.add_theme_color_override("font_shadow_color", Color(0,0,0))
+	label.add_theme_constant_override("shadow_offset_x", 1)
+	label.add_theme_constant_override("shadow_offset_y", 1)
+	label.position = position + Vector2(-6, -14)
+	label.z_index = 300
+	scene_root.add_child(label)
+	var t = scene_root.create_tween()
+	t.tween_property(label, "position", label.position + Vector2(0, -22), 0.5)
+	t.tween_property(label, "modulate:a", 0.0, 0.5)
+	t.tween_callback(func(): if is_instance_valid(label): label.queue_free())
 #
 #var hit_effect_scene = preload("res://effects/HitEffect.tscn")
 #var death_effect_scene = preload("res://effects/DeathEffect.tscn") 

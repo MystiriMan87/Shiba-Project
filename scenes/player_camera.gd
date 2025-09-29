@@ -30,6 +30,27 @@ func _ready():
 	
 	make_current()
 
+	# Attach CRT overlay if not already present
+	if not has_node("CRT"):
+		var crt = preload("res://addons/crt/crt.gd").new()
+		crt.name = "CRT"
+		add_child(crt)
+		# Tasteful defaults: mild warp and vignette, subtle scanlines
+		if crt.has_variable("warp_amount"):
+			crt.warp_amount = 0.15
+		if crt.has_variable("vignette_amount"):
+			crt.vignette_amount = 0.8
+		if crt.has_variable("vignette_intensity"):
+			crt.vignette_intensity = 0.5
+		if crt.has_variable("scan_line_amount"):
+			crt.scan_line_amount = 0.6
+		if crt.has_variable("interference_amount"):
+			crt.interference_amount = 0.05
+		if crt.has_variable("grille_amount"):
+			crt.grille_amount = 0.1
+		if crt.has_variable("aberation_amount"):
+			crt.aberation_amount = 0.2
+
 func _process(delta):
 	if not player:
 		return

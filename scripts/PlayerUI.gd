@@ -22,6 +22,7 @@ var notification_spacing: float = 30.0
 @onready var death_screen: Control = null
 @onready var dash_bar: ProgressBar = null
 @onready var dash_label: Label = null
+@onready var echo_container: HBoxContainer = null
 
 # Death screen variables
 var game_start_time: float = 0.0
@@ -31,6 +32,11 @@ func _ready():
 	item_manager = get_node("/root/ItemManager") if has_node("/root/ItemManager") else null
 	player = get_tree().get_first_node_in_group("player")
 	set_process_input(true)
+	if not InputMap.has_action("inventory_toggle"):
+		InputMap.add_action("inventory_toggle")
+		var evt := InputEventKey.new()
+		evt.physical_keycode = KEY_TAB
+		InputMap.action_add_event("inventory_toggle", evt)
 	
 	if not item_manager:
 		print("Warning: ItemManager not found at /root/ItemManager")
@@ -79,27 +85,29 @@ func connect_signals():
 		if player.has_signal("enemy_killed"):
 			if not player.enemy_killed.is_connected(_on_enemy_killed):
 				player.enemy_killed.connect(_on_enemy_killed)
+		if player.has_signal("echoes_changed"):
+			if not player.echoes_changed.is_connected(_on_echoes_changed):
+				player.echoes_changed.connect(_on_echoes_changed)
+		if player.has_signal("echo_spawned"):
+			if not player.echo_spawned.is_connected(_on_echo_spawned):
+				player.echo_spawned.connect(_on_echo_spawned)
 
 func setup_ui_layout():
 	create_health_bar()
 	create_dash_bar()
 	create_inventory_panel()
+	create_echo_pips()
 
 func create_health_bar():
 	var health_container = VBoxContainer.new()
 	health_container.name = "HealthContainer"
 	health_container.position = health_bar_position
-	health_container.size = Vector2(200, 60)
+	health_container.size = Vector2(360, 70)
 	add_child(health_container)
 	
 	health_label = Label.new()
 	health_label.name = "HealthLabel"
-	health_label.text = "Health: 100/100"
-	health_label.add_theme_font_size_override("font_size", 14)
-	health_label.add_theme_color_override("font_color", Color.WHITE)
-	health_label.add_theme_color_override("font_shadow_color", Color.BLACK)
-	health_label.add_theme_constant_override("shadow_offset_x", 1)
-	health_label.add_theme_constant_override("shadow_offset_y", 1)
+	health_label.visible = false
 	health_container.add_child(health_label)
 	
 	health_bar = ProgressBar.new()
@@ -107,42 +115,70 @@ func create_health_bar():
 	health_bar.min_value = 0
 	health_bar.max_value = 100
 	health_bar.value = 100
-	health_bar.custom_minimum_size = Vector2(180, 20)
+	health_bar.custom_minimum_size = Vector2(300, 24)
 	health_bar.show_percentage = false
 	
-	var health_bar_style = StyleBoxFlat.new()
-	health_bar_style.bg_color = Color(0.8, 0.2, 0.2)
-	health_bar_style.corner_radius_top_left = 4
-	health_bar_style.corner_radius_top_right = 4
-	health_bar_style.corner_radius_bottom_left = 4
-	health_bar_style.corner_radius_bottom_right = 4
-	health_bar.add_theme_stylebox_override("fill", health_bar_style)
+	var health_fill = StyleBoxFlat.new()
+	health_fill.bg_color = Color(0.2, 0.8, 0.2)
+	health_fill.corner_radius_top_left = 2
+	health_fill.corner_radius_top_right = 2
+	health_fill.corner_radius_bottom_left = 2
+	health_fill.corner_radius_bottom_right = 2
+	health_fill.border_width_left = 0
+	health_fill.border_width_right = 0
+	health_fill.border_width_top = 0
+	health_fill.border_width_bottom = 0
+	health_bar.add_theme_stylebox_override("fill", health_fill)
 	
 	var health_bg_style = StyleBoxFlat.new()
-	health_bg_style.bg_color = Color(0.3, 0.1, 0.1)
-	health_bg_style.corner_radius_top_left = 4
-	health_bg_style.corner_radius_top_right = 4
-	health_bg_style.corner_radius_bottom_left = 4
-	health_bg_style.corner_radius_bottom_right = 4
+	health_bg_style.bg_color = Color(0.08, 0.05, 0.07, 0.9)
+	health_bg_style.border_color = Color(0.25, 0.18, 0.22)
+	health_bg_style.border_width_left = 2
+	health_bg_style.border_width_right = 2
+	health_bg_style.border_width_top = 2
+	health_bg_style.border_width_bottom = 2
+	health_bg_style.corner_radius_top_left = 6
+	health_bg_style.corner_radius_top_right = 6
+	health_bg_style.corner_radius_bottom_left = 6
+	health_bg_style.corner_radius_bottom_right = 6
 	health_bar.add_theme_stylebox_override("background", health_bg_style)
 	
 	health_container.add_child(health_bar)
 
+func create_echo_pips():
+	var container = HBoxContainer.new()
+	container.name = "EchoPips"
+	# Position under the dash bar
+	container.position = health_bar_position + Vector2(360 + 40, 28 + 30)
+	container.add_theme_constant_override("separation", 8)
+	add_child(container)
+	echo_container = container
+	update_echo_pips(0, 3)
+
+func update_echo_pips(count: int, max_count: int = 3):
+	if not echo_container:
+		return
+	for c in echo_container.get_children():
+		c.queue_free()
+	for i in range(max_count):
+		var pip = ColorRect.new()
+		pip.custom_minimum_size = Vector2(12, 12)
+		var on_color = Color(0.2, 0.6, 1.0)
+		var off_color = Color(0.1, 0.2, 0.35)
+		pip.color = on_color if i < count else off_color
+		pip.modulate.a = 0.9
+		echo_container.add_child(pip)
+
 func create_dash_bar():
 	var dash_container = VBoxContainer.new()
 	dash_container.name = "DashContainer"
-	dash_container.position = health_bar_position + Vector2(200 + 16, 0)
-	dash_container.size = Vector2(200, 60)
+	dash_container.position = health_bar_position + Vector2(360 + 40, 0)
+	dash_container.size = Vector2(360, 70)
 	add_child(dash_container)
 
 	dash_label = Label.new()
 	dash_label.name = "DashLabel"
-	dash_label.text = "Dash: 100/100"
-	dash_label.add_theme_font_size_override("font_size", 14)
-	dash_label.add_theme_color_override("font_color", Color(0.7, 0.85, 1.0))
-	dash_label.add_theme_color_override("font_shadow_color", Color.BLACK)
-	dash_label.add_theme_constant_override("shadow_offset_x", 1)
-	dash_label.add_theme_constant_override("shadow_offset_y", 1)
+	dash_label.visible = false
 	dash_container.add_child(dash_label)
 
 	dash_bar = ProgressBar.new()
@@ -150,23 +186,28 @@ func create_dash_bar():
 	dash_bar.min_value = 0
 	dash_bar.max_value = 100
 	dash_bar.value = 100
-	dash_bar.custom_minimum_size = Vector2(180, 20)
+	dash_bar.custom_minimum_size = Vector2(300, 24)
 	dash_bar.show_percentage = false
 
 	var dash_fill = StyleBoxFlat.new()
-	dash_fill.bg_color = Color(0.2, 0.5, 1.0)
-	dash_fill.corner_radius_top_left = 4
-	dash_fill.corner_radius_top_right = 4
-	dash_fill.corner_radius_bottom_left = 4
-	dash_fill.corner_radius_bottom_right = 4
+	dash_fill.bg_color = Color(0.16, 0.55, 1.0)
+	dash_fill.corner_radius_top_left = 2
+	dash_fill.corner_radius_top_right = 2
+	dash_fill.corner_radius_bottom_left = 2
+	dash_fill.corner_radius_bottom_right = 2
 	dash_bar.add_theme_stylebox_override("fill", dash_fill)
 
 	var dash_bg = StyleBoxFlat.new()
-	dash_bg.bg_color = Color(0.08, 0.1, 0.18)
-	dash_bg.corner_radius_top_left = 4
-	dash_bg.corner_radius_top_right = 4
-	dash_bg.corner_radius_bottom_left = 4
-	dash_bg.corner_radius_bottom_right = 4
+	dash_bg.bg_color = Color(0.06, 0.08, 0.14, 0.9)
+	dash_bg.border_color = Color(0.12, 0.16, 0.26)
+	dash_bg.border_width_left = 2
+	dash_bg.border_width_right = 2
+	dash_bg.border_width_top = 2
+	dash_bg.border_width_bottom = 2
+	dash_bg.corner_radius_top_left = 6
+	dash_bg.corner_radius_top_right = 6
+	dash_bg.corner_radius_bottom_left = 6
+	dash_bg.corner_radius_bottom_right = 6
 	dash_bar.add_theme_stylebox_override("background", dash_bg)
 
 	dash_container.add_child(dash_bar)
@@ -506,6 +547,8 @@ func update_health_display():
 	health_bar.add_theme_stylebox_override("fill", health_bar_style)
 
 	update_dash_display()
+	if player and player.has_method("get_echo_count"):
+		update_echo_pips(player.get_echo_count(), 3)
 
 func update_dash_display():
 	if not player or not dash_bar or not dash_label:
@@ -524,9 +567,9 @@ func update_dash_display():
 	dash_label.text = "Dash: " + str(current_energy) + "/" + str(max_energy)
 
 	var pct = float(current_energy) / float(max_energy)
-	var color: Color = Color(0.2, 0.5, 1.0)
+	var color: Color = Color(0.16, 0.55, 1.0)
 	if pct < 0.25:
-		color = Color(0.3, 0.3, 0.6)
+		color = Color(0.22, 0.28, 0.5)
 
 	var dash_fill = StyleBoxFlat.new()
 	dash_fill.bg_color = color
@@ -543,6 +586,21 @@ func _on_player_health_changed(new_health: int):
 
 func _on_player_dash_changed(new_energy: int):
 	update_dash_display()
+
+func _on_echoes_changed(count: int):
+	update_echo_pips(count, 3)
+
+func _on_echo_spawned(duration: float):
+	if not echo_container:
+		return
+	# brief glow on newest pip
+	var idx = min(2, max(0, (player.get_echo_count() - 1))) if player and player.has_method("get_echo_count") else 0
+	if idx < echo_container.get_child_count():
+		var pip = echo_container.get_child(idx)
+		if is_instance_valid(pip):
+			var t = create_tween()
+			t.tween_property(pip, "modulate", Color(0.5, 0.8, 1.0, 1.0), 0.08)
+			t.tween_property(pip, "modulate", Color(0.2, 0.6, 1.0, 0.9), 0.18)
 
 func _on_item_picked_up(item_data: Dictionary):
 	var item_name = item_data.get("name", "Unknown Item")
@@ -918,5 +976,5 @@ func _input(event):
 			if event.is_action_pressed("ui_accept"):
 				_on_respawn_button_pressed()
 		# Otherwise allow inventory toggle
-		elif event.is_action_pressed("ui_cancel"):
+		elif event.is_action_pressed("inventory_toggle"):
 			toggle_inventory()

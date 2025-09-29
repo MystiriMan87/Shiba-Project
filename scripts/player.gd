@@ -1,5 +1,155 @@
 extends CharacterBody2D
 
+# Inline echo ghost to avoid external script load issues
+class EchoGhost:
+	extends Area2D
+
+	@export var lifetime: float = 1.0
+	@export var move_speed: float = 900.0
+	@export var damage: int = 1
+	@export var alpha: float = 0.7
+	@export var afterimage_interval: float = 0.04
+	@export var afterimage_lifetime: float = 0.18
+	@export var damage_on_move: bool = true
+	@export var move_hit_radius: float = 12.0
+	@export var burst_radius: float = 48.0
+	@export var burst_damage: int = 2
+
+	var path: Array[Vector2] = []
+	var idx: int = 0
+	var target: Vector2 = Vector2.ZERO
+	var _afterimage_timer: float = 0.0
+
+	@onready var sprite: Sprite2D = null
+
+	func _ready():
+		set_physics_process(true)
+		_afterimage_timer = 0.0
+
+	func setup(texture: Texture2D, scale_v: Vector2, start_pos: Vector2, recorded_path: Array[Vector2], hframes: int = 1, vframes: int = 1, frame_idx: int = 0, flip_h: bool = false, flip_v: bool = false, centered: bool = true):
+		path = recorded_path.duplicate()
+		idx = 0
+		global_position = start_pos
+		if not sprite:
+			sprite = Sprite2D.new()
+			sprite.modulate = Color(1, 1, 1, alpha)
+			add_child(sprite)
+		sprite.texture = texture
+		sprite.scale = scale_v
+		sprite.hframes = max(1, hframes)
+		sprite.vframes = max(1, vframes)
+		sprite.frame = max(0, frame_idx)
+		sprite.flip_h = flip_h
+		sprite.flip_v = flip_v
+		sprite.centered = centered
+		if path.size() > 0:
+			target = path[0]
+		else:
+			target = start_pos
+
+	func _physics_process(delta):
+		if lifetime > 0:
+			lifetime -= delta
+		elif path.is_empty():
+			queue_free()
+		if path.is_empty():
+			return
+
+		# emit dash-like afterimages while moving along the path
+		_afterimage_timer -= delta
+		if _afterimage_timer <= 0.0:
+			_emit_afterimage()
+			_afterimage_timer = afterimage_interval
+		var to_target = target - global_position
+		var step = move_speed * delta
+		if to_target.length() <= step:
+			global_position = target
+			idx += 1
+			if idx >= path.size():
+				path.clear()
+				return
+			target = path[idx]
+		else:
+			global_position += to_target.normalized() * step
+
+		if damage_on_move:
+			_apply_move_damage()
+
+	func _emit_afterimage():
+		if not sprite:
+			return
+		var img := Sprite2D.new()
+		img.texture = sprite.texture
+		img.hframes = sprite.hframes
+		img.vframes = sprite.vframes
+		img.frame = sprite.frame
+		img.centered = sprite.centered
+		img.flip_h = sprite.flip_h
+		img.flip_v = sprite.flip_v
+		img.scale = sprite.scale
+		img.rotation = sprite.rotation
+		img.z_index = sprite.z_index
+		img.modulate = Color(1, 1, 1, 0.8)
+		img.top_level = true
+		img.global_position = global_position
+		var mat := CanvasItemMaterial.new()
+		mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+		img.material = mat
+		var parent := get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
+		if parent:
+			parent.add_child(img)
+			var t := create_tween()
+			t.tween_property(img, "modulate:a", 0.0, afterimage_lifetime)
+			t.tween_callback(func(): img.queue_free())
+
+	func _apply_move_damage():
+		var space := get_world_2d().direct_space_state
+		if not space:
+			return
+		var circle := CircleShape2D.new()
+		circle.radius = move_hit_radius
+		var qp := PhysicsShapeQueryParameters2D.new()
+		qp.shape = circle
+		qp.transform = Transform2D(0.0, global_position)
+		qp.collision_mask = 4
+		qp.collide_with_bodies = true
+		qp.collide_with_areas = true
+		var hits = space.intersect_shape(qp)
+		for hit in hits:
+			var c = hit.get("collider")
+			if c and c.has_method("take_damage"):
+				c.take_damage(damage)
+
+	func do_burst():
+		# quick ring pop for feedback
+		var ring := ColorRect.new()
+		ring.color = Color(0.4, 0.8, 1.0, 0.6)
+		ring.size = Vector2(4, 4)
+		ring.position = Vector2(-2, -2)
+		ring.z_index = 100
+		add_child(ring)
+		var r = create_tween()
+		r.tween_property(ring, "scale", Vector2(20, 20), 0.2)
+		r.tween_property(ring, "modulate:a", 0.0, 0.2)
+		r.tween_callback(func(): if is_instance_valid(ring): ring.queue_free())
+
+		var space := get_world_2d().direct_space_state
+		if space:
+			var circle := CircleShape2D.new()
+			circle.radius = burst_radius
+			var qp := PhysicsShapeQueryParameters2D.new()
+			qp.shape = circle
+			qp.transform = Transform2D(0.0, global_position)
+			qp.collision_mask = 4
+			qp.collide_with_bodies = true
+			qp.collide_with_areas = true
+			var hits = space.intersect_shape(qp)
+			for hit in hits:
+				var c = hit.get("collider")
+				if c and c.has_method("take_damage"):
+					c.take_damage(burst_damage)
+		queue_free()
+
 @export var speed = 300
 @export var friction = 0.2
 @export var acceleration = 0.1
@@ -106,6 +256,24 @@ signal health_changed(new_health: int)
 signal player_died
 signal enemy_killed
 signal dash_energy_changed(new_energy: int)
+signal echoes_changed(count: int)
+signal echo_spawned(duration: float)
+
+@export var echo_record_duration: float = 1.0
+@export var echo_max_charges: int = 3
+@export var echo_move_speed: float = 900.0
+@export var echo_burst_damage: int = 2
+@export var echo_burst_radius: float = 48.0
+@export var echo_recall_sound_path: String = ""
+@export var echo_recall_sound_volume: float = 0.0
+
+var echo_path: Array[Vector2] = []
+var echo_timer: float = 0.0
+var active_echoes: Array[Node] = []
+var echo_spawned_this_dash: bool = false
+var echo_charges: int = 3
+var last_dash_path: Array[Vector2] = []
+var last_dash_start: Vector2 = Vector2.ZERO
 
 @onready var sprite = $Sprite2D
 @onready var animation_player = $AnimationPlayer
@@ -120,6 +288,7 @@ signal dash_energy_changed(new_energy: int)
 @onready var pickup_audio_player: AudioStreamPlayer2D = null
 @onready var hurt_audio_player: AudioStreamPlayer2D = null
 @onready var music_player: AudioStreamPlayer = null
+@onready var echo_audio_player: AudioStreamPlayer2D = null
 
 @onready var pickup_area = $PickupArea if has_node("PickupArea") else null
 @onready var pickup_collision = $PickupArea/CollisionShape2D if has_node("PickupArea/CollisionShape2D") else null
@@ -136,6 +305,15 @@ func _ready():
 	# Initialize dash energy
 	dash_energy = max_dash_energy
 	dash_energy_changed.emit(dash_energy)
+	
+	# Echo recall action (Q)
+	if not InputMap.has_action("recall_echo"):
+		InputMap.add_action("recall_echo")
+		var evq := InputEventKey.new()
+		evq.physical_keycode = KEY_Q
+		InputMap.action_add_event("recall_echo", evq)
+	# initialize echo charges
+	echo_charges = echo_max_charges
 	
 	# Ensure a "dash" action exists and is bound to Shift
 	if not InputMap.has_action("dash"):
@@ -197,6 +375,16 @@ func setup_sound_effects():
 			hurt_audio_player.bus = "Master"
 			hurt_audio_player.max_distance = 2000
 			hurt_audio_player.attenuation = 0.0
+
+	echo_audio_player = AudioStreamPlayer2D.new()
+	echo_audio_player.name = "EchoAudioPlayer"
+	add_child(echo_audio_player)
+	if echo_recall_sound_path != "" and ResourceLoader.exists(echo_recall_sound_path):
+		var er = load(echo_recall_sound_path)
+		if er is AudioStream:
+			echo_audio_player.stream = er
+			echo_audio_player.volume_db = echo_recall_sound_volume
+			echo_audio_player.bus = "Master"
 
 func play_hit_sound():
 	if not hit_audio_player or not hit_audio_player.stream:
@@ -383,6 +571,9 @@ func _physics_process(delta):
 		dash_timer -= delta
 		if dash_timer <= 0.0:
 			is_dashing = false
+			# cache path for later recall (Q)
+			last_dash_path = echo_path.duplicate()
+			echo_path.clear()
 		else:
 			# spawn afterimages while dashing
 			dash_afterimage_timer -= delta
@@ -392,6 +583,13 @@ func _physics_process(delta):
 	
 	if cooldown_timer > 0:
 		cooldown_timer -= delta
+
+	# record echo path while dashing
+	if is_dashing:
+		echo_timer += delta
+		echo_path.append(global_position)
+		if echo_timer >= echo_record_duration:
+			is_dashing = false
 	
 	if Input.is_action_just_pressed('Attack') and not is_attacking and cooldown_timer <= 0:
 		var mouse_pos = get_global_mouse_position()
@@ -401,6 +599,9 @@ func _physics_process(delta):
 	# Handle chest interaction with E key
 	if Input.is_action_just_pressed('interact'):
 		interact_with_chests()
+	# Echo recall
+	if Input.is_action_just_pressed('recall_echo'):
+		recall_echoes()
 	
 	var direction = get_input()
 	is_moving = direction.length() > 0
@@ -455,6 +656,10 @@ func start_dash(dir: Vector2):
 	dash_timer = dash_duration
 	dash_cooldown_timer = dash_cooldown
 	dash_direction = dir
+	echo_path.clear()
+	echo_timer = 0.0
+	echo_spawned_this_dash = false
+	last_dash_start = global_position
 
 	# Spend dash energy
 	var before = dash_energy
@@ -467,6 +672,8 @@ func start_dash(dir: Vector2):
 	flash_white(0.08)
 	# Dash particles disabled
 	dash_afterimage_timer = 0.0
+
+	# spawn echo on dash start if we have room and later on recall
 
 func setup_dash_particles():
 	if dash_particles:
@@ -651,9 +858,15 @@ func take_damage(amount: int, source: Node = null):
 	return true
 
 func update_health_display():
-	if health_bar:
-		health_bar.max_value = max_health
-		health_bar.value = current_health
+	if health_bar and is_instance_valid(health_bar):
+		var mh = 0
+		if typeof(max_health) != TYPE_NIL:
+			mh = int(max_health)
+		health_bar.max_value = mh
+		var cv = 0
+		if typeof(current_health) != TYPE_NIL:
+			cv = int(current_health)
+		health_bar.value = clamp(cv, 0, mh)
 
 func die():
 	print("Player died!")
@@ -687,6 +900,9 @@ func restore_dash(amount: int):
 	dash_energy = min(max_dash_energy, dash_energy + amount)
 	if dash_energy != before:
 		dash_energy_changed.emit(dash_energy)
+	# also refill echo charges when drinking dash potion
+	echo_charges = echo_max_charges
+	echoes_changed.emit(active_echoes.size())
 
 func get_dash_energy() -> int:
 	return dash_energy
@@ -885,3 +1101,72 @@ func on_enemy_killed():
 
 func get_spawn_position() -> Vector2:
 	return Vector2(0, 0)
+
+func spawn_echo_clone():
+	var echo: EchoGhost = EchoGhost.new()
+	var parent = get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
+	if not parent:
+		return
+	parent.add_child(echo)
+	var tex: Texture2D = sprite.texture if sprite else null
+	var scale_v: Vector2 = sprite.scale if sprite else Vector2.ONE
+	var hfr: int = sprite.hframes if sprite else 1
+	var vfr: int = sprite.vframes if sprite else 1
+	var frm: int = sprite.frame if sprite else 0
+	var fh: bool = sprite.flip_h if sprite else false
+	var fv: bool = sprite.flip_v if sprite else false
+	var ctr: bool = sprite.centered if sprite else true
+	var start_pos = echo_path[0] if echo_path.size() > 0 else global_position
+	echo.setup(tex, scale_v, start_pos, echo_path, hfr, vfr, frm, fh, fv, ctr)
+	echo.move_speed = echo_move_speed
+	echo.burst_damage = echo_burst_damage
+	echo.burst_radius = echo_burst_radius
+	echo.damage_on_move = true
+	active_echoes.append(echo)
+	while active_echoes.size() > echo_max_charges:
+		var old = active_echoes.pop_front()
+		if is_instance_valid(old):
+			old.queue_free()
+		echoes_changed.emit(active_echoes.size())
+	
+	echoes_changed.emit(active_echoes.size())
+	echo_spawned.emit(echo_record_duration)
+
+func recall_echoes():
+	# Spawn a ghost that traces the last dash path from its start to current position
+	if echo_charges > 0 and last_dash_path.size() > 1:
+		var ghost := EchoGhost.new()
+		var parent = get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
+		if parent:
+			parent.add_child(ghost)
+			var tex: Texture2D = sprite.texture if sprite else null
+			var scale_v: Vector2 = sprite.scale if sprite else Vector2.ONE
+			var hfr: int = sprite.hframes if sprite else 1
+			var vfr: int = sprite.vframes if sprite else 1
+			var frm: int = sprite.frame if sprite else 0
+			var fh: bool = sprite.flip_h if sprite else false
+			var fv: bool = sprite.flip_v if sprite else false
+			var ctr: bool = sprite.centered if sprite else true
+			ghost.move_speed = echo_move_speed
+			ghost.damage = attack_damage
+			ghost.burst_damage = echo_burst_damage
+			ghost.burst_radius = echo_burst_radius
+			ghost.damage_on_move = true
+			var path_for_ghost: Array[Vector2] = last_dash_path.duplicate()
+			path_for_ghost.append(global_position)
+			ghost.setup(tex, scale_v, last_dash_start, path_for_ghost, hfr, vfr, frm, fh, fv, ctr)
+			echo_charges -= 1
+			echoes_changed.emit(active_echoes.size())
+	# Clear previously queued passive echoes
+	for e in active_echoes:
+		if is_instance_valid(e) and e.has_method("queue_free"):
+			e.queue_free()
+	active_echoes.clear()
+	echoes_changed.emit(0)
+	if echo_audio_player and echo_audio_player.stream:
+		if echo_audio_player.playing:
+			echo_audio_player.stop()
+		echo_audio_player.play()
+
+func get_echo_count() -> int:
+	return active_echoes.size()
