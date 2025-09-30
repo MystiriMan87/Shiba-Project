@@ -70,6 +70,10 @@ var chase_duration = 3.0
 var chase_timer = 0.0
 var player = null
 
+signal boss_engaged(name: String, max_health: int, current_health: int)
+signal boss_disengaged()
+signal boss_health_changed(current_health: int, max_health: int)
+
 @onready var sprite = $Sprite2D
 @onready var animation_player = $AnimationPlayer if has_node("AnimationPlayer") else null
 @onready var collision_shape = $CollisionShape2D
@@ -107,6 +111,10 @@ func _ready():
 	
 	if animation_player:
 		play_animation("idle")
+
+	# Mark big slime as boss
+	if enemy_type == "big_slime":
+		add_to_group("boss")
 
 func setup_attack_area():
 	if not attack_area:
@@ -381,6 +389,15 @@ func land_jump():
 				attack_area.monitoring = false
 		)
 
+	# Big slime unique effect: quake and spawn allies on landing
+	if enemy_type == "big_slime":
+		# Camera shake
+		var cam = get_tree().current_scene.get_node_or_null("PlayerCamera") if get_tree() and get_tree().current_scene else null
+		if cam and cam.has_method("shake_camera"):
+			cam.shake_camera(8.0, 0.18)
+		# Spawn 3 slimes erupting from the ground
+		_spawn_floor_slimes(3)
+
 func play_animation_synced(anim_name: String, movement_duration: float, speed_multiplier: float = 2.0):
 	if not animation_player:
 		return
@@ -472,6 +489,10 @@ func take_damage(amount: int):
 	
 	if health_bar:
 		health_bar.value = current_health
+
+	# Notify UI for boss health updates
+	if enemy_type == "big_slime":
+		boss_health_changed.emit(current_health, max_health)
 	
 	flash_sprite(Color.RED, damage_flash_duration)
 	
@@ -511,6 +532,9 @@ func die():
 	# Handle drops (including keys)
 	DropSystem.handle_enemy_death(enemy_type, global_position, get_tree())
 	drop_keys()
+
+	if enemy_type == "big_slime":
+		boss_disengaged.emit()
 	
 	if windup_bar:
 		windup_bar.visible = false
@@ -550,6 +574,30 @@ func drop_keys():
 			pickup.set_item(key_id, 1)
 			print("Enemy dropped ", key_type, " key!")
 
+func _spawn_floor_slimes(count: int):
+	var scene_path = "res://scenes/slime_enemy.tscn"
+	var slime_scene = load(scene_path)
+	if not slime_scene:
+		return
+	var parent = get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
+	if not parent:
+		return
+	for i in range(count):
+		var s = slime_scene.instantiate()
+		if not s:
+			continue
+		parent.add_child(s)
+		# Position in a small circle around the big slime
+		var angle = (i * TAU) / float(max(1, count))
+		var radius = 36 + i * 4
+		var spawn_pos = global_position + Vector2(cos(angle), sin(angle)) * radius
+		s.global_position = spawn_pos + Vector2(0, 12)
+		# Little emerge animation (rise and fade in), keep original scale
+		if "modulate" in s:
+			s.modulate.a = 0.0
+		var tw = create_tween()
+		tw.tween_property(s, "global_position", spawn_pos, 0.25)
+		tw.tween_property(s, "modulate:a", 1.0, 0.25)
 #func drop_items():
 	#"""Handle item dropping when enemy dies"""
 	#print("Rolling for item drops...")
@@ -597,10 +645,14 @@ func _on_detection_area_entered(body):
 		player_in_detection_range = true
 		if not player:
 			player = body
+		if enemy_type == "big_slime":
+			boss_engaged.emit("Lord Slime", max_health, current_health)
 
 func _on_detection_area_exited(body):
 	if body.is_in_group("player"):
 		player_in_detection_range = false
+		if enemy_type == "big_slime":
+			boss_disengaged.emit()
 
 func _on_attack_area_body_entered(body):
 	if current_state == SlimeState.LANDING:

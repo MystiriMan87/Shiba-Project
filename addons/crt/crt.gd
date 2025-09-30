@@ -92,11 +92,17 @@ var material: ShaderMaterial
 		pixel_strength = value
 		_set_shader_param("pixel_strength", value)
 
+@export_range(0.0, 1.0) var effect_mix: float = 0.6:
+	set(value):
+		effect_mix = value
+		_set_shader_param("effect_mix", value)
+
 
 func _ready() -> void:
 	var color_rect = ColorRect.new()
 	color_rect.color = Color.WHITE
 	color_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	color_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	material = ShaderMaterial.new()
 	material.shader = load("res://addons/crt/crt.gdshader")
@@ -116,6 +122,7 @@ func _ready() -> void:
 	_set_shader_param("roll_line_amount", roll_line_amount)
 	_set_shader_param("roll_speed", roll_speed)
 	_set_shader_param("pixel_strength", pixel_strength)
+	_set_shader_param("effect_mix", effect_mix)
 
 	color_rect.material = material
 	add_child(color_rect)

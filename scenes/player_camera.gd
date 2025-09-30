@@ -14,6 +14,9 @@ var player = null
 var target_position = Vector2.ZERO
 var last_player_position = Vector2.ZERO
 
+var crt_default_vignette_amount: float = 0.5
+var crt_default_vignette_intensity: float = 0.35
+
 func _ready():
 	player = get_tree().get_first_node_in_group("player")
 	if not player:
@@ -35,21 +38,54 @@ func _ready():
 		var crt = preload("res://addons/crt/crt.gd").new()
 		crt.name = "CRT"
 		add_child(crt)
-		# Tasteful defaults: mild warp and vignette, subtle scanlines
-		if crt.has_variable("warp_amount"):
-			crt.warp_amount = 0.15
-		if crt.has_variable("vignette_amount"):
-			crt.vignette_amount = 0.8
-		if crt.has_variable("vignette_intensity"):
-			crt.vignette_intensity = 0.5
-		if crt.has_variable("scan_line_amount"):
-			crt.scan_line_amount = 0.6
-		if crt.has_variable("interference_amount"):
-			crt.interference_amount = 0.05
-		if crt.has_variable("grille_amount"):
-			crt.grille_amount = 0.1
-		if crt.has_variable("aberation_amount"):
-			crt.aberation_amount = 0.2
+		# Tasteful defaults: milder warp and vignette, subtle scanlines
+		crt.layer = 128
+		# Stronger barrel distortion for a fisheye look
+		crt.warp_amount = 0.45
+		crt.vignette_amount = crt_default_vignette_amount
+		crt.vignette_intensity = crt_default_vignette_intensity
+		crt.scan_line_amount = 0.3
+		crt.interference_amount = 0.015
+		crt.grille_amount = 0.04
+		crt.aberation_amount = 0.1
+		crt.pixel_strength = -1.4
+		crt.effect_mix = 0.5
+
+	# Add subtle curved edges mask (rounded corners)
+	if not has_node("CornerMask"):
+		var c = ColorRect.new()
+		c.name = "CornerMask"
+		c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		c.top_level = true
+		c.z_index = 90
+		c.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		c.color = Color(0, 0, 0, 0) # color controlled by shader
+		add_child(c)
+		var mat := ShaderMaterial.new()
+		mat.shader = Shader.new()
+		mat.shader.code = """
+			shader_type canvas_item;
+			uniform float corner_radius = 0.08; // in UV coords (~0..0.2 recommended)
+			uniform float edge_softness = 0.025; // feather width
+			void fragment(){
+				vec2 uv = UV;
+				// Signed distance to a rounded rectangle covering the screen with given corner radius
+				vec2 p = uv - vec2(0.5);
+				vec2 q = abs(p) - (vec2(0.5) - vec2(corner_radius));
+				float sd = length(max(q, vec2(0.0))) - corner_radius;
+				float alpha = smoothstep(0.0, edge_softness, sd);
+				COLOR = vec4(0.0, 0.0, 0.0, alpha);
+			}
+		"""
+		c.material = mat
+
+	else:
+		# If CRT already exists, capture its defaults for pulsing
+		var crt = get_node("CRT")
+		crt.layer = 128
+		crt.warp_amount = 0.45
+		crt_default_vignette_amount = crt.vignette_amount
+		crt_default_vignette_intensity = crt.vignette_intensity
 
 func _process(delta):
 	if not player:
@@ -81,10 +117,27 @@ func _process(delta):
 	
 	global_position += shake_offset
 
+
+
 func shake_camera(intensity: float, duration: float):
 	shake_intensity = intensity
 	shake_duration = duration
 	shake_timer = duration
+
+func pulse_vignette(amount_delta: float = 0.4, intensity_delta: float = 0.2, duration: float = 0.2):
+	var crt = get_node_or_null("CRT")
+	if not crt:
+		return
+	# Push up values immediately, then tween back to defaults
+	crt.vignette_amount = crt.vignette_amount + amount_delta
+	crt.vignette_intensity = crt.vignette_intensity + intensity_delta
+	var t = create_tween()
+	t.tween_interval(duration)
+	t.tween_callback(func():
+		if is_instance_valid(crt):
+			crt.vignette_amount = crt_default_vignette_amount
+			crt.vignette_intensity = crt_default_vignette_intensity
+	)
 
 func snap_to_player():
 	if player:

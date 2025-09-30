@@ -3,7 +3,7 @@ extends Control
 @export var slot_size: Vector2 = Vector2(72, 72)
 @export var max_inventory_slots: int = 20
 @export var inventory_position: Vector2 = Vector2(100, 80)
-@export var health_bar_position: Vector2 = Vector2(20, 20)
+@export var health_bar_position: Vector2 = Vector2(60, 48)
 @export var weapon_scale_factor: float = 0.6
 @export var slot_padding: int = 8
 
@@ -23,12 +23,26 @@ var notification_spacing: float = 30.0
 @onready var dash_bar: ProgressBar = null
 @onready var dash_label: Label = null
 @onready var echo_container: HBoxContainer = null
+@onready var boss_bar_container: Control = null
+@onready var boss_bar: ProgressBar = null
+@onready var boss_label: Label = null
 
 # Death screen variables
 var game_start_time: float = 0.0
 var enemies_killed: int = 0
 
 func _ready():
+	# Ensure UI renders above post-process CanvasLayers (e.g., CRT)
+	if not get_parent() or not (get_parent() is CanvasLayer):
+		var ui_layer := CanvasLayer.new()
+		ui_layer.name = "UILayer"
+		ui_layer.layer = 200
+		# Reparent this UI into a dedicated CanvasLayer to avoid screen effects
+		var root = get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
+		if root:
+			root.add_child(ui_layer)
+			reparent(ui_layer)
+
 	item_manager = get_node("/root/ItemManager") if has_node("/root/ItemManager") else null
 	player = get_tree().get_first_node_in_group("player")
 	set_process_input(true)
@@ -92,11 +106,17 @@ func connect_signals():
 			if not player.echo_spawned.is_connected(_on_echo_spawned):
 				player.echo_spawned.connect(_on_echo_spawned)
 
+	# Connect boss signals from existing big slime in scene (if any)
+	var bosses = get_tree().get_nodes_in_group("boss")
+	for b in bosses:
+		_connect_boss_signals(b)
+
 func setup_ui_layout():
 	create_health_bar()
 	create_dash_bar()
 	create_inventory_panel()
 	create_echo_pips()
+	create_boss_bar()
 
 func create_health_bar():
 	var health_container = VBoxContainer.new()
@@ -115,7 +135,7 @@ func create_health_bar():
 	health_bar.min_value = 0
 	health_bar.max_value = 100
 	health_bar.value = 100
-	health_bar.custom_minimum_size = Vector2(300, 24)
+	health_bar.custom_minimum_size = Vector2(420, 28)
 	health_bar.show_percentage = false
 	
 	var health_fill = StyleBoxFlat.new()
@@ -149,11 +169,72 @@ func create_echo_pips():
 	var container = HBoxContainer.new()
 	container.name = "EchoPips"
 	# Position under the dash bar
-	container.position = health_bar_position + Vector2(360 + 40, 28 + 30)
+	container.position = health_bar_position + Vector2(420 + 60, 28 + 40)
 	container.add_theme_constant_override("separation", 8)
 	add_child(container)
 	echo_container = container
 	update_echo_pips(0, 3)
+
+func create_boss_bar():
+	var container = Panel.new()
+	container.name = "BossBarContainer"
+	container.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	container.offset_top = 8
+	container.offset_left = 0
+	container.offset_right = 0
+	container.visible = false
+	add_child(container)
+
+	var inner = CenterContainer.new()
+	inner.name = "BossInner"
+	inner.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	container.add_child(inner)
+
+	var vbox = VBoxContainer.new()
+	vbox.name = "BossVBox"
+	vbox.add_theme_constant_override("separation", 6)
+	inner.add_child(vbox)
+
+	boss_label = Label.new()
+	boss_label.name = "BossName"
+	boss_label.text = "Lord Slime"
+	boss_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	boss_label.add_theme_font_size_override("font_size", 20)
+	boss_label.add_theme_color_override("font_color", Color(1, 0.85, 0.2))
+	vbox.add_child(boss_label)
+
+	boss_bar = ProgressBar.new()
+	boss_bar.name = "BossBar"
+	boss_bar.min_value = 0
+	boss_bar.max_value = 100
+	boss_bar.value = 100
+	boss_bar.custom_minimum_size = Vector2(620, 24)
+	boss_bar.show_percentage = false
+
+	var boss_fill = StyleBoxFlat.new()
+	boss_fill.bg_color = Color(0.85, 0.25, 0.25)
+	boss_fill.corner_radius_top_left = 6
+	boss_fill.corner_radius_top_right = 6
+	boss_fill.corner_radius_bottom_left = 6
+	boss_fill.corner_radius_bottom_right = 6
+	boss_bar.add_theme_stylebox_override("fill", boss_fill)
+
+	var boss_bg = StyleBoxFlat.new()
+	boss_bg.bg_color = Color(0.05, 0.03, 0.04, 0.9)
+	boss_bg.border_color = Color(0.3, 0.2, 0.25)
+	boss_bg.border_width_left = 2
+	boss_bg.border_width_right = 2
+	boss_bg.border_width_top = 2
+	boss_bg.border_width_bottom = 2
+	boss_bg.corner_radius_top_left = 6
+	boss_bg.corner_radius_top_right = 6
+	boss_bg.corner_radius_bottom_left = 6
+	boss_bg.corner_radius_bottom_right = 6
+	boss_bar.add_theme_stylebox_override("background", boss_bg)
+
+	vbox.add_child(boss_bar)
+
+	boss_bar_container = container
 
 func update_echo_pips(count: int, max_count: int = 3):
 	if not echo_container:
@@ -172,8 +253,8 @@ func update_echo_pips(count: int, max_count: int = 3):
 func create_dash_bar():
 	var dash_container = VBoxContainer.new()
 	dash_container.name = "DashContainer"
-	dash_container.position = health_bar_position + Vector2(360 + 40, 0)
-	dash_container.size = Vector2(360, 70)
+	dash_container.position = health_bar_position + Vector2(420 + 60, 10)
+	dash_container.size = Vector2(440, 80)
 	add_child(dash_container)
 
 	dash_label = Label.new()
@@ -186,7 +267,7 @@ func create_dash_bar():
 	dash_bar.min_value = 0
 	dash_bar.max_value = 100
 	dash_bar.value = 100
-	dash_bar.custom_minimum_size = Vector2(300, 24)
+	dash_bar.custom_minimum_size = Vector2(420, 28)
 	dash_bar.show_percentage = false
 
 	var dash_fill = StyleBoxFlat.new()
@@ -611,6 +692,33 @@ func _on_player_died():
 
 func _on_enemy_killed():
 	enemies_killed += 1
+
+func _connect_boss_signals(boss: Node):
+	if boss and boss.has_signal("boss_engaged"):
+		if not boss.boss_engaged.is_connected(_on_boss_engaged):
+			boss.boss_engaged.connect(_on_boss_engaged)
+	if boss and boss.has_signal("boss_disengaged"):
+		if not boss.boss_disengaged.is_connected(_on_boss_disengaged):
+			boss.boss_disengaged.connect(_on_boss_disengaged)
+	if boss and boss.has_signal("boss_health_changed"):
+		if not boss.boss_health_changed.is_connected(_on_boss_health_changed):
+			boss.boss_health_changed.connect(_on_boss_health_changed)
+
+func _on_boss_engaged(name: String, max_hp: int, cur_hp: int):
+	if boss_bar_container and boss_bar and boss_label:
+		boss_label.text = name
+		boss_bar.max_value = max_hp
+		boss_bar.value = cur_hp
+		boss_bar_container.visible = true
+
+func _on_boss_disengaged():
+	if boss_bar_container:
+		boss_bar_container.visible = false
+
+func _on_boss_health_changed(cur_hp: int, max_hp: int):
+	if boss_bar:
+		boss_bar.max_value = max_hp
+		boss_bar.value = cur_hp
 
 func _on_slot_clicked(slot_index: int):
 	print("Slot clicked: ", slot_index)

@@ -1,0 +1,60 @@
+[gd_scene load_steps=9 format=3 uid="uid://cme4secwfuob2"]
+
+[ext_resource type="Texture2D" uid="uid://c3wiv82uq4jry" path="res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/torch/torch_1.png" id="1_kx7w4"]
+[ext_resource type="Texture2D" uid="uid://bipp4egm3qq3n" path="res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/torch/torch_2.png" id="2_72pgl"]
+[ext_resource type="Texture2D" uid="uid://bstgt4iw5nxa2" path="res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/torch/torch_3.png" id="3_wfdi7"]
+[ext_resource type="Texture2D" uid="uid://nmfvii3xr2kx" path="res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/torch/torch_4.png" id="4_vkaj5"]
+[ext_resource type="Texture2D" uid="uid://tj1xrpvfbv3u" path="res://light.png" id="5_72pgl"]
+
+[sub_resource type="Animation" id="Animation_cfxwm"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("1_kx7w4")]
+}
+
+[sub_resource type="Animation" id="Animation_cfb3y"]
+resource_name = "torch_burn"
+length = 0.7
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.166667, 0.333333, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [ExtResource("1_kx7w4"), ExtResource("2_72pgl"), ExtResource("3_wfdi7"), ExtResource("4_vkaj5")]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_vsxk6"]
+_data = {
+&"RESET": SubResource("Animation_cfxwm"),
+&"torch_burn": SubResource("Animation_cfb3y")
+}
+
+[node name="Torch" type="Node2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_kx7w4")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_vsxk6")
+}
+autoplay = "torch_burn"
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+visible = false
+texture = ExtResource("5_72pgl")

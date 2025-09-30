@@ -40,6 +40,9 @@ uniform float roll_speed : hint_range(-8.0, 8.0) = 1.0;
 // Pixel sharpness/softness
 uniform float pixel_strength : hint_range(-4.0, 0.0) = -2.0;
 
+// Overall effect blend (0 = original screen, 1 = full CRT)
+uniform float effect_mix : hint_range(0.0, 1.0) = 0.6;
+
 // ===== Utility Functions =====
 
 /**
@@ -210,6 +213,8 @@ float roll_line(vec2 uv) {
 // ===== Main Shader Function =====
 
 void fragment() {
+    // Original screen color (for blending)
+    vec3 base = texture(SCREEN_TEXTURE, SCREEN_UV).rgb;
     // Get screen coordinates and apply screen warping
     vec2 pix = FRAGCOORD.xy;
     vec2 pos = warp(SCREEN_UV);
@@ -256,7 +261,7 @@ void fragment() {
         clr *= vignette(pos);
     }
     
-    // Output final color
-    COLOR.rgb = clr;
+    // Output final color blended with original for readability
+    COLOR.rgb = mix(base, clr, clamp(effect_mix, 0.0, 1.0));
     COLOR.a = 1.0;
 }

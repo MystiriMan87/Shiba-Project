@@ -48,6 +48,7 @@ func get_enemy_scene_path(enemy: Node) -> String:
 		print("Respawn Manager: Enemy has enemy_type: ", enemy_type)
 		var enemy_scene_map = {
 			"slime": "res://scenes/slime_enemy.tscn",
+			"big_slime": "res://scenes/slime_enemy_big.tscn",
 			"skeleton": "res://scenes/skeleton_enemy.tscn",
 		}
 		if enemy_type in enemy_scene_map:
@@ -60,6 +61,7 @@ func get_enemy_scene_path(enemy: Node) -> String:
 	
 	var enemy_scene_map = {
 		"slime": "res://scenes/slime_enemy.tscn",
+		"big_slime": "res://scenes/slime_enemy_big.tscn",
 		"skeleton": "res://scenes/skeleton_enemy.tscn",
 	}
 	

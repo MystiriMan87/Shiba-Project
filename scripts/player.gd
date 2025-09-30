@@ -500,6 +500,14 @@ func add_item_to_inventory(item_data: Dictionary):
 		if success:
 			play_pickup_sound()
 			show_pickup_notification(item_data)
+			# Cartoony popup for item pickup
+			var item_name: String = str(item_data.get("name", item_data.get("id", "Item")))
+			var qty: int = int(item_data.get("quantity", 1))
+			var qty_prefix: String = ""
+			if qty > 1:
+				qty_prefix = str(qty) + " "
+			var txt: String = "+" + qty_prefix + item_name
+			_spawn_potion_popup(txt, Color(1.0, 0.85, 0.2))
 	else:
 		var ui = get_node("../UI") if has_node("../UI") else null
 		if ui and ui.has_method("add_item_to_inventory"):
@@ -507,6 +515,14 @@ func add_item_to_inventory(item_data: Dictionary):
 			if success:
 				play_pickup_sound()
 				show_pickup_notification(item_data)
+				# Cartoony popup for item pickup
+				var item_name2: String = str(item_data.get("name", item_data.get("id", "Item")))
+				var qty2: int = int(item_data.get("quantity", 1))
+				var qty2_prefix: String = ""
+				if qty2 > 1:
+					qty2_prefix = str(qty2) + " "
+				var txt2: String = "+" + qty2_prefix + item_name2
+				_spawn_potion_popup(txt2, Color(1.0, 0.85, 0.2))
 
 func show_pickup_notification(item_data: Dictionary):
 	var ui = get_node("../UI") if has_node("../UI") else null
@@ -672,6 +688,14 @@ func start_dash(dir: Vector2):
 	flash_white(0.08)
 	# Dash particles disabled
 	dash_afterimage_timer = 0.0
+
+	# Camera feedback: shake and vignette pulse
+	var cam = get_tree().current_scene.get_node_or_null("PlayerCamera") if get_tree() and get_tree().current_scene else null
+	if cam:
+		if cam.has_method("shake_camera"):
+			cam.shake_camera(4.0, 0.10)
+		if cam.has_method("pulse_vignette"):
+			cam.pulse_vignette(0.22, 0.16, 0.10)
 
 	# spawn echo on dash start if we have room and later on recall
 
@@ -894,6 +918,10 @@ func heal(amount: int):
 	if current_health != old_health:
 		health_changed.emit(current_health)
 		update_health_display()
+		# Cartoony popup for health gain
+		var gained = current_health - old_health
+		if gained > 0:
+			_spawn_potion_popup("HP +" + str(gained), Color(0.2, 0.9, 0.2))
 
 func restore_dash(amount: int):
 	var before = dash_energy
@@ -903,6 +931,42 @@ func restore_dash(amount: int):
 	# also refill echo charges when drinking dash potion
 	echo_charges = echo_max_charges
 	echoes_changed.emit(active_echoes.size())
+
+	# Camera vignette pulse feedback on potion use
+	var cam = get_tree().current_scene.get_node_or_null("PlayerCamera") if get_tree() and get_tree().current_scene else null
+	if cam and cam.has_method("pulse_vignette"):
+		cam.pulse_vignette(0.28, 0.22, 0.14)
+
+	# Cartoony popup next to player
+	_spawn_potion_popup("Dash +", Color(0.2, 0.8, 1.0))
+
+func _spawn_potion_popup(text: String, color: Color = Color.WHITE):
+	var label := Label.new()
+	label.text = text
+	label.add_theme_font_size_override("font_size", 16)
+	label.add_theme_color_override("font_color", color)
+	label.add_theme_color_override("font_shadow_color", Color.BLACK)
+	label.add_theme_constant_override("shadow_offset_x", 2)
+	label.add_theme_constant_override("shadow_offset_y", 2)
+	label.modulate.a = 0.0
+	label.z_index = 200
+	var parent = get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
+	if not parent:
+		return
+	parent.add_child(label)
+	label.top_level = true
+	label.global_position = global_position + Vector2(0, -24)
+	var t = create_tween()
+	t.set_parallel(true)
+	# Pop scale effect
+	t.tween_property(label, "scale", Vector2(1.3, 1.3), 0.08)
+	# Fade in
+	t.tween_property(label, "modulate:a", 1.0, 0.08)
+	var t2 = create_tween()
+	# Rise and fade out
+	t2.tween_property(label, "global_position", label.global_position + Vector2(0, -36), 0.5)
+	t2.tween_property(label, "modulate:a", 0.0, 0.5)
+	t2.tween_callback(func(): if is_instance_valid(label): label.queue_free())
 
 func get_dash_energy() -> int:
 	return dash_energy
@@ -932,6 +996,11 @@ func start_attack():
 		attack_area.monitoring = true
 	
 	position_attack_hitbox(mouse_attack_direction)
+
+	# Camera feedback: light shake on attack
+	var cam = get_tree().current_scene.get_node_or_null("PlayerCamera") if get_tree() and get_tree().current_scene else null
+	if cam and cam.has_method("shake_camera"):
+		cam.shake_camera(4.0, 0.10)
 
 func start_mouse_sword_swing_animation():
 	if not attack_sprite:

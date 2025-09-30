@@ -11,11 +11,14 @@ static func spawn_damage_number(scene_root: Node, position: Vector2, amount: int
 	label.add_theme_color_override("font_shadow_color", Color(0,0,0))
 	label.add_theme_constant_override("shadow_offset_x", 1)
 	label.add_theme_constant_override("shadow_offset_y", 1)
-	label.position = position + Vector2(-6, -14)
+	label.top_level = false
+	label.global_position = position + Vector2(-6, -14)
 	label.z_index = 300
-	scene_root.add_child(label)
+	# Add to current scene root; ensure it renders above world but below UI
+	if scene_root and scene_root.has_method("add_child"):
+		scene_root.add_child(label)
 	var t = scene_root.create_tween()
-	t.tween_property(label, "position", label.position + Vector2(0, -22), 0.5)
+	t.tween_property(label, "global_position", label.global_position + Vector2(0, -22), 0.5)
 	t.tween_property(label, "modulate:a", 0.0, 0.5)
 	t.tween_callback(func(): if is_instance_valid(label): label.queue_free())
 #

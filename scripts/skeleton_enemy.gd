@@ -223,9 +223,11 @@ func change_skeleton_state(new_state: SkeletonState):
 				animation_player.play("walk")
 
 func take_damage(amount: int):
-	super.take_damage(amount)
+	# Show damage number near skeleton; offset up so it's visible
 	if get_tree() and get_tree().current_scene:
-		ParticleEffects.spawn_damage_number(get_tree().current_scene, global_position, amount)
+		ParticleEffects.spawn_damage_number(get_tree().current_scene, global_position + Vector2(0, -18), amount, Color(1, 0.6, 0.3))
+	# Apply base damage processing
+	super.take_damage(amount)
 	
 	# Play hurt animation
 	if animation_player and animation_player.has_animation("hurt"):
@@ -240,9 +242,13 @@ func take_damage(amount: int):
 		change_skeleton_state(SkeletonState.CHASING)
 
 func die():
-	# Play death animation
+	# Play death animation once and queue free after it finishes
 	if animation_player and animation_player.has_animation("death"):
 		animation_player.play("death")
-	
-	# Override die function to handle skeleton-specific death
-	super.die()
+		animation_player.loop_mode = AnimationPlayer.LOOP_NONE
+		var length = animation_player.get_animation("death").length if animation_player.get_animation("death") else 0.5
+		var t = create_tween()
+		t.tween_interval(length)
+		t.tween_callback(func(): super.die())
+	else:
+		super.die()

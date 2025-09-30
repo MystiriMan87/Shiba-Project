@@ -5,15 +5,19 @@ var loot_tables = {
 	
 	#Placeholders
 	"slime": {
-		"guaranteed_drops": [],  
+		"guaranteed_drops": [],
 		"possible_drops": [
-			{"item_id": "coin", "chance": 0.8, "min_qty": 1, "max_qty": 5},
-			{"item_id": "health_potion", "chance": 0.3, "min_qty": 1, "max_qty": 2},
-			{"item_id": "dash_flask", "chance": 0.25, "min_qty": 1, "max_qty": 1},
-			{"item_id": "iron_dagger", "chance": 0.1, "min_qty": 1, "max_qty": 1},
-			{"item_id": "legendary_mace", "chance": 0.1, "min_qty": 1, "max_qty": 1},
-			{"item_id": "steel_hammer", "chance": 0.1, "min_qty": 1, "max_qty": 1},
-			{"item_id": "stone_sword_huge", "chance": 0.1, "min_qty": 1, "max_qty": 1}
+			{"item_id": "coin", "chance": 0.95, "min_qty": 1, "max_qty": 5},
+			{"item_id": "health_potion", "chance": 0.12, "min_qty": 1, "max_qty": 1}
+		]
+	},
+	"big_slime": {
+		"guaranteed_drops": [
+			{"item_id": "coin", "min_qty": 6, "max_qty": 14}
+		],
+		"possible_drops": [
+			{"item_id": "health_potion", "chance": 0.2, "min_qty": 1, "max_qty": 2},
+			{"item_id": "dash_flask", "chance": 0.1, "min_qty": 1, "max_qty": 1}
 		]
 	},
 	#"orc": {

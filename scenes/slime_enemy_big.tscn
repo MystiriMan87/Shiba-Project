@@ -1,18 +1,18 @@
-[gd_scene load_steps=10 format=3 uid="uid://drik1twhweam8"]
+[gd_scene load_steps=10 format=3 uid="uid://d13pxeacfjovf"]
 
-[ext_resource type="Script" uid="uid://ba4klw55e614j" path="res://scripts/enemy.gd" id="1_md0e3"]
-[ext_resource type="Texture2D" uid="uid://pc5fy4ks2pd" path="res://Assets/green-slime-spritesheet.png" id="2_md0e3"]
+[ext_resource type="Script" uid="uid://ba4klw55e614j" path="res://scripts/enemy.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://pc5fy4ks2pd" path="res://Assets/green-slime-spritesheet.png" id="2"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_5uy6h"]
-size = Vector2(52, 38)
+[sub_resource type="CircleShape2D" id="CircleShape2D_de7wt"]
+radius = 35.4902
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_md0e3"]
-radius = 142.056
+[sub_resource type="CircleShape2D" id="2"]
+radius = 260.0
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_md0e3"]
-size = Vector2(62.875, 53.125)
+[sub_resource type="RectangleShape2D" id="3"]
+size = Vector2(77.3333, 61)
 
-[sub_resource type="Animation" id="Animation_5uy6h"]
+[sub_resource type="Animation" id="4"]
 length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -27,7 +27,7 @@ tracks/0/keys = {
 "values": [0]
 }
 
-[sub_resource type="Animation" id="Animation_4ra3w"]
+[sub_resource type="Animation" id="5"]
 resource_name = "idle"
 length = 2.7
 loop_mode = 1
@@ -44,7 +44,7 @@ tracks/0/keys = {
 "values": [0, 1, 2, 3, 4]
 }
 
-[sub_resource type="Animation" id="Animation_c4w8v"]
+[sub_resource type="Animation" id="6"]
 resource_name = "jump"
 length = 1.6
 loop_mode = 1
@@ -61,61 +61,72 @@ tracks/0/keys = {
 "values": [3, 4, 5, 6, 7, 8, 9, 10]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_xwavj"]
+[sub_resource type="AnimationLibrary" id="7"]
 _data = {
-&"RESET": SubResource("Animation_5uy6h"),
-&"idle": SubResource("Animation_4ra3w"),
-&"jump": SubResource("Animation_c4w8v")
+&"RESET": SubResource("4"),
+&"idle": SubResource("5"),
+&"jump": SubResource("6")
 }
 
-[node name="Enemy" type="CharacterBody2D"]
+[node name="BigSlime" type="CharacterBody2D"]
+scale = Vector2(3, 3)
 collision_layer = 4
-script = ExtResource("1_md0e3")
-max_health = 4
-jump_arc_height = 100
+script = ExtResource("1")
+max_health = 8
+speed = 45
+damage = 2
+detection_range = 220
+attack_range = 120
+enemy_type = "big_slime"
+jump_windup_duration = 0.6
+jump_duration = 0.5
+jump_cooldown = 2.2
+jump_arc_height = 140
+land_damage_radius = 60
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(0.5, 0.2, 0.9, 1)
 texture_filter = 1
-scale = Vector2(2.2, 2.2)
-texture = ExtResource("2_md0e3")
+scale = Vector2(5, 5)
+texture = ExtResource("2")
 hframes = 11
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(1, 33)
-shape = SubResource("RectangleShape2D_5uy6h")
+position = Vector2(0.333333, 55.3333)
+shape = SubResource("CircleShape2D_de7wt")
 
 [node name="HealthBar" type="ProgressBar" parent="."]
 visible = false
 layout_direction = 2
-offset_left = -63.0
-offset_top = -100.0
-offset_right = 64.0
-offset_bottom = -78.0
+offset_left = -80.0
+offset_top = -120.0
+offset_right = 80.0
+offset_bottom = -96.0
 show_percentage = false
 
 [node name="DetectionArea" type="Area2D" parent="."]
 collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea"]
-position = Vector2(0, -1)
-shape = SubResource("CircleShape2D_md0e3")
+position = Vector2(0.333313, 58.3333)
+shape = SubResource("2")
 
 [node name="AttackArea" type="Area2D" parent="."]
 collision_layer = 8
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
-position = Vector2(2, 33)
-shape = SubResource("RectangleShape2D_md0e3")
+position = Vector2(-1.66667, 55.8333)
+shape = SubResource("3")
 debug_color = Color(0.854902, 0, 0, 0.647059)
 
 [node name="WindUpBar" type="ProgressBar" parent="."]
 visible = false
 offset_left = 83.0
-offset_top = -65.0
+offset_top = -75.0
 offset_right = 87.0
-offset_bottom = -38.0
+offset_bottom = -48.0
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-&"": SubResource("AnimationLibrary_xwavj")
+&"": SubResource("7")
 }
