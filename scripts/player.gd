@@ -1,12 +1,11 @@
 extends CharacterBody2D
 
-# Inline echo ghost to avoid external script load issues
 class EchoGhost:
 	extends Area2D
 
 	@export var lifetime: float = 1.0
 	@export var move_speed: float = 900.0
-	@export var damage: int = 1
+	@export var echo_damage: int = 1
 	@export var alpha: float = 0.7
 	@export var afterimage_interval: float = 0.04
 	@export var afterimage_lifetime: float = 0.18
@@ -21,10 +20,28 @@ class EchoGhost:
 	var _afterimage_timer: float = 0.0
 
 	@onready var sprite: Sprite2D = null
+	@onready var shape: CollisionShape2D = null
 
 	func _ready():
 		set_physics_process(true)
 		_afterimage_timer = 0.0
+		monitoring = true
+		collision_layer = 0
+		collision_mask = 4
+		shape = CollisionShape2D.new()
+		var circ := CircleShape2D.new()
+		circ.radius = move_hit_radius
+		shape.shape = circ
+		add_child(shape)
+		if path.is_empty():
+			queue_free()
+			return
+		target = path[0]
+		body_entered.connect(_on_body_entered)
+
+	func _on_body_entered(body: Node):
+		if body and body.has_method("take_damage"):
+			body.take_damage(echo_damage)
 
 	func setup(texture: Texture2D, scale_v: Vector2, start_pos: Vector2, recorded_path: Array[Vector2], hframes: int = 1, vframes: int = 1, frame_idx: int = 0, flip_h: bool = false, flip_v: bool = false, centered: bool = true):
 		path = recorded_path.duplicate()
@@ -48,18 +65,19 @@ class EchoGhost:
 			target = start_pos
 
 	func _physics_process(delta):
+		# If the path finished, remove immediately to avoid lingering ghost
+		if path.is_empty():
+			queue_free()
+			return
+		# Lifetime used only as safety; still allow path to drive existence
 		if lifetime > 0:
 			lifetime -= delta
-		elif path.is_empty():
-			queue_free()
-		if path.is_empty():
-			return
 
-		# emit dash-like afterimages while moving along the path
 		_afterimage_timer -= delta
 		if _afterimage_timer <= 0.0:
 			_emit_afterimage()
 			_afterimage_timer = afterimage_interval
+
 		var to_target = target - global_position
 		var step = move_speed * delta
 		if to_target.length() <= step:
@@ -67,6 +85,7 @@ class EchoGhost:
 			idx += 1
 			if idx >= path.size():
 				path.clear()
+				queue_free()
 				return
 			target = path[idx]
 		else:
@@ -101,6 +120,9 @@ class EchoGhost:
 			var t := create_tween()
 			t.tween_property(img, "modulate:a", 0.0, afterimage_lifetime)
 			t.tween_callback(func(): img.queue_free())
+			# Fail-safe cleanup in case tween callback doesn't fire
+			var timer := get_tree().create_timer(afterimage_lifetime + 0.15)
+			timer.timeout.connect(func(): if is_instance_valid(img): img.queue_free())
 
 	func _apply_move_damage():
 		var space := get_world_2d().direct_space_state
@@ -118,10 +140,9 @@ class EchoGhost:
 		for hit in hits:
 			var c = hit.get("collider")
 			if c and c.has_method("take_damage"):
-				c.take_damage(damage)
+				c.take_damage(echo_damage)
 
 	func do_burst():
-		# quick ring pop for feedback
 		var ring := ColorRect.new()
 		ring.color = Color(0.4, 0.8, 1.0, 0.6)
 		ring.size = Vector2(4, 4)
@@ -133,22 +154,35 @@ class EchoGhost:
 		r.tween_property(ring, "modulate:a", 0.0, 0.2)
 		r.tween_callback(func(): if is_instance_valid(ring): ring.queue_free())
 
-		var space := get_world_2d().direct_space_state
-		if space:
-			var circle := CircleShape2D.new()
-			circle.radius = burst_radius
-			var qp := PhysicsShapeQueryParameters2D.new()
-			qp.shape = circle
-			qp.transform = Transform2D(0.0, global_position)
-			qp.collision_mask = 4
-			qp.collide_with_bodies = true
-			qp.collide_with_areas = true
-			var hits = space.intersect_shape(qp)
-			for hit in hits:
-				var c = hit.get("collider")
-				if c and c.has_method("take_damage"):
-					c.take_damage(burst_damage)
+		var space2 := get_world_2d().direct_space_state
+		if space2:
+			var circle2 := CircleShape2D.new()
+			circle2.radius = burst_radius
+			var qp2 := PhysicsShapeQueryParameters2D.new()
+			qp2.shape = circle2
+			qp2.transform = Transform2D(0.0, global_position)
+			qp2.collision_mask = 4
+			qp2.collide_with_bodies = true
+			qp2.collide_with_areas = true
+			var hits2 = space2.intersect_shape(qp2)
+			for hit2 in hits2:
+				var c2 = hit2.get("collider")
+				if c2 and c2.has_method("take_damage"):
+					c2.take_damage(burst_damage)
 		queue_free()
+
+	# Brief white flash similar to player's dash flash
+	func flash_white(duration: float = 0.08):
+		if not sprite:
+			return
+		var original_mod := sprite.modulate
+		sprite.modulate = Color(1, 1, 1, 1)
+		var t := create_tween()
+		t.tween_interval(duration)
+		t.tween_callback(func():
+			if is_instance_valid(self) and sprite:
+				sprite.modulate = original_mod
+		)
 
 @export var speed = 300
 @export var friction = 0.2
@@ -335,6 +369,11 @@ func _ready():
 	
 	if animation_player:
 		play_animation("Idle_down")
+		
+
+func _on_body_entered(body: Node):
+	if body and body.has_method("take_damage"):
+		body.take_damage(attack_damage)
 
 func setup_sound_effects():
 	hit_audio_player = AudioStreamPlayer2D.new()
@@ -555,12 +594,9 @@ func interact_with_chests():
 
 
 func _physics_process(delta):
-	# Handle dash white flash (separate from damage flash)
+	# Progress dash white-flash timer so it actually ends
 	if dash_flash_timer > 0.0:
 		dash_flash_timer -= delta
-		if dash_flash_timer <= 0.0 and sprite:
-			sprite.modulate = Color.WHITE
-
 	# Handle damage flash only when not in dash i-frames
 	if damage_immunity_timer > 0:
 		damage_immunity_timer -= delta
@@ -589,6 +625,8 @@ func _physics_process(delta):
 			is_dashing = false
 			# cache path for later recall (Q)
 			last_dash_path = echo_path.duplicate()
+			if echo_path.size() > 1:
+				spawn_echo_clone()
 			echo_path.clear()
 		else:
 			# spawn afterimages while dashing
@@ -600,12 +638,11 @@ func _physics_process(delta):
 	if cooldown_timer > 0:
 		cooldown_timer -= delta
 
-	# record echo path while dashing
+	# record echo path while dashing (do not end the dash here; just stop recording after duration)
 	if is_dashing:
 		echo_timer += delta
-		echo_path.append(global_position)
-		if echo_timer >= echo_record_duration:
-			is_dashing = false
+		if echo_timer < echo_record_duration:
+			echo_path.append(global_position)
 	
 	if Input.is_action_just_pressed('Attack') and not is_attacking and cooldown_timer <= 0:
 		var mouse_pos = get_global_mouse_position()
@@ -699,52 +736,52 @@ func start_dash(dir: Vector2):
 
 	# spawn echo on dash start if we have room and later on recall
 
-func setup_dash_particles():
-	if dash_particles:
-		return
-	
-	dash_particles = CPUParticles2D.new()
-	dash_particles.name = "DashParticles"
-	add_child(dash_particles)
-	
-	# Basic white burst behind the player
-	dash_particles.emitting = false
-	dash_particles.one_shot = true
-	dash_particles.amount = 24
-	dash_particles.lifetime = 0.20
-	dash_particles.preprocess = 0.0
-	dash_particles.explosiveness = 0.9
-	dash_particles.gravity = Vector2.ZERO
-	dash_particles.initial_velocity_min = 120
-	dash_particles.initial_velocity_max = 220
-	dash_particles.spread = 60
-	dash_particles.scale_amount_min = 0.5
-	dash_particles.scale_amount_max = 1.0
-	dash_particles.color = Color(1, 1, 1, 0.9)
-	dash_particles.z_index = -1
-	# Ensure particles stay in world space so they don't move with the player after emission
-	dash_particles.local_coords = false
+#func setup_dash_particles():
+	#if dash_particles:
+		#return
+	#
+	#dash_particles = CPUParticles2D.new()
+	#dash_particles.name = "DashParticles"
+	#add_child(dash_particles)
+	#
+	## Basic white burst behind the player
+	#dash_particles.emitting = false
+	#dash_particles.one_shot = true
+	#dash_particles.amount = 24
+	#dash_particles.lifetime = 0.20
+	#dash_particles.preprocess = 0.0
+	#dash_particles.explosiveness = 0.9
+	#dash_particles.gravity = Vector2.ZERO
+	#dash_particles.initial_velocity_min = 120
+	#dash_particles.initial_velocity_max = 220
+	#dash_particles.spread = 60
+	#dash_particles.scale_amount_min = 0.5
+	#dash_particles.scale_amount_max = 1.0
+	#dash_particles.color = Color(1, 1, 1, 0.9)
+	#dash_particles.z_index = -1
+	## Ensure particles stay in world space so they don't move with the player after emission
+	#dash_particles.local_coords = false
+#
+	## Generate a small white circle texture so particles are visible
+	#var img := Image.create(8, 8, false, Image.FORMAT_RGBA8)
+	#img.fill(Color(0, 0, 0, 0))
+	#var center := Vector2(3.5, 3.5)
+	#for y in range(8):
+		#for x in range(8):
+			#var d = Vector2(x, y).distance_to(center)
+			#if d <= 3.0:
+				#img.set_pixel(x, y, Color(1, 1, 1, 1))
+	#var tex := ImageTexture.create_from_image(img)
+	#dash_particles.texture = tex
 
-	# Generate a small white circle texture so particles are visible
-	var img := Image.create(8, 8, false, Image.FORMAT_RGBA8)
-	img.fill(Color(0, 0, 0, 0))
-	var center := Vector2(3.5, 3.5)
-	for y in range(8):
-		for x in range(8):
-			var d = Vector2(x, y).distance_to(center)
-			if d <= 3.0:
-				img.set_pixel(x, y, Color(1, 1, 1, 1))
-	var tex := ImageTexture.create_from_image(img)
-	dash_particles.texture = tex
-
-func emit_dash_particles():
-	if not dash_particles:
-		return
-	
-	dash_particles.global_position = global_position
-	dash_particles.emitting = false
-	dash_particles.restart()
-	dash_particles.emitting = true
+#func emit_dash_particles():
+	#if not dash_particles:
+		#return
+	#
+	#dash_particles.global_position = global_position
+	#dash_particles.emitting = false
+	#dash_particles.restart()
+	#dash_particles.emitting = true
 
 func emit_dash_afterimage():
 	if not sprite:
@@ -775,6 +812,9 @@ func emit_dash_afterimage():
 		var t := create_tween()
 		t.tween_property(ghost, "modulate:a", 0.0, dash_afterimage_lifetime)
 		t.tween_callback(func(): ghost.queue_free())
+		# Fail-safe cleanup in case tween callback doesn't fire
+		var timer := get_tree().create_timer(dash_afterimage_lifetime + 0.15)
+		timer.timeout.connect(func(): if is_instance_valid(ghost): ghost.queue_free())
 
 func flash_white(duration: float = 0.08):
 	if not sprite:
@@ -1176,7 +1216,6 @@ func spawn_echo_clone():
 	var parent = get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
 	if not parent:
 		return
-	parent.add_child(echo)
 	var tex: Texture2D = sprite.texture if sprite else null
 	var scale_v: Vector2 = sprite.scale if sprite else Vector2.ONE
 	var hfr: int = sprite.hframes if sprite else 1
@@ -1186,11 +1225,18 @@ func spawn_echo_clone():
 	var fv: bool = sprite.flip_v if sprite else false
 	var ctr: bool = sprite.centered if sprite else true
 	var start_pos = echo_path[0] if echo_path.size() > 0 else global_position
-	echo.setup(tex, scale_v, start_pos, echo_path, hfr, vfr, frm, fh, fv, ctr)
+	# Configure before adding to scene so _ready sees correct values
 	echo.move_speed = echo_move_speed
 	echo.burst_damage = echo_burst_damage
 	echo.burst_radius = echo_burst_radius
 	echo.damage_on_move = true
+	echo.move_hit_radius = 14.0
+	echo.afterimage_interval = 0.03
+	echo.afterimage_lifetime = 0.20
+	echo.setup(tex, scale_v, start_pos, echo_path, hfr, vfr, frm, fh, fv, ctr)
+	parent.add_child(echo)
+	# Start with a brief flash to mimic player's dash
+	echo.flash_white(0.06)
 	active_echoes.append(echo)
 	while active_echoes.size() > echo_max_charges:
 		var old = active_echoes.pop_front()
@@ -1203,11 +1249,10 @@ func spawn_echo_clone():
 
 func recall_echoes():
 	# Spawn a ghost that traces the last dash path from its start to current position
-	if echo_charges > 0 and last_dash_path.size() > 1:
+	if echo_charges > 0 and last_dash_path.size() >= 1:
 		var ghost := EchoGhost.new()
 		var parent = get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
 		if parent:
-			parent.add_child(ghost)
 			var tex: Texture2D = sprite.texture if sprite else null
 			var scale_v: Vector2 = sprite.scale if sprite else Vector2.ONE
 			var hfr: int = sprite.hframes if sprite else 1
@@ -1217,13 +1262,23 @@ func recall_echoes():
 			var fv: bool = sprite.flip_v if sprite else false
 			var ctr: bool = sprite.centered if sprite else true
 			ghost.move_speed = echo_move_speed
-			ghost.damage = attack_damage
+			ghost.echo_damage = attack_damage
 			ghost.burst_damage = echo_burst_damage
 			ghost.burst_radius = echo_burst_radius
 			ghost.damage_on_move = true
-			var path_for_ghost: Array[Vector2] = last_dash_path.duplicate()
+			ghost.move_hit_radius = 14.0
+			ghost.afterimage_interval = 0.04
+			ghost.afterimage_lifetime = 0.18
+			var path_for_ghost: Array[Vector2] = []
+			if last_dash_path.size() >= 1:
+				path_for_ghost = last_dash_path.duplicate()
+			else:
+				# Fallback: use dash start
+				path_for_ghost.append(last_dash_start)
 			path_for_ghost.append(global_position)
 			ghost.setup(tex, scale_v, last_dash_start, path_for_ghost, hfr, vfr, frm, fh, fv, ctr)
+			parent.add_child(ghost)
+			ghost.flash_white(0.06)
 			echo_charges -= 1
 			echoes_changed.emit(active_echoes.size())
 	# Clear previously queued passive echoes
@@ -1239,3 +1294,20 @@ func recall_echoes():
 
 func get_echo_count() -> int:
 	return active_echoes.size()
+	
+func spawn_dash_echo_from_path(path_points: Array[Vector2]) -> void:
+	if path_points.size() < 2:
+		return
+	var parent = get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
+	if not parent:
+		return
+	var echo := EchoGhost.new()
+	echo.global_position = path_points[0]
+	echo.path = path_points.duplicate()
+	echo.move_speed = 900.0
+	echo.echo_damage = 2
+	echo.move_hit_radius = 14.0
+	echo.afterimage_interval = 0.03
+	echo.afterimage_lifetime = 0.20
+	parent.add_child(echo)
+	

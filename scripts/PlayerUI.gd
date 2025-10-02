@@ -2,8 +2,8 @@ extends Control
 
 @export var slot_size: Vector2 = Vector2(72, 72)
 @export var max_inventory_slots: int = 20
-@export var inventory_position: Vector2 = Vector2(100, 80)
-@export var health_bar_position: Vector2 = Vector2(60, 48)
+@export var inventory_position: Vector2 = Vector2(120, 120)
+@export var health_bar_position: Vector2 = Vector2(100, 90)
 @export var weapon_scale_factor: float = 0.6
 @export var slot_padding: int = 8
 
@@ -32,17 +32,10 @@ var game_start_time: float = 0.0
 var enemies_killed: int = 0
 
 func _ready():
-	# Ensure UI renders above post-process CanvasLayers (e.g., CRT)
-	if not get_parent() or not (get_parent() is CanvasLayer):
-		var ui_layer := CanvasLayer.new()
-		ui_layer.name = "UILayer"
-		ui_layer.layer = 200
-		# Reparent this UI into a dedicated CanvasLayer to avoid screen effects
-		var root = get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
-		if root:
-			root.add_child(ui_layer)
-			reparent(ui_layer)
-
+	# Ensure this UI is rendered in the same pass as the world (so it warps with fisheye)
+	if get_parent() is CanvasLayer:
+		var cl := get_parent() as CanvasLayer
+		cl.layer = 0
 	item_manager = get_node("/root/ItemManager") if has_node("/root/ItemManager") else null
 	player = get_tree().get_first_node_in_group("player")
 	set_process_input(true)
@@ -169,7 +162,7 @@ func create_echo_pips():
 	var container = HBoxContainer.new()
 	container.name = "EchoPips"
 	# Position under the dash bar
-	container.position = health_bar_position + Vector2(420 + 60, 28 + 40)
+	container.position = health_bar_position + Vector2(420 + 80, 28 + 60)
 	container.add_theme_constant_override("separation", 8)
 	add_child(container)
 	echo_container = container
@@ -253,8 +246,8 @@ func update_echo_pips(count: int, max_count: int = 3):
 func create_dash_bar():
 	var dash_container = VBoxContainer.new()
 	dash_container.name = "DashContainer"
-	dash_container.position = health_bar_position + Vector2(420 + 60, 10)
-	dash_container.size = Vector2(440, 80)
+	dash_container.position = health_bar_position + Vector2(420 + 80, 24)
+	dash_container.size = Vector2(460, 84)
 	add_child(dash_container)
 
 	dash_label = Label.new()
