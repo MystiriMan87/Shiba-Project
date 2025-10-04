@@ -896,6 +896,14 @@ func take_damage(amount: int, source: Node = null):
 		return false
 	
 	play_hurt_sound()
+
+	# Camera feedback on damage
+	var cam = get_tree().current_scene.get_node_or_null("PlayerCamera") if get_tree() and get_tree().current_scene else null
+	if cam:
+		if cam.has_method("shake_camera"):
+			cam.shake_camera(10.0, 0.18)
+		if cam.has_method("pulse_vignette"):
+			cam.pulse_vignette(0.30, 0.18, 0.12)
 	
 	current_health -= amount
 	damage_immunity_timer = damage_immunity_duration
@@ -1040,7 +1048,7 @@ func start_attack():
 	# Camera feedback: light shake on attack
 	var cam = get_tree().current_scene.get_node_or_null("PlayerCamera") if get_tree() and get_tree().current_scene else null
 	if cam and cam.has_method("shake_camera"):
-		cam.shake_camera(4.0, 0.10)
+		cam.shake_camera(6.0, 0.12)
 
 func start_mouse_sword_swing_animation():
 	if not attack_sprite:

@@ -6,8 +6,17 @@ extends "res://scripts/enemy.gd"
 
 var start_position: Vector2
 var patrol_direction = 1
-var is_patrolling = true
+var is_patrolling = false
 #var attack_timer = 0.0
+
+# Local damage gating so hurt doesn't re-trigger or loop
+var hurt_locked: bool = false
+@export var damage_cooldown: float = 0.25
+# use damage_timer from base enemy.gd
+
+# Attack coordination
+var attack_in_progress: bool = false
+var damage_scheduled: bool = false
 
 enum SkeletonState {
 	IDLE,
@@ -17,7 +26,7 @@ enum SkeletonState {
 	RETURNING
 }
 
-var current_skeleton_state = SkeletonState.PATROLLING
+var current_skeleton_state = SkeletonState.IDLE
 
 func _ready():
 	super._ready()
@@ -42,6 +51,10 @@ func _ready():
 	else:
 		print("Skeleton: No animation player found!")
 	
+	# Connect animation finished once
+	if animation_player and not animation_player.animation_finished.is_connected(_on_anim_finished):
+		animation_player.animation_finished.connect(_on_anim_finished)
+
 	# Wait a frame and check again
 	await get_tree().process_frame
 	if animation_player:
@@ -53,6 +66,8 @@ func _physics_process(delta):
 		return
 	
 	attack_timer -= delta
+	if damage_timer > 0.0:
+		damage_timer -= delta
 	
 	match current_skeleton_state:
 		SkeletonState.IDLE:
@@ -73,16 +88,11 @@ func _physics_process(delta):
 	move_and_slide()
 
 func handle_idle_state(delta):
-	# Stay idle for a short time, then start patrolling
-	if state_timer <= 0:
-		change_skeleton_state(SkeletonState.PATROLLING)
-		state_timer = 1.0
-	else:
-		state_timer -= delta
-	
-	# Play idle animation
-	if animation_player and animation_player.current_animation != "idle":
-		play_animation("idle")
+	velocity = Vector2.ZERO
+	# Always idle until player is detected
+	if animation_player and animation_player.current_animation != "idle" and not hurt_locked:
+		if animation_player.has_animation("idle"):
+			animation_player.play("idle")
 
 func handle_patrol_state(delta):
 	if not is_patrolling:
@@ -99,18 +109,8 @@ func handle_patrol_state(delta):
 		if sprite:
 			sprite.flip_h = patrol_direction < 0
 	
-	# Play walk animation based on direction
-	if animation_player and animation_player.has_animation("walk"):
-		if animation_player.current_animation != "walk":
-			animation_player.play("walk")
-			print("Skeleton: Playing walk animation")
-	else:
-		print("Skeleton: No walk animation found or no animation player")
-	
-	# Debug: Print current animation state
-	if animation_player:
-		print("Skeleton: Current animation: ", animation_player.current_animation)
-		print("Skeleton: Is playing: ", animation_player.is_playing())
+	# Play movement animation (supports either "walk" or "movement")
+	_play_movement_anim()
 
 func handle_chase_state(delta):
 	if not player:
@@ -133,10 +133,8 @@ func handle_chase_state(delta):
 			# Stop and wait for attack cooldown
 			velocity = Vector2.ZERO
 	
-	# Play walk animation while chasing
-	if animation_player and animation_player.has_animation("walk"):
-		if animation_player.current_animation != "walk":
-			animation_player.play("walk")
+	# Play movement animation
+	_play_movement_anim()
 
 func handle_attack_state(delta):
 	# Stop movement during attack
@@ -144,18 +142,23 @@ func handle_attack_state(delta):
 	
 	# Play attack animation
 	if animation_player and animation_player.has_animation("attack"):
-		if animation_player.current_animation != "attack":
+		if not attack_in_progress:
+			attack_in_progress = true
+			damage_scheduled = false
 			animation_player.play("attack")
+			# schedule damage roughly mid-animation
+			var len: float = 0.5
+			if animation_player.get_animation("attack"):
+				len = float(animation_player.get_animation("attack").length)
+			if not damage_scheduled:
+				damage_scheduled = true
+				_schedule_attack_hit(max(0.05, min(len * 0.5, len - 0.05)))
 	
 	# Attack logic here
-	if player and global_position.distance_to(player.global_position) <= attack_range:
-		# Deal damage to player
-		if player.has_method("take_damage"):
-			player.take_damage(damage)
+	# Hit is performed in _schedule_attack_hit()
 	
 	# Return to chasing after attack
-	attack_timer = attack_cooldown
-	change_skeleton_state(SkeletonState.CHASING)
+	# Transition back happens in _on_anim_finished when attack ends
 
 func handle_return_state(delta):
 	# Return to start position
@@ -171,10 +174,8 @@ func handle_return_state(delta):
 		change_skeleton_state(SkeletonState.PATROLLING)
 		velocity = Vector2.ZERO
 	
-	# Play walk animation while returning
-	if animation_player and animation_player.has_animation("walk"):
-		if animation_player.current_animation != "walk":
-			animation_player.play("walk")
+	# Play movement animation
+	_play_movement_anim()
 
 func check_player_detection():
 	if not detection_area:
@@ -207,31 +208,50 @@ func change_skeleton_state(new_state: SkeletonState):
 	match new_state:
 		SkeletonState.IDLE:
 			velocity = Vector2.ZERO
-			if animation_player and animation_player.has_animation("idle"):
+			if animation_player and animation_player.has_animation("idle") and not hurt_locked:
 				animation_player.play("idle")
-		SkeletonState.PATROLLING:
-			if animation_player and animation_player.has_animation("walk"):
-				animation_player.play("walk")
-		SkeletonState.CHASING:
-			if animation_player and animation_player.has_animation("walk"):
-				animation_player.play("walk")
+		SkeletonState.PATROLLING, SkeletonState.CHASING, SkeletonState.RETURNING:
+			if not hurt_locked:
+				_play_movement_anim()
 		SkeletonState.ATTACKING:
-			if animation_player and animation_player.has_animation("attack"):
-				animation_player.play("attack")
-		SkeletonState.RETURNING:
-			if animation_player and animation_player.has_animation("walk"):
-				animation_player.play("walk")
+			pass
+
+func _play_movement_anim() -> void:
+	if not animation_player or hurt_locked:
+		return
+	var movement_name := "walk"
+	if not animation_player.has_animation("walk") and animation_player.has_animation("movement"):
+		movement_name = "movement"
+	if animation_player.has_animation(movement_name) and animation_player.current_animation != movement_name:
+		animation_player.play(movement_name)
 
 func take_damage(amount: int):
 	# Show damage number near skeleton; offset up so it's visible
 	if get_tree() and get_tree().current_scene:
 		ParticleEffects.spawn_damage_number(get_tree().current_scene, global_position + Vector2(0, -18), amount, Color(1, 0.6, 0.3))
 	# Apply base damage processing
+	if hurt_locked or damage_timer > 0.0:
+		return
+	damage_timer = damage_cooldown
 	super.take_damage(amount)
 	
 	# Play hurt animation
 	if animation_player and animation_player.has_animation("hurt"):
-		animation_player.play("hurt")
+		hurt_locked = true
+		animation_player.play("hurt") # clip must have Loop Off in editor
+		await animation_player.animation_finished
+		hurt_locked = false
+		# Resume appropriate animation/state
+		match current_skeleton_state:
+			SkeletonState.ATTACKING:
+				if animation_player.has_animation("attack"):
+					animation_player.play("attack")
+			SkeletonState.CHASING, SkeletonState.PATROLLING, SkeletonState.RETURNING:
+				if animation_player.has_animation("walk"):
+					animation_player.play("walk")
+			_:
+				if animation_player.has_animation("idle"):
+					animation_player.play("idle")
 	
 	# Reset sprite color after a short delay to prevent permanent red
 	var tween = create_tween()
@@ -241,14 +261,35 @@ func take_damage(amount: int):
 	if current_skeleton_state == SkeletonState.PATROLLING and player:
 		change_skeleton_state(SkeletonState.CHASING)
 
+func _schedule_attack_hit(delay: float) -> void:
+	if delay <= 0.0:
+		_do_attack_hit()
+		return
+	var t = get_tree().create_timer(delay)
+	await t.timeout
+	_do_attack_hit()
+
+func _do_attack_hit() -> void:
+	if current_skeleton_state != SkeletonState.ATTACKING:
+		return
+	if player and global_position.distance_to(player.global_position) <= attack_range:
+		if player.has_method("take_damage"):
+			player.take_damage(int(damage), self)
+
+func _on_anim_finished(anim_name: String) -> void:
+	if anim_name == "attack" and current_skeleton_state == SkeletonState.ATTACKING:
+		attack_in_progress = false
+		attack_timer = attack_cooldown
+		change_skeleton_state(SkeletonState.CHASING)
+
 func die():
 	# Play death animation once and queue free after it finishes
 	if animation_player and animation_player.has_animation("death"):
 		animation_player.play("death")
-		animation_player.loop_mode = AnimationPlayer.LOOP_NONE
-		var length = animation_player.get_animation("death").length if animation_player.get_animation("death") else 0.5
-		var t = create_tween()
-		t.tween_interval(length)
-		t.tween_callback(func(): super.die())
+		var length := 0.5
+		if animation_player.get_animation("death"):
+			length = float(animation_player.get_animation("death").length)
+		await get_tree().create_timer(length).timeout
+		super.die()
 	else:
 		super.die()

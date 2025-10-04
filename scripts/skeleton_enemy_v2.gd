@@ -22,6 +22,9 @@ extends CharacterBody2D
 var current_health
 var is_dead = false
 var is_attacking = false
+var hurt_locked: bool = false
+var damage_cooldown: float = 0.25
+var damage_timer: float = 0.0
 var player = null
 var player_in_detection_range = false
 var chase_timer = 0.0
@@ -54,7 +57,39 @@ func _ready():
 	add_to_group("enemies")
 	current_health = max_health
 	collision_layer = 4
-	collision_mask = 4
+	collision_mask = 1
+
+	# Safety: ensure exported values are valid (some scenes may have saved them as null)
+	if typeof(walk_friction) == TYPE_NIL:
+		walk_friction = 200
+	if typeof(walk_acceleration) == TYPE_NIL:
+		walk_acceleration = 300
+	if typeof(min_animation_speed) == TYPE_NIL:
+		min_animation_speed = 0.6
+	if typeof(max_animation_speed) == TYPE_NIL:
+		max_animation_speed = 1.6
+	if typeof(attack_speed_multiplier) == TYPE_NIL:
+		attack_speed_multiplier = 1.25
+	if typeof(separation_distance) == TYPE_NIL:
+		separation_distance = 20.0
+	if typeof(separation_force) == TYPE_NIL:
+		separation_force = 200.0
+	if typeof(speed) == TYPE_NIL:
+		speed = 60
+	if typeof(lunge_speed) == TYPE_NIL:
+		lunge_speed = 150.0
+	if typeof(lunge_duration) == TYPE_NIL:
+		lunge_duration = 0.12
+	if typeof(attack_range) == TYPE_NIL:
+		attack_range = 80
+	if typeof(detection_range) == TYPE_NIL:
+		detection_range = 120
+	if typeof(chase_duration) == TYPE_NIL:
+		chase_duration = 5.0
+	if typeof(attack_cooldown) == TYPE_NIL:
+		attack_cooldown = 2.0
+	if typeof(attack_hit_ratio) == TYPE_NIL:
+		attack_hit_ratio = 0.45
 	
 	setup_detection_area()
 	call_deferred("find_player")
@@ -77,6 +112,9 @@ func find_player():
 func _physics_process(delta):
 	if is_dead:
 		return
+	
+	if damage_timer > 0.0:
+		damage_timer -= delta
 	
 	if attack_timer > 0:
 		attack_timer -= delta
@@ -115,7 +153,7 @@ func handle_walking_state(delta):
 	
 	var distance_to_player = global_position.distance_to(player.global_position)
 	
-	if distance_to_player <= attack_range and attack_timer <= 0:
+	if distance_to_player <= attack_range and attack_timer <= 0 and not hurt_locked:
 		change_state(SkeletonState.ATTACKING)
 		return
 	
@@ -186,8 +224,8 @@ func start_attack():
 	var hit_time: float = (attack_len * attack_hit_ratio) / scaled
 	await get_tree().create_timer(hit_time).timeout
 	
-	if player and global_position.distance_to(player.global_position) <= attack_range:
-		player.take_damage(damage)
+	if player and player.has_method("take_damage") and global_position.distance_to(player.global_position) <= attack_range:
+		player.take_damage(int(damage), self)
 	
 	var dir: Vector2 = Vector2.ZERO
 	if player:
@@ -234,7 +272,7 @@ func _on_animation_finished(anim_name: String) -> void:
 		change_state(SkeletonState.WALKING)
 
 func take_damage(amount: int):
-	if is_dead:
+	if is_dead or hurt_locked or damage_timer > 0.0:
 		return
 	
 	# Show damage number the same way as slimes
@@ -242,10 +280,26 @@ func take_damage(amount: int):
 		ParticleEffects.spawn_damage_number(get_tree().current_scene, global_position + Vector2(0, -18), amount)
 	
 	current_health -= amount
+	damage_timer = damage_cooldown
 	
-	sprite.modulate = Color.RED
-	await get_tree().create_timer(0.1).timeout
-	sprite.modulate = Color.WHITE
+	# Play one-shot hurt animation (no loop)
+	if animation_player and animation_player.has_animation("hurt"):
+		hurt_locked = true
+		var len: float = max(0.05, float(animation_player.get_animation("hurt").length))
+		animation_player.speed_scale = 1.0
+		animation_player.play("hurt")
+		# brief flash
+		sprite.modulate = Color.RED
+		await get_tree().create_timer(min(0.15, len * 0.25)).timeout
+		sprite.modulate = Color.WHITE
+		# wait for rest of hurt, but cap to avoid long stalls
+		await get_tree().create_timer(min(0.6, len)).timeout
+		hurt_locked = false
+	else:
+		# fallback flash only
+		sprite.modulate = Color.RED
+		await get_tree().create_timer(0.1).timeout
+		sprite.modulate = Color.WHITE
 	
 	if current_health <= 0:
 		die()

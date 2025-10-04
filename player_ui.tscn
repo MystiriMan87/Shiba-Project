@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://cqk6unim2ftgo"]
+[gd_scene load_steps=4 format=3 uid="uid://cqk6unim2ftgo"]
 
 [ext_resource type="Script" uid="uid://bov65j62y0be8" path="res://scripts/PlayerUI.gd" id="1_lwipk"]
+[ext_resource type="Texture2D" uid="uid://d12anw6sa6wxg" path="res://Assets/16x64 Red Simple Healthbar.png" id="2_654h1"]
+[ext_resource type="Script" uid="uid://etw1xkbn5jmn" path="res://healthbar.gd" id="3_pc08v"]
 
 [node name="PlayerUI" type="Control"]
 layout_mode = 3
@@ -15,7 +17,6 @@ mouse_filter = 1
 script = ExtResource("1_lwipk")
 
 [node name="HealthContainer" type="HBoxContainer" parent="."]
-visible = false
 texture_filter = 1
 layout_mode = 1
 offset_left = 86.0
@@ -24,111 +25,13 @@ offset_right = 160.0
 offset_bottom = 113.0
 scale = Vector2(6, 6)
 
-[node name="HealthIcon" type="TextureRect" parent="HealthContainer"]
-visible = false
-layout_mode = 2
-expand_mode = 3
-stretch_mode = 3
-
-[node name="HealthBar" type="ProgressBar" parent="HealthContainer"]
-visible = false
-custom_minimum_size = Vector2(50, 12)
-layout_mode = 2
-show_percentage = false
-
-[node name="HealthLabel" type="Label" parent="HealthContainer"]
-visible = false
-custom_minimum_size = Vector2(60, 24)
-layout_mode = 2
-text = "100/100"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="WeaponContainer" type="VBoxContainer" parent="."]
-visible = false
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -639.0
-offset_top = 75.0
-offset_right = -339.0
-offset_bottom = 229.0
-grow_horizontal = 0
-scale = Vector2(2, 2)
-alignment = 1
-
-[node name="WeaponIcon" type="TextureRect" parent="WeaponContainer"]
-visible = false
+[node name="Sprite2D" type="Sprite2D" parent="HealthContainer"]
 texture_filter = 1
-custom_minimum_size = Vector2(1, 50)
-layout_mode = 2
-expand_mode = 2
-stretch_mode = 5
-
-[node name="WeaponInfo" type="VBoxContainer" parent="WeaponContainer"]
-visible = false
-custom_minimum_size = Vector2(150, 50)
-layout_mode = 2
-
-[node name="WeaponName" type="Label" parent="WeaponContainer/WeaponInfo"]
-layout_mode = 2
-text = "Iron Sword"
-horizontal_alignment = 1
-
-[node name="WeaponDamage" type="Label" parent="WeaponContainer/WeaponInfo"]
-layout_mode = 2
-text = "DMG: 1"
-horizontal_alignment = 1
-
-[node name="CooldownBar" type="ProgressBar" parent="WeaponContainer"]
-visible = false
-custom_minimum_size = Vector2(150, 6)
-layout_mode = 2
-max_value = 1.0
-
-[node name="InventoryContainer" type="VBoxContainer" parent="."]
-visible = false
-layout_mode = 0
-offset_top = 481.0
-offset_right = 1000.0
-offset_bottom = 1072.0
-alignment = 1
-
-[node name="InventoryLabel" type="Label" parent="InventoryContainer"]
-visible = false
-layout_mode = 2
-theme_override_font_sizes/font_size = 30
-text = "Inventory
-"
-horizontal_alignment = 1
-uppercase = true
-
-[node name="InventoryGrid" type="GridContainer" parent="InventoryContainer"]
-visible = false
-custom_minimum_size = Vector2(80, 400)
-layout_mode = 2
-size_flags_vertical = 3
-columns = 4
-
-[node name="NotificationContainer" type="VBoxContainer" parent="."]
-visible = false
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -20.0
-offset_top = 33.0
-offset_right = 20.0
-offset_bottom = 73.0
-grow_horizontal = 2
-
-[node name="NotificationLabel" type="Label" parent="NotificationContainer"]
-visible = false
-custom_minimum_size = Vector2(200, 60)
-layout_mode = 2
-horizontal_alignment = 1
-autowrap_mode = 3
+position = Vector2(48.5, 7)
+scale = Vector2(1.6224, 1.75)
+texture = ExtResource("2_654h1")
+vframes = 5
+script = ExtResource("3_pc08v")
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 0

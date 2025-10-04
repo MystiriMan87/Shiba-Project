@@ -105,58 +105,31 @@ func connect_signals():
 		_connect_boss_signals(b)
 
 func setup_ui_layout():
-	create_health_bar()
+	#create_health_bar()
 	create_dash_bar()
 	create_inventory_panel()
 	create_echo_pips()
 	create_boss_bar()
 
-func create_health_bar():
-	var health_container = VBoxContainer.new()
-	health_container.name = "HealthContainer"
-	health_container.position = health_bar_position
-	health_container.size = Vector2(360, 70)
-	add_child(health_container)
-	
-	health_label = Label.new()
-	health_label.name = "HealthLabel"
-	health_label.visible = false
-	health_container.add_child(health_label)
-	
-	health_bar = ProgressBar.new()
-	health_bar.name = "HealthBar"
-	health_bar.min_value = 0
-	health_bar.max_value = 100
-	health_bar.value = 100
-	health_bar.custom_minimum_size = Vector2(420, 28)
-	health_bar.show_percentage = false
-	
-	var health_fill = StyleBoxFlat.new()
-	health_fill.bg_color = Color(0.2, 0.8, 0.2)
-	health_fill.corner_radius_top_left = 2
-	health_fill.corner_radius_top_right = 2
-	health_fill.corner_radius_bottom_left = 2
-	health_fill.corner_radius_bottom_right = 2
-	health_fill.border_width_left = 0
-	health_fill.border_width_right = 0
-	health_fill.border_width_top = 0
-	health_fill.border_width_bottom = 0
-	health_bar.add_theme_stylebox_override("fill", health_fill)
-	
-	var health_bg_style = StyleBoxFlat.new()
-	health_bg_style.bg_color = Color(0.08, 0.05, 0.07, 0.9)
-	health_bg_style.border_color = Color(0.25, 0.18, 0.22)
-	health_bg_style.border_width_left = 2
-	health_bg_style.border_width_right = 2
-	health_bg_style.border_width_top = 2
-	health_bg_style.border_width_bottom = 2
-	health_bg_style.corner_radius_top_left = 6
-	health_bg_style.corner_radius_top_right = 6
-	health_bg_style.corner_radius_bottom_left = 6
-	health_bg_style.corner_radius_bottom_right = 6
-	health_bar.add_theme_stylebox_override("background", health_bg_style)
-	
-	health_container.add_child(health_bar)
+#func create_health_bar():
+	#var health_container = VBoxContainer.new()
+	#health_container.name = "HealthContainer"
+	#health_container.position = health_bar_position
+	#health_container.size = Vector2(360, 70)
+	#add_child(health_container)
+	#
+	#health_label = Label.new()
+	#health_label.name = "HealthLabel"
+	#health_label.visible = false
+	#health_container.add_child(health_label)
+	#
+	## Old ProgressBar-based health bar is deprecated in favor of the new sprite one.
+	## Keep references null/hidden to avoid layout conflicts.
+	#health_bar = ProgressBar.new()
+	#health_bar.visible = false
+	#health_container.add_child(health_bar)
+	## Hide the entire legacy container so it doesn't overlay the new bar
+	#health_container.visible = false
 
 func create_echo_pips():
 	var container = HBoxContainer.new()
@@ -246,8 +219,9 @@ func update_echo_pips(count: int, max_count: int = 3):
 func create_dash_bar():
 	var dash_container = VBoxContainer.new()
 	dash_container.name = "DashContainer"
-	dash_container.position = health_bar_position + Vector2(420 + 80, 24)
-	dash_container.size = Vector2(460, 84)
+	# Place directly under the health bar position
+	dash_container.position = health_bar_position + Vector2(35, 120)
+	dash_container.size = Vector2(460, 48)
 	add_child(dash_container)
 
 	dash_label = Label.new()
@@ -260,28 +234,29 @@ func create_dash_bar():
 	dash_bar.min_value = 0
 	dash_bar.max_value = 100
 	dash_bar.value = 100
-	dash_bar.custom_minimum_size = Vector2(420, 28)
+	# Make thinner
+	dash_bar.custom_minimum_size = Vector2(420, 12)
 	dash_bar.show_percentage = false
 
 	var dash_fill = StyleBoxFlat.new()
 	dash_fill.bg_color = Color(0.16, 0.55, 1.0)
-	dash_fill.corner_radius_top_left = 2
-	dash_fill.corner_radius_top_right = 2
-	dash_fill.corner_radius_bottom_left = 2
-	dash_fill.corner_radius_bottom_right = 2
+	dash_fill.corner_radius_top_left = 3
+	dash_fill.corner_radius_top_right = 3
+	dash_fill.corner_radius_bottom_left = 3
+	dash_fill.corner_radius_bottom_right = 3
 	dash_bar.add_theme_stylebox_override("fill", dash_fill)
 
 	var dash_bg = StyleBoxFlat.new()
 	dash_bg.bg_color = Color(0.06, 0.08, 0.14, 0.9)
 	dash_bg.border_color = Color(0.12, 0.16, 0.26)
-	dash_bg.border_width_left = 2
-	dash_bg.border_width_right = 2
-	dash_bg.border_width_top = 2
-	dash_bg.border_width_bottom = 2
-	dash_bg.corner_radius_top_left = 6
-	dash_bg.corner_radius_top_right = 6
-	dash_bg.corner_radius_bottom_left = 6
-	dash_bg.corner_radius_bottom_right = 6
+	dash_bg.border_width_left = 1
+	dash_bg.border_width_right = 1
+	dash_bg.border_width_top = 1
+	dash_bg.border_width_bottom = 1
+	dash_bg.corner_radius_top_left = 4
+	dash_bg.corner_radius_top_right = 4
+	dash_bg.corner_radius_bottom_left = 4
+	dash_bg.corner_radius_bottom_right = 4
 	dash_bar.add_theme_stylebox_override("background", dash_bg)
 
 	dash_container.add_child(dash_bar)

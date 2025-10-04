@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=4 uid="uid://dpcl1dclvepl8"]
+[gd_scene load_steps=28 format=4 uid="uid://dpcl1dclvepl8"]
 
 [ext_resource type="Script" uid="uid://c4k4k8r5ebb5c" path="res://scenes/world.gd" id="1_4mrxx"]
 [ext_resource type="PackedScene" uid="uid://hqa6411o6hsf" path="res://scenes/player.tscn" id="1_nnsk1"]
@@ -16,6 +16,7 @@
 [ext_resource type="PackedScene" uid="uid://cme4secwfuob2" path="res://torch.tscn" id="13_jhx03"]
 [ext_resource type="PackedScene" uid="uid://bfy8qij5td24" path="res://scenes/Gate_door.tscn" id="15_xo05s"]
 [ext_resource type="PackedScene" uid="uid://bu81gbln0icr0" path="res://scenes/SpikeTrap.tscn" id="16_dss4m"]
+[ext_resource type="PackedScene" uid="uid://dda8iy5rwprfp" path="res://scenes/vampire_enemy.tscn" id="17_7t5mc"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_71j4m"]
 texture = ExtResource("4_k0juu")
@@ -726,66 +727,79 @@ texture_filter = 1
 z_index = 1
 position = Vector2(161, -26)
 color = Color(0.731403, 0.20432, 0.137489, 1)
+energy = 2.9
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D2" type="PointLight2D" parent="PointLight"]
 position = Vector2(483, -31)
 color = Color(0.731403, 0.20432, 0.137489, 1)
+energy = 2.9
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D3" type="PointLight2D" parent="PointLight"]
 position = Vector2(224, 731)
 color = Color(0.731403, 0.20432, 0.137489, 1)
+energy = 2.9
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D4" type="PointLight2D" parent="PointLight"]
 position = Vector2(418, 736)
 color = Color(0.731403, 0.20432, 0.137489, 1)
+energy = 2.9
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D5" type="PointLight2D" parent="PointLight"]
 position = Vector2(-31, 858)
 color = Color(0.731403, 0.20432, 0.137489, 1)
+energy = 2.9
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D6" type="PointLight2D" parent="PointLight"]
 position = Vector2(-28, 1050)
 color = Color(0.731403, 0.20432, 0.137489, 1)
+energy = 2.9
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D7" type="PointLight2D" parent="PointLight"]
 position = Vector2(-350, 859)
 color = Color(0.731403, 0.20432, 0.137489, 1)
+energy = 2.9
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D8" type="PointLight2D" parent="PointLight"]
 position = Vector2(-350, 1053)
 color = Color(0.731403, 0.20432, 0.137489, 1)
+energy = 2.9
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D9" type="PointLight2D" parent="PointLight"]
 position = Vector2(-733, 929)
 color = Color(0.731403, 0.20432, 0.137489, 1)
+energy = 2.9
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D10" type="PointLight2D" parent="PointLight"]
 position = Vector2(-734, 1070)
 color = Color(0.731403, 0.20432, 0.137489, 1)
+energy = 2.9
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D11" type="PointLight2D" parent="PointLight"]
 position = Vector2(223, 1692)
 color = Color(0.731403, 0.20432, 0.137489, 1)
+energy = 2.9
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D12" type="PointLight2D" parent="PointLight"]
 position = Vector2(413, 1688)
 color = Color(0.731403, 0.20432, 0.137489, 1)
+energy = 2.9
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D13" type="PointLight2D" parent="PointLight"]
 position = Vector2(309, 1963.5)
 scale = Vector2(1.92578, 1.33008)
+energy = 2.9
 texture = ExtResource("12_q5onr")
 
 [node name="TileMap" type="TileMap" parent="."]
@@ -851,90 +865,74 @@ is_locked = false
 loot_items = Array[String](["health_potion", "Steel_hammer"])
 
 [node name="BigSlime" parent="." instance=ExtResource("11_e3hyu")]
-visible = false
 position = Vector2(320, 1958)
 max_health = 100
 
 [node name="Enemy" parent="." instance=ExtResource("1_rwgxs")]
-visible = false
 position = Vector2(16, 748)
 
 [node name="Enemy2" parent="." instance=ExtResource("1_rwgxs")]
-visible = false
 position = Vector2(141, 779)
 
 [node name="Enemy3" parent="." instance=ExtResource("1_rwgxs")]
-visible = false
 position = Vector2(52, 861)
 
 [node name="Enemy4" parent="." instance=ExtResource("1_rwgxs")]
-visible = false
 position = Vector2(492, 976)
 
 [node name="Enemy5" parent="." instance=ExtResource("1_rwgxs")]
-visible = false
 position = Vector2(639, 995)
 
 [node name="Enemy6" parent="." instance=ExtResource("1_rwgxs")]
-visible = false
 position = Vector2(543, 1083)
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
-visible = false
 z_index = 1
 position = Vector2(62, 52)
 color = Color(0.470076, 0.470076, 0.470076, 1)
 
 [node name="Torch" parent="." instance=ExtResource("13_jhx03")]
-visible = false
-z_index = -1
+top_level = true
+light_mask = 1023
+visibility_layer = 1023
 position = Vector2(475, -33)
 scale = Vector2(4, 4)
 
 [node name="Torch2" parent="." instance=ExtResource("13_jhx03")]
-visible = false
 z_index = -1
 position = Vector2(169, -37)
 scale = Vector2(4, 4)
 
 [node name="Torch3" parent="." instance=ExtResource("13_jhx03")]
-visible = false
-z_index = -1
+z_index = 22
 position = Vector2(200, 681)
 scale = Vector2(4, 4)
 
 [node name="Torch4" parent="." instance=ExtResource("13_jhx03")]
-visible = false
 z_index = -1
 position = Vector2(441, 683)
 scale = Vector2(4, 4)
 
 [node name="Torch5" parent="." instance=ExtResource("13_jhx03")]
-visible = false
 z_index = -1
 position = Vector2(200, 1648)
 scale = Vector2(4, 4)
 
 [node name="Torch6" parent="." instance=ExtResource("13_jhx03")]
-visible = false
 z_index = -1
 position = Vector2(444, 1646)
 scale = Vector2(4, 4)
 
 [node name="SkeletonEnemyV2" parent="." instance=ExtResource("10_w7kh3")]
-visible = false
 position = Vector2(571, 788)
 
 [node name="SkeletonEnemyV3" parent="." instance=ExtResource("10_w7kh3")]
-visible = false
 position = Vector2(55, 1103)
 
 [node name="SkeletonEnemyV4" parent="." instance=ExtResource("10_w7kh3")]
-visible = false
 position = Vector2(-511, 862)
 
 [node name="SkeletonEnemyV5" parent="." instance=ExtResource("10_w7kh3")]
-visible = false
 position = Vector2(-523, 1118)
 
 [node name="GateDoor" parent="." instance=ExtResource("15_xo05s")]
@@ -948,3 +946,12 @@ position = Vector2(360, -1481)
 [node name="SpikeTrap2" parent="." instance=ExtResource("16_dss4m")]
 z_index = -1
 position = Vector2(442, -1481)
+
+[node name="Vampire_enemy" parent="." instance=ExtResource("17_7t5mc")]
+position = Vector2(482, -853)
+
+[node name="Vampire_enemy2" parent="." instance=ExtResource("17_7t5mc")]
+position = Vector2(126, -696)
+
+[node name="Vampire_enemy3" parent="." instance=ExtResource("17_7t5mc")]
+position = Vector2(0, -1509)
