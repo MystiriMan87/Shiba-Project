@@ -87,6 +87,8 @@ func _ready():
 	current_health = max_health
 	collision_layer = 4
 	collision_mask = 1
+	# Ensure all enemies are discoverable via the common group
+	add_to_group("enemies")
 	# Safety: ensure exported floats are valid even if scene serialized differently
 	if typeof(walk_friction) == TYPE_NIL:
 		walk_friction = 200.0

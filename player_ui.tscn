@@ -132,14 +132,16 @@ autowrap_mode = 3
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 0
-offset_left = 1390.0
-offset_top = 872.0
-offset_right = 1954.0
-offset_bottom = 1057.0
+offset_left = 1367.0
+offset_top = 763.0
+offset_right = 1931.0
+offset_bottom = 1042.0
 theme_override_font_sizes/font_size = 31
-text = "New AREA and boss coming soon!
+text = "Dash through enemies 
+to Damage them
 
 Tab - INVENTORY
-Shift - Dash"
+Shift - Dash
+Q - Dash echo"
 horizontal_alignment = 1
 uppercase = true

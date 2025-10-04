@@ -4,6 +4,14 @@ class_name DropSystem
 var loot_tables = {
 	
 	#Placeholders
+	"skeleton": {
+		"guaranteed_drops": [],
+		"possible_drops": [
+			{"item_id": "coin", "chance": 0.9, "min_qty": 1, "max_qty": 4},
+			{"item_id": "health_potion", "chance": 0.1, "min_qty": 1, "max_qty": 1},
+			{"item_id": "iron_dagger", "chance": 0.05, "min_qty": 1, "max_qty": 1}
+		]
+	},
 	"slime": {
 		"guaranteed_drops": [],
 		"possible_drops": [

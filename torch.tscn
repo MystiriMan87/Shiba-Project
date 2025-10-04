@@ -44,7 +44,7 @@ _data = {
 &"torch_burn": SubResource("Animation_cfb3y")
 }
 
-[node name="Torch" type="Node2D"]
+[node name="Torch" type="Node2D" groups=["lights"]]
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_kx7w4")

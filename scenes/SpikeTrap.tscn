@@ -1,0 +1,56 @@
+[gd_scene load_steps=8 format=3 uid="uid://bu81gbln0icr0"]
+
+[ext_resource type="Script" uid="uid://d3dsa2cviajuk" path="res://scenes/spike_trap.gd" id="1_uud73"]
+[ext_resource type="Texture2D" uid="uid://00eewwjv1bvr" path="res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/peaks/peaks_3.png" id="2_qkxa7"]
+[ext_resource type="Texture2D" uid="uid://h61hnpxwwr6n" path="res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/peaks/peaks_4.png" id="3_onegg"]
+[ext_resource type="Texture2D" uid="uid://dttakual60ny0" path="res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/peaks/peaks_2.png" id="4_57arr"]
+[ext_resource type="Texture2D" uid="uid://bpo01qj6cvn0r" path="res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/peaks/peaks_1.png" id="5_xurlj"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_hfrp4"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_qkxa7")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 2.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_qkxa7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_onegg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_57arr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_xurlj")
+}],
+"loop": false,
+"name": &"stab",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1dub5"]
+
+[node name="SpikeTrap" type="Area2D"]
+scale = Vector2(4, 4)
+collision_layer = 0
+collision_mask = 31
+script = ExtResource("1_uud73")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_hfrp4")
+animation = &"idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_1dub5")
+
+[node name="ReArmTimer" type="Timer" parent="."]
+wait_time = 5.0
+one_shot = true
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

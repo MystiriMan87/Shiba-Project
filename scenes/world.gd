@@ -45,6 +45,11 @@ func _ready():
 		var spawn_pos = player.global_position + Vector2(120, 40)
 		spawn_pickup_item("iron_axe", spawn_pos, 1)
 
+	# Add line-of-sight overlay that follows player
+	var los := LineOfSight.new()
+	add_child(los)
+	los.set_target(player)
+
 func spawn_pickup_item(item_id: String, position: Vector2, quantity: int = 1):
 	# FIXED: Use the static create function instead of trying to load a .tscn file
 	var pickup = PickupItem.create_pickup_item(item_id, position, quantity)
@@ -64,7 +69,6 @@ func _on_enemy_died(enemy_position: Vector2):
 		
 		spawn_pickup_item(random_item, enemy_position, random_quantity)
 
-# Test function - call this to debug pickup system
 func _input(event):
 	if event is InputEventKey and event.pressed:
 		match event.keycode:

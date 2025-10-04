@@ -32,7 +32,7 @@ func spawn_chest(chest_type: String, position: Vector2) -> Chest:
 			chest.coin_drop_max = 20
 		"unlocked":
 			chest.is_locked = false
-			chest.loot_table = ["health_potion", "coin"]
+			chest.loot_table = ["health_potion", "coin", "legendary_mace"]
 			chest.coin_drop_min = 0
 			chest.coin_drop_max = 3
 	

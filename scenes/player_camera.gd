@@ -44,12 +44,13 @@ func _ready():
 		crt.warp_amount = 0.45
 		crt.vignette_amount = crt_default_vignette_amount
 		crt.vignette_intensity = crt_default_vignette_intensity
-		crt.scan_line_amount = 0.3
-		crt.interference_amount = 0.015
-		crt.grille_amount = 0.04
-		crt.aberation_amount = 0.1
-		crt.pixel_strength = -1.4
-		crt.effect_mix = 0.5
+		# Tone down image-distorting effects to avoid UI/enemy sprite wobble
+		crt.scan_line_amount = 0.15
+		crt.interference_amount = 0.0
+		crt.grille_amount = 0.02
+		crt.aberation_amount = 0.03
+		crt.pixel_strength = -0.8
+		crt.effect_mix = 0.35
 
 	# Add subtle curved edges mask (rounded corners)
 	if not has_node("CornerMask"):
