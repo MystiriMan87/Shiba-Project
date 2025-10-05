@@ -382,11 +382,14 @@ _data = {
 }
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_2"]
-radius = 45.2769
+radius = 81.0027
 
 [node name="Vampire_enemy" type="CharacterBody2D"]
 scale = Vector2(3, 3)
 script = ExtResource("1_6pm7g")
+attack_cooldown = 1.0
+max_health = 8
+damage = 2
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture_filter = 1

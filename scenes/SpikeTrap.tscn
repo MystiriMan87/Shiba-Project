@@ -28,10 +28,19 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": ExtResource("5_xurlj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_57arr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_onegg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_qkxa7")
 }],
 "loop": false,
 "name": &"stab",
-"speed": 5.0
+"speed": 10.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1dub5"]
@@ -44,7 +53,9 @@ script = ExtResource("1_uud73")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_hfrp4")
-animation = &"idle"
+animation = &"stab"
+frame = 6
+frame_progress = 1.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_1dub5")

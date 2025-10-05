@@ -9,12 +9,12 @@ class_name LineOfSight
 @export var invert_border: float = 6000.0
 
 var target: Node2D = null
-@export var ignore_groups: Array[String] = ["enemies", "skeleton", "pickup", "items"]
+@export var ignore_groups: Array[String] = ["enemies", "skeleton", "pickup", "items", "chests"]
 @export_flags_2d_physics var ignore_layers: int = 4 | 8
 @export var obey_shadow_zones: bool = false
 @export var require_shadow_zone: bool = false
 @export var hide_groups: Array[String] = ["enemies", "skeleton", "pickup", "items"]
-@export var exempt_light_groups: Array[String] = ["lights"]
+@export var exempt_light_groups: Array[String] = ["lights", "chests"]
 
 @onready var mask: Polygon2D = Polygon2D.new()
 

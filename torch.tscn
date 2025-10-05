@@ -7,6 +7,11 @@
 [ext_resource type="Texture2D" uid="uid://tj1xrpvfbv3u" path="res://light.png" id="5_72pgl"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_bright"]
+light_mode = 1
+particles_animation = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
 
 [sub_resource type="Animation" id="Animation_cfxwm"]
 length = 0.001
@@ -51,6 +56,7 @@ _data = {
 [node name="Sprite2D" type="Sprite2D" parent="."]
 z_index = 1200
 z_as_relative = false
+texture_filter = 1
 material = SubResource("CanvasItemMaterial_bright")
 texture = ExtResource("1_kx7w4")
 
