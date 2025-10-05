@@ -848,6 +848,7 @@ tile_set = SubResource("TileSet_jhx03")
 metadata/_edit_use_anchors_ = true
 
 [node name="LineOfSightUILayer" type="CanvasLayer" parent="."]
+visible = false
 
 [node name="LightingMaskBlocker" type="ColorRect" parent="LineOfSightUILayer"]
 layout_direction = 4

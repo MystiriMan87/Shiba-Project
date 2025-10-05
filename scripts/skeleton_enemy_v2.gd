@@ -130,7 +130,7 @@ func _physics_process(delta):
 			handle_death_state(delta)
 	
 	apply_player_separation(delta)
-	move_and_slide()
+	move_and_collide(velocity * delta)
 
 func handle_idle_state(delta):
 	target_velocity = Vector2.ZERO

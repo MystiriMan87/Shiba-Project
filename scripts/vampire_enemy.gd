@@ -85,7 +85,7 @@ func _physics_process(delta):
 	check_player_detection()
 	
 	# Apply movement
-	move_and_slide()
+	move_and_collide(velocity * delta)
 
 func handle_idle_state(delta):
 	velocity = Vector2.ZERO

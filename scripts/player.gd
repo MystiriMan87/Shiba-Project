@@ -695,7 +695,7 @@ func _physics_process(delta):
 	if is_swing_animating:
 		update_sword_swing_animation(delta)
 	
-	move_and_slide()
+	move_and_collide(velocity * delta)
 
 	# Regenerate dash energy when not dashing
 	if not is_dashing and dash_energy < max_dash_energy:
