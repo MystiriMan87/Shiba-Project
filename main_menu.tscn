@@ -1,0 +1,132 @@
+[gd_scene load_steps=4 format=3 uid="uid://byg0qtj4d0dqv"]
+
+[ext_resource type="Script" uid="uid://buobjj1brmb24" path="res://main_menu.gd" id="1_7vrkn"]
+[ext_resource type="FontFile" uid="uid://blkgwe4swrid8" path="res://100-Sub-Assets-Free/Fonts/m5x7.ttf" id="2_fu7sn"]
+[ext_resource type="FontFile" uid="uid://vkfuxgs5bk41" path="res://100-Sub-Assets-Free/Fonts/PixeloidSans-nR3g1.ttf" id="3_fu7sn"]
+
+[node name="MainMenu" type="Control"]
+layout_direction = 1
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_7vrkn")
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -141.0
+offset_top = -56.0
+offset_right = 141.0
+offset_bottom = 56.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_fu7sn")
+theme_override_font_sizes/font_size = 100
+text = "Play
+"
+
+[node name="Button2" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -141.0
+offset_top = 85.0
+offset_right = 141.0
+offset_bottom = 197.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_fu7sn")
+theme_override_font_sizes/font_size = 100
+text = "Options
+"
+
+[node name="Button3" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -77.0
+offset_top = 230.0
+offset_right = 79.0
+offset_bottom = 318.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_fu7sn")
+theme_override_font_sizes/font_size = 100
+text = "Quit
+"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -532.0
+offset_top = -81.0
+offset_right = -516.0
+offset_bottom = -42.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(13.4983, 8.36)
+alignment = 1
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -540.0
+offset_top = -473.0
+offset_right = 539.0
+offset_bottom = -103.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/default_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.111448, 0.348301, 1, 1)
+theme_override_colors/font_shadow_color = Color(0.975664, 5.60723e-06, 2.11775e-06, 1)
+theme_override_fonts/normal_font = ExtResource("2_fu7sn")
+theme_override_font_sizes/normal_font_size = 200
+text = "Finders Keepers"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 1344.0
+offset_top = 116.0
+offset_right = 1756.0
+offset_bottom = 186.0
+rotation = 0.324354
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("3_fu7sn")
+theme_override_font_sizes/font_size = 43
+text = "Work in Progress!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="."]
+visible = false
+z_index = -2
+layout_mode = 0
+offset_right = 1988.0
+offset_bottom = 1080.0
+expand_mode = 1
+
+[connection signal="pressed" from="Button" to="." method="_on_play_pressed"]

@@ -4,8 +4,8 @@ class_name LineOfSight
 @export var rays: int = 256
 @export var max_distance: float = 10000.0
 @export_flags_2d_physics var los_collision_mask: int = 0x7FFFFFFF
-@export var darkness: Color = Color(0, 0, 0, 0.6) : set = set_darkness
-@export_range(0.0, 1.0) var darkness_alpha: float = 0.6 : set = set_darkness_alpha
+@export var darkness: Color = Color(0, 0, 0, 0.1) : set = set_darkness
+@export_range(0.0, 1.0) var darkness_alpha: float = 0.1 : set = set_darkness_alpha
 @export var invert_border: float = 6000.0
 
 var target: Node2D = null

@@ -72,7 +72,7 @@ class EchoGhost:
 		# Lifetime used only as safety; still allow path to drive existence
 		if lifetime > 0:
 			lifetime -= delta
-
+	
 		_afterimage_timer -= delta
 		if _afterimage_timer <= 0.0:
 			_emit_afterimage()

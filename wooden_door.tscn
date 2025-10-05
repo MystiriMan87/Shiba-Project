@@ -8,34 +8,6 @@ radius = 9.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_thovl"]
 
-[sub_resource type="Animation" id="Animation_lko12"]
-resource_name = "open"
-length = 1.2
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0.0333333, 0.233333, 0.433333, 0.633333, 0.833333, 1.06667),
-"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
-"update": 1,
-"values": [54, 55, 56, 57, 58, 59]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("StaticBody2D/CollisionShape2D:disabled")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0.0666667, 0.3, 1.06667, 1.26667),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
-"update": 1,
-"values": [false, false, true, true]
-}
-
 [sub_resource type="Animation" id="Animation_nfgin"]
 length = 0.001
 tracks/0/type = "value"
@@ -89,6 +61,34 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
 "values": [true, true, false, false]
+}
+
+[sub_resource type="Animation" id="Animation_lko12"]
+resource_name = "open"
+length = 1.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.0333333, 0.233333, 0.433333, 0.633333, 0.833333, 1.06667),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [54, 55, 56, 57, 58, 59]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("StaticBody2D/CollisionShape2D:disabled")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.0666667, 0.3, 1.06667, 1.26667),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [false, false, true, true]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_kj7ku"]

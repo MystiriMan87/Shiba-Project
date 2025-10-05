@@ -40,8 +40,8 @@ func _ready():
 		add_child(crt)
 		# Tasteful defaults: milder warp and vignette, subtle scanlines
 		crt.layer = 128
-		# Stronger barrel distortion for a fisheye look
-		crt.warp_amount = 0.45
+		# Weaker barrel distortion for a subtle fisheye look
+		crt.warp_amount = 0.15
 		crt.vignette_amount = crt_default_vignette_amount
 		crt.vignette_intensity = crt_default_vignette_intensity
 		# Tone down image-distorting effects to avoid UI/enemy sprite wobble
@@ -84,7 +84,7 @@ func _ready():
 		# If CRT already exists, capture its defaults for pulsing
 		var crt = get_node("CRT")
 		crt.layer = 128
-		crt.warp_amount = 0.45
+		crt.warp_amount = 0.15
 		crt_default_vignette_amount = crt.vignette_amount
 		crt_default_vignette_intensity = crt.vignette_intensity
 
