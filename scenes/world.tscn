@@ -4328,6 +4328,8 @@ position = Vector2(-661, 1008)
 input_pickable = true
 is_locked = false
 loot_items = Array[String](["health_potion", "iron_sword", "dash_flask"])
+loot_spawn_radius_base = 300.0
+loot_spawn_radius_step = 300.0
 
 [node name="Chest2" parent="." instance=ExtResource("9_7r4gi")]
 texture_filter = 1
@@ -4339,6 +4341,7 @@ loot_items = Array[String](["health_potion", "steel_hammer"])
 [node name="BigSlime" parent="." instance=ExtResource("11_e3hyu")]
 position = Vector2(320, 1958)
 max_health = 100
+land_damage_radius = 30
 
 [node name="Enemy" parent="." instance=ExtResource("1_rwgxs")]
 position = Vector2(16, 748)
@@ -4420,13 +4423,13 @@ position = Vector2(200, -1000)
 scale = Vector2(5, 5)
 
 [node name="SpikeTrap3_Alter" parent="." instance=ExtResource("17_lakw3")]
-position = Vector2(443, -1480)
+position = Vector2(443, -1481)
 
 [node name="SpikeTrap3_Alter2" parent="." instance=ExtResource("17_lakw3")]
-position = Vector2(524, -1480)
+position = Vector2(281, -1327)
 
 [node name="SpikeTrap4_Alter" parent="." instance=ExtResource("17_lakw3")]
-position = Vector2(362, -1480)
+position = Vector2(116, -1518)
 
 [node name="SpikeTrap" parent="." instance=ExtResource("16_dss4m")]
 z_index = -1

@@ -55,9 +55,9 @@ offset_top = 70.0
 offset_right = 1975.0
 offset_bottom = 443.0
 theme_override_font_sizes/font_size = 31
-text = "Go down and to the left for sword
- then go up for a new weapon,
- lastly fight the boss
+text = "Go down and to the left for some loot
+go up for a new weapon,
+Go down and fight the boss 
 "
 horizontal_alignment = 1
 uppercase = true
