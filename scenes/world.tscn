@@ -4409,6 +4409,12 @@ scale = Vector2(4, 4)
 [node name="SkeletonEnemyV2" parent="." instance=ExtResource("10_w7kh3")]
 position = Vector2(571, 788)
 
+[node name="SkeletonEnemyV6" parent="." instance=ExtResource("10_w7kh3")]
+position = Vector2(530, -1603)
+
+[node name="SkeletonEnemyV7" parent="." instance=ExtResource("10_w7kh3")]
+position = Vector2(-108, -1258)
+
 [node name="SkeletonEnemyV3" parent="." instance=ExtResource("10_w7kh3")]
 position = Vector2(55, 1103)
 
@@ -4424,6 +4430,9 @@ scale = Vector2(5, 5)
 
 [node name="SpikeTrap3_Alter" parent="." instance=ExtResource("17_lakw3")]
 position = Vector2(443, -1481)
+
+[node name="SpikeTrap3_Alter3" parent="." instance=ExtResource("17_lakw3")]
+position = Vector2(-42, -1322)
 
 [node name="SpikeTrap3_Alter2" parent="." instance=ExtResource("17_lakw3")]
 position = Vector2(281, -1327)
@@ -4449,6 +4458,10 @@ max_health = 15
 
 [node name="Vampire_enemy3" parent="." instance=ExtResource("17_7t5mc")]
 position = Vector2(0, -1509)
+max_health = 15
+
+[node name="Vampire_enemy4" parent="." instance=ExtResource("17_7t5mc")]
+position = Vector2(489, -1302)
 max_health = 15
 
 [node name="WoodenDoor" parent="." instance=ExtResource("19_pm21f")]

@@ -9,6 +9,8 @@ extends Control
 
 var inventory_slots: Array = []
 var selected_slot_index: int = -1
+var inventory_slots_per_row: int = 8  # Adjust based on your inventory layout
+var inventory_rows: int = 4  # Adjust based on your inventory layout
 var item_manager: Node = null
 var player: CharacterBody2D = null
 
@@ -44,6 +46,10 @@ func _ready():
 		var evt := InputEventKey.new()
 		evt.physical_keycode = KEY_TAB
 		InputMap.action_add_event("inventory_toggle", evt)
+		# Add controller support for inventory toggle (Triangle/Y button)
+		var controller_evt := InputEventJoypadButton.new()
+		controller_evt.button_index = JOY_BUTTON_Y
+		InputMap.action_add_event("inventory_toggle", controller_evt)
 	
 	if not item_manager:
 		print("Warning: ItemManager not found at /root/ItemManager")
@@ -509,6 +515,30 @@ func create_enhanced_inventory_slot(index: int) -> Control:
 	
 	background.add_theme_stylebox_override("panel", style_box)
 	slot.add_child(background)
+	
+	# Add selection highlight
+	var selection_overlay = Panel.new()
+	selection_overlay.name = "SelectionOverlay"
+	selection_overlay.anchor_left = 0.0
+	selection_overlay.anchor_top = 0.0
+	selection_overlay.anchor_right = 1.0
+	selection_overlay.anchor_bottom = 1.0
+	selection_overlay.visible = false
+	
+	var selection_style = StyleBoxFlat.new()
+	selection_style.bg_color = Color(0.2, 0.6, 1.0, 0.3)
+	selection_style.border_width_top = 3
+	selection_style.border_width_bottom = 3
+	selection_style.border_width_left = 3
+	selection_style.border_width_right = 3
+	selection_style.border_color = Color(0.4, 0.8, 1.0, 0.8)
+	selection_style.corner_radius_top_left = 6
+	selection_style.corner_radius_top_right = 6
+	selection_style.corner_radius_bottom_left = 6
+	selection_style.corner_radius_bottom_right = 6
+	
+	selection_overlay.add_theme_stylebox_override("panel", selection_style)
+	slot.add_child(selection_overlay)
 	
 	var item_icon = TextureRect.new()
 	item_icon.name = "ItemIcon"
@@ -1039,13 +1069,72 @@ func toggle_inventory():
 		inventory_panel.visible = !inventory_panel.visible
 		if inventory_panel.visible:
 			refresh_inventory_display()
+			# Select first slot when opening inventory
+			selected_slot_index = 0
+			update_inventory_selection()
+		else:
+			# Clear selection when closing inventory
+			selected_slot_index = -1
 
 func add_item_to_inventory(item_id: String, quantity: int = 1) -> bool:
 	if item_manager:
 		return item_manager.add_item_to_inventory(item_id, quantity)
 	return false
 
+# Controller navigation functions
+func navigate_inventory(direction: int):
+	if inventory_slots.size() == 0:
+		return
+	
+	# Initialize selection if none
+	if selected_slot_index == -1:
+		selected_slot_index = 0
+	else:
+		# Move up/down by slots_per_row
+		selected_slot_index += direction * inventory_slots_per_row
+	
+	# Clamp to valid range
+	selected_slot_index = clamp(selected_slot_index, 0, inventory_slots.size() - 1)
+	
+	# Update visual selection
+	update_inventory_selection()
+
+func navigate_inventory_horizontal(direction: int):
+	if inventory_slots.size() == 0:
+		return
+	
+	# Initialize selection if none
+	if selected_slot_index == -1:
+		selected_slot_index = 0
+	else:
+		# Move left/right by 1
+		selected_slot_index += direction
+	
+	# Clamp to valid range
+	selected_slot_index = clamp(selected_slot_index, 0, inventory_slots.size() - 1)
+	
+	# Update visual selection
+	update_inventory_selection()
+
+func select_inventory_item():
+	if selected_slot_index >= 0 and selected_slot_index < inventory_slots.size():
+		_on_slot_clicked(selected_slot_index)
+
+func update_inventory_selection():
+	# Clear all selections first
+	for i in range(inventory_slots.size()):
+		var slot = inventory_slots[i]
+		if slot and slot.has_node("SelectionOverlay"):
+			slot.get_node("SelectionOverlay").visible = false
+	
+	# Highlight selected slot
+	if selected_slot_index >= 0 and selected_slot_index < inventory_slots.size():
+		var selected_slot = inventory_slots[selected_slot_index]
+		if selected_slot and selected_slot.has_node("SelectionOverlay"):
+			selected_slot.get_node("SelectionOverlay").visible = true
+
 func _input(event):
+	# Handle keyboard input
 	if event is InputEventKey and event.pressed and not event.echo:
 		# First check for death screen input
 		if death_screen and death_screen.visible:
@@ -1054,3 +1143,30 @@ func _input(event):
 		# Otherwise allow inventory toggle
 		elif event.is_action_pressed("inventory_toggle"):
 			toggle_inventory()
+	
+	# Handle controller button input
+	if event is InputEventJoypadButton and event.pressed:
+		# First check for death screen input
+		if death_screen and death_screen.visible:
+			if event.is_action_pressed("ui_accept"):
+				_on_respawn_button_pressed()
+		# Otherwise allow inventory toggle
+		elif event.is_action_pressed("inventory_toggle"):
+			toggle_inventory()
+	
+	# Handle controller D-pad navigation when inventory is open
+	if inventory_panel and inventory_panel.visible:
+		if event is InputEventJoypadButton and event.pressed:
+			match event.button_index:
+				JOY_BUTTON_DPAD_UP:
+					navigate_inventory(-1)  # Move up
+				JOY_BUTTON_DPAD_DOWN:
+					navigate_inventory(1)   # Move down
+				JOY_BUTTON_DPAD_LEFT:
+					navigate_inventory_horizontal(-1)  # Move left
+				JOY_BUTTON_DPAD_RIGHT:
+					navigate_inventory_horizontal(1)   # Move right
+				JOY_BUTTON_A:
+					select_inventory_item()  # Select/use item
+				JOY_BUTTON_B:
+					select_inventory_item()  # Select/use item (Circle button)

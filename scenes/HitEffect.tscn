@@ -1,4 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://yagvs8k8kfhd"]
+[gd_scene load_steps=5 format=3 uid="uid://yagvs8k8kfhd"]
+
+[ext_resource type="Script" uid="uid://baqgixdw2nqqj" path="res://scenes/hit_effect.gd" id="1_dhkt0"]
 
 [sub_resource type="Gradient" id="Gradient_fl6o4"]
 offsets = PackedFloat32Array(0, 0.509091, 1)
@@ -6,6 +8,7 @@ colors = PackedColorArray(0, 0, 0, 1, 0.45, 0.45, 0.45, 1, 1, 1, 1, 1)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_dhkt0"]
 gradient = SubResource("Gradient_fl6o4")
+width = 300
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_fl6o4"]
 particle_flag_disable_z = true
@@ -13,15 +16,19 @@ emission_shape_offset = Vector3(0, -1, 0)
 initial_velocity_min = 30.0
 initial_velocity_max = 80.0
 gravity = Vector3(0, 98, 0)
+scale_min = 29.17
+scale_max = 29.17
 color = Color(0.997517, 0, 0.130102, 1)
 color_ramp = SubResource("GradientTexture1D_dhkt0")
 
 [node name="HitEffect" type="Node2D"]
+script = ExtResource("1_dhkt0")
 
 [node name="GPUParticles2D" type="GPUParticles2D" parent="."]
 emitting = false
-amount = 15
+amount = 20
 lifetime = 0.8
 one_shot = true
 explosiveness = 1.0
+randomness = 1.0
 process_material = SubResource("ParticleProcessMaterial_fl6o4")

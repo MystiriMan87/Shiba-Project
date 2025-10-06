@@ -21,6 +21,8 @@ class EchoGhost:
 
 	@onready var sprite: Sprite2D = null
 	@onready var shape: CollisionShape2D = null
+	
+	
 
 	func _ready():
 		set_physics_process(true)
@@ -234,6 +236,8 @@ class EchoGhost:
 
 @export var pickup_sound_path: String = "res://audio/pickup_sound.wav"
 @export var pickup_sound_volume: float = 0.0
+@export var dash_sound_base_pitch: float = 1.0
+@export var dash_sound_pitch_variation: float = 0.05
 @export var pickup_sound_base_pitch: float = 1.0
 @export var pickup_sound_pitch_variation: float = 0.2
 
@@ -245,6 +249,8 @@ class EchoGhost:
 @export var background_music_path: String = "res://audio/background_music.ogg"
 @export var background_music_volume: float = -10.0
 @export var music_autoplay: bool = true
+
+var HitEffectScene := preload("res://scenes/HitEffect.tscn")
 
 var is_attacking = false
 var attack_timer = 0.0
@@ -262,6 +268,9 @@ var dash_afterimage_timer = 0.0
 var dash_energy: int = 0
 
 var mouse_attack_direction = Vector2.RIGHT
+var controller_deadzone: float = 0.3
+var facing_direction: int = 1
+var right_stick_active: bool = false
 var swing_start_angle = 0.0
 var swing_end_angle = 0.0
 var swing_current_progress = 0.0
@@ -274,7 +283,7 @@ var max_trail_length = 8
 @export var trail_width = 3.0
 @export var trail_max_alpha = 0.8
 
-var current_health
+var current_health: int = 0
 var is_taking_damage = false
 var damage_immunity_timer = 0.0
 var damage_flash_timer = 0.0
@@ -319,6 +328,8 @@ var last_dash_start: Vector2 = Vector2.ZERO
 @onready var dash_particles: CPUParticles2D = null
 
 @onready var hit_audio_player: AudioStreamPlayer2D = null
+@onready var sword_slice_player: AudioStreamPlayer2D = null
+@onready var dash_audio_player: AudioStreamPlayer2D = null
 @onready var pickup_audio_player: AudioStreamPlayer2D = null
 @onready var hurt_audio_player: AudioStreamPlayer2D = null
 @onready var music_player: AudioStreamPlayer = null
@@ -338,11 +349,27 @@ func _ready():
 	
 	# Initialize dash energy
 	dash_energy = max_dash_energy
+	
+	# Detect controller for attack direction
+	if Input.get_connected_joypads().size() > 0:
+		print("Controller detected for attack direction")
 	dash_energy_changed.emit(dash_energy)
 	
 	# Echo recall action (Q)
 	if not InputMap.has_action("recall_echo"):
 		InputMap.add_action("recall_echo")
+	
+	# Add controller support for dash (Left Trigger)
+	if not InputMap.has_action("dash"):
+		InputMap.add_action("dash")
+		# Add keyboard input (Shift)
+		var shift_evt := InputEventKey.new()
+		shift_evt.physical_keycode = KEY_SHIFT
+		InputMap.action_add_event("dash", shift_evt)
+		# Add controller input (Left Shoulder Button)
+		var shoulder_evt := InputEventJoypadButton.new()
+		shoulder_evt.button_index = JOY_BUTTON_LEFT_SHOULDER
+		InputMap.action_add_event("dash", shoulder_evt)
 		var evq := InputEventKey.new()
 		evq.physical_keycode = KEY_Q
 		InputMap.action_add_event("recall_echo", evq)
@@ -372,8 +399,17 @@ func _ready():
 		
 
 func _on_body_entered(body: Node):
+	var fx = HitEffectScene.instantiate()
+	fx.global_position = body.global_position  # spawn on enemy
+	get_tree().current_scene.add_child(fx)
+	fx.rotation = get_mouse_attack_direction().angle()
+	if fx is GPUParticles2D or fx is CPUParticles2D:
+		fx.emitting = true	
+	
 	if body and body.has_method("take_damage"):
 		body.take_damage(attack_damage)
+		
+
 
 func setup_sound_effects():
 	hit_audio_player = AudioStreamPlayer2D.new()
@@ -388,6 +424,20 @@ func setup_sound_effects():
 			hit_audio_player.bus = "Master"
 			hit_audio_player.max_distance = 2000
 			hit_audio_player.attenuation = 0.0
+
+	# Dedicated audio player for sword slice when hitting enemies
+	sword_slice_player = AudioStreamPlayer2D.new()
+	sword_slice_player.name = "SwordSlicePlayer"
+	add_child(sword_slice_player)
+	var violent_slice_path := "res://audio/violent-sword-slice-393848.mp3"
+	if ResourceLoader.exists(violent_slice_path):
+		var vs = load(violent_slice_path)
+		if vs is AudioStream:
+			sword_slice_player.stream = vs
+			sword_slice_player.bus = "Master"
+			sword_slice_player.volume_db = -6.0
+			sword_slice_player.max_distance = 2000
+			sword_slice_player.attenuation = 0.0
 
 	pickup_audio_player = AudioStreamPlayer2D.new()
 	pickup_audio_player.name = "PickupAudioPlayer"
@@ -425,6 +475,17 @@ func setup_sound_effects():
 			echo_audio_player.volume_db = echo_recall_sound_volume
 			echo_audio_player.bus = "Master"
 
+	# Dash SFX
+	dash_audio_player = AudioStreamPlayer2D.new()
+	dash_audio_player.name = "DashAudioPlayer"
+	add_child(dash_audio_player)
+	var dash_sfx_path := "res://audio/dash-sfx.mp3"
+	if ResourceLoader.exists(dash_sfx_path):
+		var ds = load(dash_sfx_path)
+		if ds is AudioStream:
+			dash_audio_player.stream = ds
+			dash_audio_player.bus = "Master"
+
 func play_hit_sound():
 	if not hit_audio_player or not hit_audio_player.stream:
 		return
@@ -439,6 +500,18 @@ func play_hit_sound():
 	
 	hit_audio_player.pitch_scale = clamp(final_pitch, 0.1, 3.0)
 	hit_audio_player.play()
+
+func play_sword_slice_sound():
+	if not sword_slice_player or not sword_slice_player.stream:
+		return
+	if sword_slice_player.playing:
+		sword_slice_player.stop()
+	var final_pitch = hit_sound_base_pitch
+	if hit_sound_pitch_variation > 0.0:
+		var pitch_offset = randf_range(-hit_sound_pitch_variation, hit_sound_pitch_variation)
+		final_pitch += pitch_offset
+	sword_slice_player.pitch_scale = clamp(final_pitch, 0.1, 3.0)
+	sword_slice_player.play()
 
 func play_pickup_sound():
 	if not pickup_audio_player or not pickup_audio_player.stream:
@@ -593,7 +666,45 @@ func interact_with_chests():
 			break
 
 
+func _input(event):
+	# Handle right stick for attack direction
+	if event is InputEventJoypadMotion:
+		if event.axis == JOY_AXIS_RIGHT_X or event.axis == JOY_AXIS_RIGHT_Y:
+			var right_stick = Vector2(
+				Input.get_joy_axis(0, JOY_AXIS_RIGHT_X),
+				Input.get_joy_axis(0, JOY_AXIS_RIGHT_Y)
+			)
+			
+			# Apply deadzone
+			if right_stick.length() > controller_deadzone:
+				mouse_attack_direction = right_stick.normalized()
+				# Update player facing direction
+				if right_stick.x != 0:
+					facing_direction = 1 if right_stick.x > 0 else -1
+
 func _physics_process(delta):
+	# Update attack direction from right stick - always check, not just when active
+	var right_stick = Vector2(
+		Input.get_joy_axis(0, JOY_AXIS_RIGHT_X),
+		Input.get_joy_axis(0, JOY_AXIS_RIGHT_Y)
+	)
+	
+	if right_stick.length() > controller_deadzone:
+		mouse_attack_direction = right_stick.normalized()
+		right_stick_active = true
+		# Update facing direction
+		if right_stick.x != 0:
+			facing_direction = 1 if right_stick.x > 0 else -1
+		# Force redraw to update visual indicator
+		queue_redraw()
+	else:
+		right_stick_active = false
+		# Only fallback to movement direction if no right stick input AND we're moving
+		if velocity.length() > 0:
+			mouse_attack_direction = velocity.normalized()
+			# Force redraw to update visual indicator
+			queue_redraw()
+	
 	# Progress dash white-flash timer so it actually ends
 	if dash_flash_timer > 0.0:
 		dash_flash_timer -= delta
@@ -645,8 +756,13 @@ func _physics_process(delta):
 			echo_path.append(global_position)
 	
 	if Input.is_action_just_pressed('Attack') and not is_attacking and cooldown_timer <= 0:
-		var mouse_pos = get_global_mouse_position()
-		mouse_attack_direction = (mouse_pos - global_position).normalized()
+		# Use controller direction if right stick is active, otherwise use mouse
+		if right_stick_active:
+			# mouse_attack_direction is already set by controller input
+			pass
+		else:
+			var mouse_pos = get_global_mouse_position()
+			mouse_attack_direction = (mouse_pos - global_position).normalized()
 		start_attack()
 	
 	# Handle chest interaction with E key
@@ -710,6 +826,15 @@ func start_dash(dir: Vector2):
 	dash_cooldown_timer = dash_cooldown
 	dash_direction = dir
 	echo_path.clear()
+	if dash_audio_player and dash_audio_player.stream:
+		if dash_audio_player.playing:
+			dash_audio_player.stop()
+		var final_pitch = dash_sound_base_pitch
+		if dash_sound_pitch_variation > 0.0:
+			var pitch_offset = randf_range(-dash_sound_pitch_variation, dash_sound_pitch_variation)
+			final_pitch += pitch_offset
+		dash_audio_player.pitch_scale = clamp(final_pitch, 0.1, 3.0)
+		dash_audio_player.play()
 	echo_timer = 0.0
 	echo_spawned_this_dash = false
 	last_dash_start = global_position
@@ -1095,18 +1220,25 @@ func update_sword_swing_animation(delta):
 		is_swing_animating = false
 
 func _draw():
+	# Visual feedback for attack direction - only when using controller (right stick activity)
+	if right_stick_active:
+		var start_pos = Vector2.ZERO
+		var end_pos = mouse_attack_direction * 30
+		draw_line(start_pos, end_pos, Color.WHITE, 2.0)
+		draw_arc(Vector2.ZERO, attack_range * 0.3, 0, PI/2, 16, Color.WHITE, 1.0)
+	
 	if not enable_trail_effect or trail_positions.size() < 2:
 		return
 	
 	for i in range(trail_positions.size() - 1):
-		var start_pos = to_local(trail_positions[i])
-		var end_pos = to_local(trail_positions[i + 1])
+		var trail_start_pos = to_local(trail_positions[i])
+		var trail_end_pos = to_local(trail_positions[i + 1])
 		
 		var alpha = float(i) / float(trail_positions.size() - 1)
 		var color = trail_color
 		color.a = alpha * trail_max_alpha
 		
-		draw_line(start_pos, end_pos, color, trail_width)
+		draw_line(trail_start_pos, trail_end_pos, color, trail_width)
 
 func ease_out_quad(t: float) -> float:
 	return 1.0 - (1.0 - t) * (1.0 - t)
@@ -1165,12 +1297,14 @@ func position_attack_hitbox(direction: Vector2):
 func _on_attack_area_body_entered(body):
 	if body.has_method("take_damage"):
 		body.take_damage(attack_damage)
-		play_hit_sound()
+		# Enemy hit: play sword slice with pitch variation
+		play_sword_slice_sound()
 		enemy_killed.emit()
 	elif body.has_method("on_sword_hit"):
 		body.on_sword_hit()
-		play_hit_sound()
+		play_sword_slice_sound()
 	else:
+		# Non-enemy hit: play generic hit
 		play_hit_sound()
 
 func get_is_attacking() -> bool:
