@@ -22,6 +22,7 @@ ParticleEffectsManager="res://scripts/Particle_Effects_Manager.gd"
 AdvancedDropSystem="*res://scripts/AdvancedDropSystem.gd"
 TextureCreator="res://scripts/TextureCreator.gd"
 ChestManager="res://scripts/chest_manager.gd"
+DialogueManager="*res://scripts/DialogueManager.gd"
 
 [display]
 

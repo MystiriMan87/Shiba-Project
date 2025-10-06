@@ -277,6 +277,9 @@ var swing_current_progress = 0.0
 var is_swing_animating = false
 
 var trail_positions = []
+
+# Effects
+#var HitEffectScene := preload("res://scenes/HitEffect.tscn")
 var max_trail_length = 8
 
 @export var trail_color = Color.CYAN
@@ -664,9 +667,20 @@ func interact_with_chests():
 		if chest.global_position.distance_to(global_position) < 50:
 			chest.interact()
 			break
+			
+func check_npc_interaction():
+	var npcs = get_tree().get_nodes_in_group("npcs")
+	for npc in npcs:
+		if npc.has_method("interact") and npc.player_in_range:
+			npc.interact()
+			break
 
 
 func _input(event):
+	
+	if event.is_action_pressed("interact"):
+		check_npc_interaction()
+		
 	# Handle right stick for attack direction
 	if event is InputEventJoypadMotion:
 		if event.axis == JOY_AXIS_RIGHT_X or event.axis == JOY_AXIS_RIGHT_Y:
@@ -1299,6 +1313,31 @@ func _on_attack_area_body_entered(body):
 		body.take_damage(attack_damage)
 		# Enemy hit: play sword slice with pitch variation
 		play_sword_slice_sound()
+		# Spawn hit particles and ensure they play
+		if HitEffectScene:
+			var fx = HitEffectScene.instantiate()
+			fx.global_position = body.global_position
+			# Rotate particle effect to match current attack direction
+			fx.rotation = mouse_attack_direction.angle()
+			var parent = get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
+			if parent:
+				parent.add_child(fx)
+				# Find the particles node and ensure it has a round texture
+				var particle_node: Node = null
+				if fx is GPUParticles2D or fx is CPUParticles2D:
+					particle_node = fx
+				elif fx.has_node("GPUParticles2D"):
+					particle_node = fx.get_node("GPUParticles2D")
+				elif fx.has_node("CPUParticles2D"):
+					particle_node = fx.get_node("CPUParticles2D")
+				if particle_node and particle_node.has_method("restart"):
+					# Apply a soft round texture if none is assigned
+					if "texture" in particle_node and particle_node.texture == null:
+						particle_node.texture = _make_round_particle_texture(64)
+					particle_node.restart()
+				# Failsafe cleanup
+				var t = get_tree().create_timer(0.7)
+				t.timeout.connect(func(): if is_instance_valid(fx): fx.queue_free())
 		enemy_killed.emit()
 	elif body.has_method("on_sword_hit"):
 		body.on_sword_hit()
@@ -1388,6 +1427,23 @@ func spawn_echo_clone():
 	
 	echoes_changed.emit(active_echoes.size())
 	echo_spawned.emit(echo_record_duration)
+
+# Create a soft round texture (white center, transparent edge) for particles
+func _make_round_particle_texture(size: int = 64) -> Texture2D:
+	size = max(8, size)
+	var img := Image.create(size, size, false, Image.FORMAT_RGBA8)
+	var center := Vector2(size * 0.5, size * 0.5)
+	var radius := float(size) * 0.5
+	for y in range(size):
+		for x in range(size):
+			var p := Vector2(x + 0.5, y + 0.5)
+			var d := p.distance_to(center)
+			var t: float = clamp(1.0 - (d / radius), 0.0, 1.0)
+			# Smooth edge
+			var alpha := pow(t, 1.8)
+			img.set_pixel(x, y, Color(1, 1, 1, alpha))
+	var tex := ImageTexture.create_from_image(img)
+	return tex
 
 func recall_echoes():
 	# Spawn a ghost that traces the last dash path from its start to current position

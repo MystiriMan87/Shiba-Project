@@ -1,0 +1,62 @@
+[gd_scene load_steps=2 format=3 uid="uid://bkcsm36nf4kyd"]
+
+[ext_resource type="Script" uid="uid://ouw84ow3cenv" path="res://dialogue_box.gd" id="1_senjy"]
+
+[node name="DialogueBox" type="CanvasLayer"]
+process_mode = 3
+script = ExtResource("1_senjy")
+
+[node name="Panel" type="Panel" parent="."]
+custom_minimum_size = Vector2(800, 200)
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -499.0
+offset_top = -254.0
+offset_right = 301.0
+offset_bottom = -54.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer"]
+layout_mode = 2
+
+[node name="SpeakerLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Speaker Name"
+
+[node name="TextLabel" type="RichTextLabel" parent="Panel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(700, 100)
+layout_mode = 2
+theme_override_colors/default_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/normal_font_size = 16
+scroll_active = false
+
+[node name="ContinueIndicator" type="Label" parent="Panel"]
+visible = false
+layout_mode = 0
+offset_left = 706.0
+offset_top = 155.0
+offset_right = 782.0
+offset_bottom = 184.0
+theme_override_font_sizes/font_size = 30
+text = "▼"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TypeTimer" type="Timer" parent="."]
+one_shot = true
