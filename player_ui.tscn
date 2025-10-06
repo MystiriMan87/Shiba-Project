@@ -35,16 +35,29 @@ script = ExtResource("3_pc08v")
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 0
-offset_left = 1367.0
-offset_top = 763.0
-offset_right = 1931.0
-offset_bottom = 1042.0
+offset_left = 1227.0
+offset_top = 743.0
+offset_right = 2044.0
+offset_bottom = 1116.0
 theme_override_font_sizes/font_size = 31
-text = "Dash through enemies 
-to Damage them
-
+text = "
+E - Open chest
 Tab - INVENTORY
 Shift - Dash
 Q - Dash echo"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="Label2" type="Label" parent="."]
+layout_mode = 0
+offset_left = 1158.0
+offset_top = 70.0
+offset_right = 1975.0
+offset_bottom = 443.0
+theme_override_font_sizes/font_size = 31
+text = "Go down and to the left for sword
+ then go up for a new weapon,
+ lastly fight the boss
+"
 horizontal_alignment = 1
 uppercase = true

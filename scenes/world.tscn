@@ -4438,12 +4438,15 @@ position = Vector2(-281, 1000)
 
 [node name="Vampire_enemy" parent="." instance=ExtResource("17_7t5mc")]
 position = Vector2(482, -853)
+max_health = 15
 
 [node name="Vampire_enemy2" parent="." instance=ExtResource("17_7t5mc")]
 position = Vector2(126, -696)
+max_health = 15
 
 [node name="Vampire_enemy3" parent="." instance=ExtResource("17_7t5mc")]
 position = Vector2(0, -1509)
+max_health = 15
 
 [node name="WoodenDoor" parent="." instance=ExtResource("19_pm21f")]
 position = Vector2(200, -1809)

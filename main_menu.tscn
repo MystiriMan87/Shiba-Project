@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://byg0qtj4d0dqv"]
+[gd_scene load_steps=5 format=3 uid="uid://byg0qtj4d0dqv"]
 
 [ext_resource type="Script" uid="uid://buobjj1brmb24" path="res://main_menu.gd" id="1_7vrkn"]
 [ext_resource type="FontFile" uid="uid://blkgwe4swrid8" path="res://100-Sub-Assets-Free/Fonts/m5x7.ttf" id="2_fu7sn"]
 [ext_resource type="FontFile" uid="uid://vkfuxgs5bk41" path="res://100-Sub-Assets-Free/Fonts/PixeloidSans-nR3g1.ttf" id="3_fu7sn"]
+[ext_resource type="Texture2D" uid="uid://yu3pqmbyr3a" path="res://fondo para itchio (3).png" id="4_jix8l"]
 
 [node name="MainMenu" type="Control"]
 layout_direction = 1
@@ -122,11 +123,13 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="TextureRect" type="TextureRect" parent="."]
-visible = false
-z_index = -2
+z_index = -7
+texture_filter = 1
 layout_mode = 0
 offset_right = 1988.0
 offset_bottom = 1080.0
+mouse_filter = 2
+texture = ExtResource("4_jix8l")
 expand_mode = 1
 
 [connection signal="pressed" from="Button" to="." method="_on_play_pressed"]
