@@ -88,6 +88,10 @@ func open_chest():
 		else:
 			print("Need " + key_type + " key!")
 			return
+			
+	var quest_manager = get_node_or_null("/root/QuestManager")
+	if quest_manager:
+		quest_manager.on_chest_opened()
 	
 	# Play opening animation
 	play_opening_animation()

@@ -1,4 +1,4 @@
-[gd_scene load_steps=44 format=4 uid="uid://dpcl1dclvepl8"]
+[gd_scene load_steps=48 format=4 uid="uid://dpcl1dclvepl8"]
 
 [ext_resource type="Script" uid="uid://c4k4k8r5ebb5c" path="res://scenes/world.gd" id="1_4mrxx"]
 [ext_resource type="PackedScene" uid="uid://hqa6411o6hsf" path="res://scenes/player.tscn" id="1_nnsk1"]
@@ -24,10 +24,13 @@
 [ext_resource type="PackedScene" uid="uid://8a7m82fpuqoj" path="res://wooden_door.tscn" id="19_pm21f"]
 [ext_resource type="PackedScene" uid="uid://bkcsm36nf4kyd" path="res://dialogue_box.tscn" id="23_xgqkh"]
 [ext_resource type="PackedScene" uid="uid://bfjoojsctscj1" path="res://Miner_NPC.tscn" id="24_ctatt"]
+[ext_resource type="PackedScene" uid="uid://hkva3wgg66js" path="res://quest_log_ui.tscn" id="24_navra"]
 [ext_resource type="PackedScene" uid="uid://dtdn67h8hhagm" path="res://shop_ui.tscn" id="25_0nbtd"]
+[ext_resource type="Texture2D" uid="uid://dxa61mw40yf4p" path="res://icon.svg" id="25_ts3gi"]
 [ext_resource type="PackedScene" uid="uid://bgg32r6jrhvd4" path="res://Trader_NPC.tscn" id="26_munwf"]
 [ext_resource type="Script" uid="uid://chsoa6deu0e0y" path="res://scenes/npc.gd" id="27_0nbtd"]
 [ext_resource type="Texture2D" uid="uid://bijlf6im51jrw" path="res://Assets/2D Pixel Dungeon Asset Pack/character and tileset/Dungeon_Character.png" id="27_ts3gi"]
+[ext_resource type="PackedScene" uid="uid://bmrnrfe6psbj2" path="res://quest_ui.tscn" id="31_luhhm"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_71j4m"]
 texture = ExtResource("4_k0juu")
@@ -4169,6 +4172,9 @@ sources/0 = SubResource("TileSetAtlasSource_q5onr")
 [sub_resource type="CircleShape2D" id="CircleShape2D_ts3gi"]
 radius = 40.05
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_37qwj"]
+radius = 45.0999
+
 [node name="World" type="Node2D"]
 script = ExtResource("1_4mrxx")
 
@@ -4351,6 +4357,7 @@ loot_items = Array[String](["health_potion", "steel_hammer", "coin", "coin"])
 [node name="BigSlime" parent="." instance=ExtResource("11_e3hyu")]
 position = Vector2(320, 1958)
 max_health = 100
+jump_arc_height = 50
 land_damage_radius = 30
 
 [node name="Enemy" parent="." instance=ExtResource("1_rwgxs")]
@@ -4480,9 +4487,13 @@ scale = Vector2(5.5, 5.5)
 
 [node name="DialogueBox" parent="." instance=ExtResource("23_xgqkh")]
 
+[node name="QuestLogUI" parent="." instance=ExtResource("24_navra")]
+
 [node name="Crazed Wizard" parent="." instance=ExtResource("24_ctatt")]
 position = Vector2(426, 25)
 audio_volume = -10.0
+is_quest_giver = true
+quest_to_give = "tutorial_quest"
 
 [node name="ShopUI" parent="." instance=ExtResource("25_0nbtd")]
 
@@ -4496,7 +4507,6 @@ script = ExtResource("27_0nbtd")
 dialogue_id = "merchant_intro"
 interaction_range = 80.0
 npc_name = "Merchant"
-dialogue_audio_path = ""
 
 [node name="Sprite2D" type="Sprite2D" parent="MerchatNPC"]
 scale = Vector2(3, 3)
@@ -4507,3 +4517,15 @@ frame = 17
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MerchatNPC"]
 shape = SubResource("CircleShape2D_ts3gi")
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="."]
+position = Vector2(112, 269)
+
+[node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D"]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("25_ts3gi")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
+shape = SubResource("CircleShape2D_37qwj")
+
+[node name="QuestUI" parent="." instance=ExtResource("31_luhhm")]

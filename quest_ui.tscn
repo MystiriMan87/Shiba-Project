@@ -1,0 +1,43 @@
+[gd_scene load_steps=3 format=3 uid="uid://bmrnrfe6psbj2"]
+
+[ext_resource type="Script" uid="uid://lkxct583cfki" path="res://scripts/QuestUI.gd" id="1_y361u"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mxsos"]
+bg_color = Color(0, 0, 0, 0.866667)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[node name="QuestUI" type="CanvasLayer"]
+script = ExtResource("1_y361u")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -487.0
+offset_top = 39.0
+offset_right = -65.0
+offset_bottom = 339.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_mxsos")
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 14.0
+offset_right = 397.0
+offset_bottom = 281.0
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="QuestContainer" type="VBoxContainer" parent="Panel/MarginContainer"]
+layout_mode = 2

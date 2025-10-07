@@ -342,6 +342,9 @@ var last_dash_start: Vector2 = Vector2.ZERO
 @onready var pickup_collision = $PickupArea/CollisionShape2D if has_node("PickupArea/CollisionShape2D") else null
 
 func _ready():
+	var quest_manager = get_node("/root/QuestManager")
+	quest_manager.start_quest("tutorial_quest")
+	
 	add_to_group("player")
 	current_health = max_health
 	update_health_display()
@@ -677,6 +680,14 @@ func check_npc_interaction():
 
 
 func _input(event):
+	if event.is_action_pressed("open_quest_log"):
+		var quest_log = get_node_or_null("/root/QuestLogUI")
+		if not quest_log:
+			quest_log = get_tree().current_scene.get_node_or_null("QuestLogUI")
+		
+		if quest_log:
+			quest_log.open_quest_log()
+	
 	
 	if event.is_action_pressed("interact"):
 		check_npc_interaction()

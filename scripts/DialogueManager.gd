@@ -5,8 +5,8 @@ var dialogues = {
 	"npc_greeting": [
 		{"speaker": "Crazed Wizard", "text": "Hello traveler! What brings you to these forsaken caverns?."},
 		{"speaker": "Player", "text": "I came here for some loot to salvage."},
-		{"speaker": "Crazed Wizard", "text": "Looking for treasure hehe... (crazed mumbling) I wouldn't reccomend you go that way... that place is infested with vampires. Best you try your luck in the slime ridden place that way hahaha. Might be some loot to help you on your journeys!."},
-		{"speaker": "Crazed Wizard", "text": "Well if you meet a merchant on your travels make sure to give him your coins in exhange for valuable.. valuable.. items! (mumbling)"},
+		{"speaker": "Crazed Wizard", "text": "Looking for treasure hehe... (crazed mumbling) I wouldn't reccomend you go that way... that place is infested with vampires. How about this, go kill some enemies and find the chest somewhere that way, I will reward you handsomely."},
+		{"speaker": "Crazed Wizard", "text": "If you meet a merchant on your travels make sure to give him your coins in exhange for valuable.. valuable.. items! (mumbling)"},
 	],
 	"merchant_intro": [
 		{"speaker": "Merchant", "text": "Looking to buy some potions?"},

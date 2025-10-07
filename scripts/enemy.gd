@@ -542,11 +542,17 @@ func die():
 		windup_bar.visible = false
 	
 	collision_shape.disabled = true
+	
+	var quest_manager = get_node_or_null("/root/QuestManager")
+	if quest_manager:
+		quest_manager.on_enemy_killed("skeleton_enemy") 
 		
 	var tween = create_tween()
 	tween.parallel().tween_property(sprite, "modulate:a", 0.0, 0.5)
 	tween.parallel().tween_property(sprite, "scale", Vector2(1.5, 0.5), 0.5)
 	tween.tween_callback(queue_free)
+	
+	
 	
 	
 func drop_keys():
@@ -600,6 +606,29 @@ func _spawn_floor_slimes(count: int):
 		var tw = create_tween()
 		tw.tween_property(s, "global_position", spawn_pos, 0.25)
 		tw.tween_property(s, "modulate:a", 1.0, 0.25)
+		
+#func _spawn_floor_enemies(count: int):
+	#var scene_path = "res://scenes/vampire_enemy.tscn"
+	#var vampire_scene = load(scene_path)
+	#if not vampire_scene:
+		#return
+	#var parent = get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
+	#if not parent:
+		#return
+	#for i in range(count):
+		#var s = vampire_scene.instantiate()
+		#if not s:
+			#continue
+		#parent.add_child(s)
+		#var angle = (i * TAU) / float(max(1, count))
+		#var radius = 36 + i * 4
+		#var spawn_pos = global_position + Vector2(cos(angle), sin(angle)) * radius
+		#s.global_position = spawn_pos + Vector2(0, 12)
+		#if "modulate" in s:
+			#s.modulate.a = 0.0
+		#var tw = create_tween()
+		#tw.tween_property(s, "global_position", spawn_pos, 0.25)
+		#tw.tween_property(s, "modulate:a", 1.0, 0.25)
 #func drop_items():
 	#"""Handle item dropping when enemy dies"""
 	#print("Rolling for item drops...")

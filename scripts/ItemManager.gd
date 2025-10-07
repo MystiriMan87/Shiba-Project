@@ -656,6 +656,12 @@ func add_item_to_inventory(item_id: String, quantity: int = 1) -> bool:
 	item_picked_up.emit(item_data)
 	print("Successfully added all items to inventory")
 	return true
+	
+	var quest_manager = get_node_or_null("/root/QuestManager")
+	if quest_manager:
+		quest_manager.on_item_collected(item_id, quantity)
+	
+	return true
 
 func remove_item_from_inventory(item_id: String, quantity: int = 1) -> bool:
 	print("Removing from inventory: ", item_id, " x", quantity)
