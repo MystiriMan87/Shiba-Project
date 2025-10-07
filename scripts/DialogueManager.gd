@@ -5,8 +5,24 @@ var dialogues = {
 	"npc_greeting": [
 		{"speaker": "Crazed Wizard", "text": "Hello traveler! What brings you to these forsaken caverns?."},
 		{"speaker": "Player", "text": "I came here for some loot to salvage."},
-		{"speaker": "Crazed Wizard", "text": "Looking for treasure hehe... (crazed mumbling) I wouldn't reccomend you go that way... that place is infested with vampires. How about this, go kill some enemies and find the chest somewhere that way, I will reward you handsomely."},
+		{"speaker": "Crazed Wizard", "text": "Looking for treasure hehe... (crazed mumbling) I wouldn't reccomend you go that way... that place is infested with vampires. How about this, go kill some skeletons, I will reward you handsomely."},
 		{"speaker": "Crazed Wizard", "text": "If you meet a merchant on your travels make sure to give him your coins in exhange for valuable.. valuable.. items! (mumbling)"},
+	],
+	"skeleton_quest_start": [
+		 "Go kill some skeletons for me!",
+		 "Could you help me by defeating 3 of them?",
+		 "I'll reward you handsomely for your trouble."
+	],
+	"skeleton_quest_active": [
+		"Have you dealt with those skeletons yet?",
+		"Be careful out there, they can be dangerous!",
+  		"Come back when you've defeated 3 of them."
+	],
+		
+	"skeleton_quest_complete": [
+		"You did it! The dungeon feels safer already.",
+		"Thank you so much for your help!",
+		"Here's your reward as promised."
 	],
 	"merchant_intro": [
 		{"speaker": "Merchant", "text": "Looking to buy some potions?"},

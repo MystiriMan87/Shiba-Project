@@ -1,5 +1,4 @@
 # QuestManager.gd
-
 extends Node
 
 signal quest_started(quest_id: String)
@@ -8,30 +7,28 @@ signal quest_failed(quest_id: String)
 signal quest_objective_updated(quest_id: String, objective_index: int)
 signal quest_updated()
 
-# Quest data structure
 var quests_database = {}
-var active_quests = {}  # Currently active quests
-var completed_quests = []  # IDs of completed quests
-var failed_quests = []  # IDs of failed quests
+var active_quests = {}
+var completed_quests = []
+var failed_quests = []
 
 func _ready():
 	load_quests_database()
 
 func load_quests_database():
-	"""Define all available quests in the game"""
 	quests_database = {
 		"tutorial_quest": {
 			"id": "tutorial_quest",
 			"name": "Welcome to the Dungeon",
 			"description": "Learn the basics of survival in the dungeon.",
 			"objectives": [
-				#{
-					#"description": "Move around using WASD",
-					#"type": "custom",  # Will be manually completed
-					#"required": 1,
-					#"current": 0,
-					#"completed": false
-				#},
+				{
+					"description": "Move around using WASD",
+					"type": "custom",  # Will be manually completed
+					"required": 1,
+					"current": 0,
+					"completed": false
+				},
 				{
 					"description": "Attack an enemy",
 					"type": "kill_enemy",
@@ -53,7 +50,7 @@ func load_quests_database():
 				"items": ["health_potion"],
 				"experience": 100
 			},
-			"auto_accept": true
+			"auto_accept": false
 		},
 		
 		"slay_skeletons": {
@@ -62,17 +59,17 @@ func load_quests_database():
 			"description": "The dungeon is overrun with skeletons. Defeat them to make it safer.",
 			"objectives": [
 				{
-					"description": "Defeat 2 skeleton enemies",
+					"description": "Defeat 3 skeleton enemies",
 					"type": "kill_enemy",
 					"target": "skeleton_enemy",
-					"required": 2,
+					"required": 3,
 					"current": 0,
 					"completed": false
 				}
 			],
 			"rewards": {
-				"gold": 15,
-				"items": ["dash_flask"],
+				"gold": 20,
+				"items": ["iron_sword"],
 				"experience": 250
 			},
 			"auto_accept": false
@@ -114,20 +111,20 @@ func load_quests_database():
 			"description": "Open treasure chests to find valuable loot.",
 			"objectives": [
 				{
-					"description": "Open 2 chests",
+					"description": "Open 1 chest(s)",
 					"type": "open_chest",
-					"required": 2,
+					"required": 1,
 					"current": 0,
 					"completed": false
 				}
 			],
 			"rewards": {
-				"gold": 10,
+				"gold": 15,
 				"items": ["health_potion"],
 				"experience": 200
 			},
 			"auto_accept": false
-		}
+		},
 		
 		#"merchant_delivery": {
 			#"id": "merchant_delivery",
@@ -324,6 +321,7 @@ func give_quest_rewards(rewards: Dictionary):
 			item_manager.add_item_to_inventory(item_id, 1)
 			print("Rewarded item: ", item_id)
 	
+	# Give experience (you can hook this up to your XP system)
 	if "experience" in rewards:
 		print("Rewarded ", rewards.experience, " experience")
 

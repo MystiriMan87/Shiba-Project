@@ -4493,7 +4493,10 @@ scale = Vector2(5.5, 5.5)
 position = Vector2(426, 25)
 audio_volume = -10.0
 is_quest_giver = true
-quest_to_give = "tutorial_quest"
+quest_to_give = "treasure_hunter"
+quest_dialogue_id = "npc_greeting"
+quest_complete_dialogue_id = "skeleton_quest_complete"
+quest_active_dialogue_id = "skeleton_quest_active"
 
 [node name="ShopUI" parent="." instance=ExtResource("25_0nbtd")]
 
@@ -4507,6 +4510,7 @@ script = ExtResource("27_0nbtd")
 dialogue_id = "merchant_intro"
 interaction_range = 80.0
 npc_name = "Merchant"
+dialogue_audio_path = ""
 
 [node name="Sprite2D" type="Sprite2D" parent="MerchatNPC"]
 scale = Vector2(3, 3)
@@ -4519,6 +4523,7 @@ frame = 17
 shape = SubResource("CircleShape2D_ts3gi")
 
 [node name="CharacterBody2D" type="CharacterBody2D" parent="."]
+visible = false
 position = Vector2(112, 269)
 
 [node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D"]

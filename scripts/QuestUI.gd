@@ -52,7 +52,6 @@ func refresh_quests():
 		create_quest_display(quest_data)
 
 func create_quest_display(quest_data: Dictionary):
-	"""Create UI elements for a single quest"""
 	
 	# Quest title
 	var title_label = Label.new()
