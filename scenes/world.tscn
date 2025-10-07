@@ -1,4 +1,4 @@
-[gd_scene load_steps=41 format=4 uid="uid://dpcl1dclvepl8"]
+[gd_scene load_steps=44 format=4 uid="uid://dpcl1dclvepl8"]
 
 [ext_resource type="Script" uid="uid://c4k4k8r5ebb5c" path="res://scenes/world.gd" id="1_4mrxx"]
 [ext_resource type="PackedScene" uid="uid://hqa6411o6hsf" path="res://scenes/player.tscn" id="1_nnsk1"]
@@ -23,8 +23,11 @@
 [ext_resource type="PackedScene" uid="uid://dspx1svbrq84n" path="res://scenes/SpikeTrap_alter.tscn" id="17_lakw3"]
 [ext_resource type="PackedScene" uid="uid://8a7m82fpuqoj" path="res://wooden_door.tscn" id="19_pm21f"]
 [ext_resource type="PackedScene" uid="uid://bkcsm36nf4kyd" path="res://dialogue_box.tscn" id="23_xgqkh"]
-[ext_resource type="Script" uid="uid://chsoa6deu0e0y" path="res://scenes/npc.gd" id="24_munwf"]
-[ext_resource type="Texture2D" uid="uid://dxa61mw40yf4p" path="res://icon.svg" id="25_ts3gi"]
+[ext_resource type="PackedScene" uid="uid://bfjoojsctscj1" path="res://Miner_NPC.tscn" id="24_ctatt"]
+[ext_resource type="PackedScene" uid="uid://dtdn67h8hhagm" path="res://shop_ui.tscn" id="25_0nbtd"]
+[ext_resource type="PackedScene" uid="uid://bgg32r6jrhvd4" path="res://Trader_NPC.tscn" id="26_munwf"]
+[ext_resource type="Script" uid="uid://chsoa6deu0e0y" path="res://scenes/npc.gd" id="27_0nbtd"]
+[ext_resource type="Texture2D" uid="uid://bijlf6im51jrw" path="res://Assets/2D Pixel Dungeon Asset Pack/character and tileset/Dungeon_Character.png" id="27_ts3gi"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_71j4m"]
 texture = ExtResource("4_k0juu")
@@ -4163,8 +4166,8 @@ texture = ExtResource("4_k0juu")
 [sub_resource type="TileSet" id="TileSet_jhx03"]
 sources/0 = SubResource("TileSetAtlasSource_q5onr")
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_0nbtd"]
-radius = 43.7379
+[sub_resource type="CircleShape2D" id="CircleShape2D_ts3gi"]
+radius = 40.05
 
 [node name="World" type="Node2D"]
 script = ExtResource("1_4mrxx")
@@ -4339,10 +4342,11 @@ loot_spawn_radius_step = 300.0
 
 [node name="Chest2" parent="." instance=ExtResource("9_7r4gi")]
 texture_filter = 1
-position = Vector2(198, -2047)
+position = Vector2(79, -2009)
 input_pickable = true
 is_locked = false
-loot_items = Array[String](["health_potion", "steel_hammer"])
+key_type = "iron"
+loot_items = Array[String](["health_potion", "steel_hammer", "coin", "coin"])
 
 [node name="BigSlime" parent="." instance=ExtResource("11_e3hyu")]
 position = Vector2(320, 1958)
@@ -4476,16 +4480,30 @@ scale = Vector2(5.5, 5.5)
 
 [node name="DialogueBox" parent="." instance=ExtResource("23_xgqkh")]
 
-[node name="CharacterBody2D" type="CharacterBody2D" parent="."]
-position = Vector2(496, 289)
-script = ExtResource("24_munwf")
+[node name="Crazed Wizard" parent="." instance=ExtResource("24_ctatt")]
+position = Vector2(426, 25)
+audio_volume = -10.0
+
+[node name="ShopUI" parent="." instance=ExtResource("25_0nbtd")]
+
+[node name="MerchantShop" parent="." instance=ExtResource("26_munwf")]
+position = Vector2(363, -2060)
 interaction_range = 80.0
 
-[node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D"]
-position = Vector2(-8.58307e-06, -3.8147e-06)
-scale = Vector2(0.578125, 0.539062)
-texture = ExtResource("25_ts3gi")
+[node name="MerchatNPC" type="CharacterBody2D" parent="."]
+position = Vector2(274, -2060)
+script = ExtResource("27_0nbtd")
+dialogue_id = "merchant_intro"
+interaction_range = 80.0
+npc_name = "Merchant"
+dialogue_audio_path = ""
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
-position = Vector2(-2, -1)
-shape = SubResource("CircleShape2D_0nbtd")
+[node name="Sprite2D" type="Sprite2D" parent="MerchatNPC"]
+scale = Vector2(3, 3)
+texture = ExtResource("27_ts3gi")
+hframes = 7
+vframes = 4
+frame = 17
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MerchatNPC"]
+shape = SubResource("CircleShape2D_ts3gi")

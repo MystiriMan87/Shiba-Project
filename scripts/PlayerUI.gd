@@ -9,8 +9,8 @@ extends Control
 
 var inventory_slots: Array = []
 var selected_slot_index: int = -1
-var inventory_slots_per_row: int = 8  # Adjust based on your inventory layout
-var inventory_rows: int = 4  # Adjust based on your inventory layout
+var inventory_slots_per_row: int = 8 
+var inventory_rows: int = 4  
 var item_manager: Node = null
 var player: CharacterBody2D = null
 
@@ -129,12 +129,10 @@ func setup_ui_layout():
 	#health_label.visible = false
 	#health_container.add_child(health_label)
 	#
-	## Old ProgressBar-based health bar is deprecated in favor of the new sprite one.
-	## Keep references null/hidden to avoid layout conflicts.
+	
 	#health_bar = ProgressBar.new()
 	#health_bar.visible = false
 	#health_container.add_child(health_bar)
-	## Hide the entire legacy container so it doesn't overlay the new bar
 	#health_container.visible = false
 
 func create_echo_pips():

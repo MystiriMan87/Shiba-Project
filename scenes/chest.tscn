@@ -22,7 +22,9 @@ z_as_relative = false
 texture = ExtResource("2_sy5e1")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+texture_filter = 1
 shape = SubResource("CircleShape2D_gqd3d")
+disabled = true
 
 [node name="Area2D" type="Area2D" parent="."]
 collision_layer = 15

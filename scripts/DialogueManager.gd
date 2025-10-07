@@ -3,13 +3,15 @@ extends Node
 # Dialogue data structure
 var dialogues = {
 	"npc_greeting": [
-		{"speaker": "Villager", "text": "Hello traveler! Welcome to our village."},
-		{"speaker": "Villager", "text": "Beware of the enemies lurking in the forest."},
+		{"speaker": "Crazed Wizard", "text": "Hello traveler! What brings you to these forsaken caverns?."},
+		{"speaker": "Player", "text": "I came here for some loot to salvage."},
+		{"speaker": "Crazed Wizard", "text": "Looking for treasure hehe... (crazed mumbling) I wouldn't reccomend you go that way... that place is infested with vampires. Best you try your luck in the slime ridden place that way hahaha. Might be some loot to help you on your journeys!."},
+		{"speaker": "Crazed Wizard", "text": "Well if you meet a merchant on your travels make sure to give him your coins in exhange for valuable.. valuable.. items! (mumbling)"},
 	],
 	"merchant_intro": [
 		{"speaker": "Merchant", "text": "Looking to buy some potions?"},
 		{"speaker": "Player", "text": "What do you have?"},
-		{"speaker": "Merchant", "text": "Health and dash potions! Very useful for adventurers."},
+		{"speaker": "Merchant", "text": "Health, dash potions, and more! Very useful for adventurers. If you bring me upgrades I will be able to sell you more items. Take a look at my supplies here, if anything catches your eye"},
 	],
 	"quest_giver": [
 		{"speaker": "Elder", "text": "The forest has become dangerous lately."},

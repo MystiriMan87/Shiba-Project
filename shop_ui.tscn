@@ -1,0 +1,90 @@
+[gd_scene load_steps=5 format=3 uid="uid://dtdn67h8hhagm"]
+
+[ext_resource type="Script" uid="uid://dpi8ly4j6co0y" path="res://shop_ui.gd" id="1_fscwk"]
+[ext_resource type="FontFile" uid="uid://blkgwe4swrid8" path="res://100-Sub-Assets-Free/Fonts/m5x7.ttf" id="2_l4r40"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w63dr"]
+bg_color = Color(0.486578, 0.350011, 0, 1)
+corner_radius_top_left = 50
+corner_radius_top_right = 50
+corner_radius_bottom_right = 50
+corner_radius_bottom_left = 50
+
+[sub_resource type="LabelSettings" id="LabelSettings_l4r40"]
+font_size = 65
+
+[node name="ShopUI" type="CanvasLayer"]
+script = ExtResource("1_fscwk")
+
+[node name="Panel" type="Panel" parent="."]
+custom_minimum_size = Vector2(800, 600)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -400.0
+offset_top = -339.0
+offset_right = 400.0
+offset_bottom = 316.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_w63dr")
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+custom_minimum_size = Vector2(750, 400)
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.019
+anchor_top = -0.042
+anchor_right = 0.981
+anchor_bottom = 1.042
+offset_left = -0.200001
+offset_top = 0.200003
+offset_right = 0.199951
+offset_bottom = -0.200012
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 25
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="TopBar" type="HBoxContainer" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="GoldLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer/TopBar"]
+layout_mode = 2
+theme_override_constants/line_spacing = 10
+theme_override_fonts/font = ExtResource("2_l4r40")
+theme_override_font_sizes/font_size = 43
+text = "Gold: 0 "
+label_settings = SubResource("LabelSettings_l4r40")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CloseButton" type="Button" parent="Panel/MarginContainer/VBoxContainer/TopBar"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_l4r40")
+theme_override_font_sizes/font_size = 56
+text = "                              X"
+flat = true
+alignment = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel/MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(750, 550)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="ItemsContainer" type="VBoxContainer" parent="Panel/MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="MessageLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer"]
+layout_mode = 2

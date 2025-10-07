@@ -1,8 +1,11 @@
-[gd_scene load_steps=4 format=3 uid="uid://cqk6unim2ftgo"]
+[gd_scene load_steps=7 format=3 uid="uid://cqk6unim2ftgo"]
 
 [ext_resource type="Script" uid="uid://bov65j62y0be8" path="res://scripts/PlayerUI.gd" id="1_lwipk"]
 [ext_resource type="Texture2D" uid="uid://d12anw6sa6wxg" path="res://Assets/16x64 Red Simple Healthbar.png" id="2_654h1"]
 [ext_resource type="Script" uid="uid://etw1xkbn5jmn" path="res://healthbar.gd" id="3_pc08v"]
+[ext_resource type="Texture2D" uid="uid://14jjco5gh3hy" path="res://Assets/Square.png" id="4_pc08v"]
+[ext_resource type="Texture2D" uid="uid://dysb32n4ws6ys" path="res://Assets/Triangle.png" id="5_a4em4"]
+[ext_resource type="Texture2D" uid="uid://dd0gqips5pn8y" path="res://Assets/L1.png" id="6_gxl1c"]
 
 [node name="PlayerUI" type="Control"]
 layout_mode = 3
@@ -41,7 +44,7 @@ offset_right = 2044.0
 offset_bottom = 1116.0
 theme_override_font_sizes/font_size = 31
 text = "
-E - Open chest
+E - Interact
 Tab - INVENTORY
 Shift - Dash
 Q - Dash echo"
@@ -55,9 +58,37 @@ offset_top = 70.0
 offset_right = 1975.0
 offset_bottom = 443.0
 theme_override_font_sizes/font_size = 31
-text = "Go down and to the left for some loot
-go up for a new weapon,
-Go down and fight the boss 
+text = "(!) Listen to the crazed Wizard
+
+(!) Fight the boss
+
 "
 horizontal_alignment = 1
 uppercase = true
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 1431.0
+offset_top = 774.0
+offset_right = 1475.0
+offset_bottom = 814.0
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("4_pc08v")
+
+[node name="TextureRect2" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 1430.0
+offset_top = 830.0
+offset_right = 1474.0
+offset_bottom = 870.0
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("5_a4em4")
+
+[node name="TextureRect4" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 1426.0
+offset_top = 881.0
+offset_right = 1474.0
+offset_bottom = 921.0
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("6_gxl1c")
