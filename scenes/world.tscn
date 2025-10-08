@@ -5648,7 +5648,21 @@ texture = ExtResource("12_q5onr")
 [node name="PointLight2D14" type="PointLight2D" parent="PointLight"]
 z_index = 1
 position = Vector2(124, -2117)
-color = Color(0.877664, 0.0430575, 0.0954433, 1)
+color = Color(0.823529, 0.0862745, 0, 1)
+energy = 2.9
+texture = ExtResource("12_q5onr")
+
+[node name="PointLight2D15" type="PointLight2D" parent="PointLight"]
+z_index = 1
+position = Vector2(49, -1720)
+color = Color(0.821966, 0.086183, 0, 1)
+energy = 2.9
+texture = ExtResource("12_q5onr")
+
+[node name="PointLight2D16" type="PointLight2D" parent="PointLight"]
+z_index = 1
+position = Vector2(340, -1720)
+color = Color(0.821966, 0.086183, 0, 1)
 energy = 2.9
 texture = ExtResource("12_q5onr")
 
@@ -5802,30 +5816,6 @@ is_locked = false
 key_type = "iron"
 loot_items = Array[String](["health_potion", "steel_hammer", "coin", "coin"])
 
-[node name="BigSlime" parent="." instance=ExtResource("11_e3hyu")]
-position = Vector2(320, 1958)
-max_health = 100
-jump_arc_height = 50
-land_damage_radius = 30
-
-[node name="Enemy" parent="." instance=ExtResource("1_rwgxs")]
-position = Vector2(16, 748)
-
-[node name="Enemy2" parent="." instance=ExtResource("1_rwgxs")]
-position = Vector2(141, 779)
-
-[node name="Enemy3" parent="." instance=ExtResource("1_rwgxs")]
-position = Vector2(52, 861)
-
-[node name="Enemy4" parent="." instance=ExtResource("1_rwgxs")]
-position = Vector2(492, 976)
-
-[node name="Enemy5" parent="." instance=ExtResource("1_rwgxs")]
-position = Vector2(639, 995)
-
-[node name="Enemy6" parent="." instance=ExtResource("1_rwgxs")]
-position = Vector2(543, 1083)
-
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
 z_index = 1
 position = Vector2(62, 52)
@@ -5871,22 +5861,64 @@ z_index = -1
 position = Vector2(444, 1646)
 scale = Vector2(4, 4)
 
-[node name="SkeletonEnemyV2" parent="." instance=ExtResource("10_w7kh3")]
+[node name="Enemies" type="Node" parent="."]
+
+[node name="Vampire_enemy" parent="Enemies" instance=ExtResource("17_7t5mc")]
+position = Vector2(482, -853)
+max_health = 15
+
+[node name="Vampire_enemy2" parent="Enemies" instance=ExtResource("17_7t5mc")]
+position = Vector2(126, -696)
+max_health = 15
+
+[node name="Vampire_enemy3" parent="Enemies" instance=ExtResource("17_7t5mc")]
+position = Vector2(0, -1509)
+max_health = 15
+
+[node name="Vampire_enemy4" parent="Enemies" instance=ExtResource("17_7t5mc")]
+position = Vector2(489, -1302)
+max_health = 15
+
+[node name="BigSlime" parent="Enemies" instance=ExtResource("11_e3hyu")]
+position = Vector2(320, 1958)
+max_health = 100
+jump_arc_height = 50
+land_damage_radius = 30
+
+[node name="Enemy" parent="Enemies" instance=ExtResource("1_rwgxs")]
+position = Vector2(16, 748)
+
+[node name="Enemy2" parent="Enemies" instance=ExtResource("1_rwgxs")]
+position = Vector2(141, 779)
+
+[node name="Enemy3" parent="Enemies" instance=ExtResource("1_rwgxs")]
+position = Vector2(52, 861)
+
+[node name="Enemy4" parent="Enemies" instance=ExtResource("1_rwgxs")]
+position = Vector2(492, 976)
+
+[node name="Enemy5" parent="Enemies" instance=ExtResource("1_rwgxs")]
+position = Vector2(639, 995)
+
+[node name="Enemy6" parent="Enemies" instance=ExtResource("1_rwgxs")]
+position = Vector2(543, 1083)
+
+[node name="SkeletonEnemyV2" parent="Enemies" instance=ExtResource("10_w7kh3")]
 position = Vector2(571, 788)
 
-[node name="SkeletonEnemyV6" parent="." instance=ExtResource("10_w7kh3")]
+[node name="SkeletonEnemyV6" parent="Enemies" instance=ExtResource("10_w7kh3")]
 position = Vector2(530, -1603)
 
-[node name="SkeletonEnemyV7" parent="." instance=ExtResource("10_w7kh3")]
+[node name="SkeletonEnemyV7" parent="Enemies" instance=ExtResource("10_w7kh3")]
 position = Vector2(-108, -1258)
 
-[node name="SkeletonEnemyV3" parent="." instance=ExtResource("10_w7kh3")]
+[node name="SkeletonEnemyV3" parent="Enemies" instance=ExtResource("10_w7kh3")]
 position = Vector2(55, 1103)
 
-[node name="SkeletonEnemyV4" parent="." instance=ExtResource("10_w7kh3")]
+[node name="SkeletonEnemyV4" parent="Enemies" instance=ExtResource("10_w7kh3")]
 position = Vector2(-511, 862)
 
-[node name="SkeletonEnemyV5" parent="." instance=ExtResource("10_w7kh3")]
+[node name="SkeletonEnemyV5" parent="Enemies" instance=ExtResource("10_w7kh3")]
 position = Vector2(-523, 1118)
 
 [node name="GateDoor" parent="." instance=ExtResource("15_xo05s")]
@@ -5912,22 +5944,6 @@ position = Vector2(-281, 919)
 [node name="SpikeTrap2" parent="." instance=ExtResource("16_dss4m")]
 z_index = -1
 position = Vector2(-281, 1000)
-
-[node name="Vampire_enemy" parent="." instance=ExtResource("17_7t5mc")]
-position = Vector2(482, -853)
-max_health = 15
-
-[node name="Vampire_enemy2" parent="." instance=ExtResource("17_7t5mc")]
-position = Vector2(126, -696)
-max_health = 15
-
-[node name="Vampire_enemy3" parent="." instance=ExtResource("17_7t5mc")]
-position = Vector2(0, -1509)
-max_health = 15
-
-[node name="Vampire_enemy4" parent="." instance=ExtResource("17_7t5mc")]
-position = Vector2(489, -1302)
-max_health = 15
 
 [node name="WoodenDoor" parent="." instance=ExtResource("19_pm21f")]
 position = Vector2(200, -1809)
@@ -5982,3 +5998,11 @@ texture = ExtResource("25_ts3gi")
 shape = SubResource("CircleShape2D_37qwj")
 
 [node name="QuestUI" parent="." instance=ExtResource("31_luhhm")]
+
+[node name="Torch8" parent="." instance=ExtResource("13_jhx03")]
+position = Vector2(50, -1723)
+scale = Vector2(4, 4)
+
+[node name="Torch9" parent="." instance=ExtResource("13_jhx03")]
+position = Vector2(341, -1720)
+scale = Vector2(4, 4)
