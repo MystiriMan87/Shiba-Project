@@ -310,6 +310,11 @@ func die():
 	is_dead = true
 	current_state = SkeletonState.DEATH
 	
+	var quest_manager = get_node_or_null("/root/QuestManager")
+	if quest_manager:
+		quest_manager.on_enemy_killed("skeleton_enemy")  # Must match quest target exactly!
+	
+	
 	var death_len := 0.6
 	if animation_player and animation_player.has_animation("death"):
 		if animation_player.current_animation != "death":

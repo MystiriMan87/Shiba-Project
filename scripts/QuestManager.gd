@@ -22,13 +22,13 @@ func load_quests_database():
 			"name": "Welcome to the Dungeon",
 			"description": "Learn the basics of survival in the dungeon.",
 			"objectives": [
-				{
-					"description": "Move around using WASD",
-					"type": "custom",  # Will be manually completed
-					"required": 1,
-					"current": 0,
-					"completed": false
-				},
+				#{
+					#"description": "Move around using WASD",
+					#"type": "custom",  # Will be manually completed
+					#"required": 1,
+					#"current": 0,
+					#"completed": false
+				#},
 				{
 					"description": "Attack an enemy",
 					"type": "kill_enemy",

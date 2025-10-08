@@ -545,7 +545,7 @@ func die():
 	
 	var quest_manager = get_node_or_null("/root/QuestManager")
 	if quest_manager:
-		quest_manager.on_enemy_killed("skeleton_enemy") 
+		quest_manager.on_enemy_killed("slime_enemy") 
 		
 	var tween = create_tween()
 	tween.parallel().tween_property(sprite, "modulate:a", 0.0, 0.5)

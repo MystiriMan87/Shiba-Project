@@ -22,7 +22,7 @@ var dialogues = {
 	"skeleton_quest_complete": [
 		"You did it! The dungeon feels safer already.",
 		"Thank you so much for your help!",
-		"Here's your reward as promised."
+		"Here's your reward as promised. Before you go, head into the dark corridors ahead and you will find the merchant, you can buy useful items from him!"
 	],
 	"merchant_intro": [
 		{"speaker": "Merchant", "text": "Looking to buy some potions?"},

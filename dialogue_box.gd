@@ -42,8 +42,12 @@ func display_current_line():
 		return
 	
 	var line = current_dialogue[current_index]
-	speaker_label.text = line.get("speaker", "")
-	current_text = line.get("text", "")
+	if typeof(line) == TYPE_STRING:
+		speaker_label.text = ""
+		current_text = line
+	else:
+		speaker_label.text = line.get("speaker", "")
+		current_text = line.get("text", "")
 	
 	text_label.text = ""
 	char_index = 0

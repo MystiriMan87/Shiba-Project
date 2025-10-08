@@ -4491,10 +4491,11 @@ scale = Vector2(5.5, 5.5)
 
 [node name="Crazed Wizard" parent="." instance=ExtResource("24_ctatt")]
 position = Vector2(426, 25)
+dialogue_id = "skeleton_quest_complete"
 audio_volume = -10.0
 is_quest_giver = true
-quest_to_give = "treasure_hunter"
-quest_dialogue_id = "npc_greeting"
+quest_to_give = "slay_skeletons"
+quest_dialogue_id = "skeleton_quest_start"
 quest_complete_dialogue_id = "skeleton_quest_complete"
 quest_active_dialogue_id = "skeleton_quest_active"
 
