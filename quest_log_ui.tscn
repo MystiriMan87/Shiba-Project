@@ -1,14 +1,21 @@
-[gd_scene load_steps=3 format=3 uid="uid://hkva3wgg66js"]
+[gd_scene load_steps=4 format=3 uid="uid://hkva3wgg66js"]
 
 [ext_resource type="Script" uid="uid://v3615ow8pq33" path="res://scripts/QuestLogUI.gd" id="1_imfox"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tc1xv"]
-bg_color = Color(0, 0, 0, 0.490196)
+bg_color = Color(0.620748, 0.498927, 0.324464, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 border_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_imfox"]
+bg_color = Color(0.380516, 0.226403, 0.181305, 1)
 corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
@@ -41,10 +48,10 @@ offset_bottom = 578.0
 
 [node name="TabContainer" type="TabContainer" parent="Panel/MarginContainer"]
 layout_mode = 2
-current_tab = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_imfox")
+current_tab = 0
 
 [node name="Active" type="TabBar" parent="Panel/MarginContainer/TabContainer"]
-visible = false
 layout_mode = 2
 metadata/_tab_index = 0
 
@@ -74,6 +81,7 @@ offset_bottom = 507.0
 layout_mode = 2
 
 [node name="Available" type="TabBar" parent="Panel/MarginContainer/TabContainer"]
+visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 
