@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://37l8va4q08k"
+path="res://.godot/imported/_mana_normal_animations.ase-6f6c6f7e3b0cddb08435741136fbf176.res"
+
+[deps]
+
+source_file="res://Assets/Snoblin/Snoblin_Animated_HUD_Bonus/Assets/Mana Container/_mana_normal_animations.ase"
+dest_files=["res://.godot/imported/_mana_normal_animations.ase-6f6c6f7e3b0cddb08435741136fbf176.res"]
+
+[params]
+

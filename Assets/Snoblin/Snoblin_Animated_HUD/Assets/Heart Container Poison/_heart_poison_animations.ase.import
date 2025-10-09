@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://dta4gw5t8y3bl"
+path="res://.godot/imported/_heart_poison_animations.ase-0638452f5780da1ab5765cff8b2aabdf.res"
+
+[deps]
+
+source_file="res://Assets/Snoblin/Snoblin_Animated_HUD/Assets/Heart Container Poison/_heart_poison_animations.ase"
+dest_files=["res://.godot/imported/_heart_poison_animations.ase-0638452f5780da1ab5765cff8b2aabdf.res"]
+
+[params]
+

@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://boevf16qqkmfe"
+path="res://.godot/imported/_armor_golden_animations.ase-cc66c9e91ccd6937e0dc2992a416a5d1.res"
+
+[deps]
+
+source_file="res://Assets/Snoblin/Snoblin_Animated_HUD/Assets/Armor Container Golden/_armor_golden_animations.ase"
+dest_files=["res://.godot/imported/_armor_golden_animations.ase-cc66c9e91ccd6937e0dc2992a416a5d1.res"]
+
+[params]
+

@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://5movm0ns3c3k"
+path="res://.godot/imported/_heart_golden_animations.ase-e650e27ef02502e76e34be9514fc4779.res"
+
+[deps]
+
+source_file="res://Assets/Snoblin/Snoblin_Animated_HUD/Assets/Heart Container Golden/_heart_golden_animations.ase"
+dest_files=["res://.godot/imported/_heart_golden_animations.ase-e650e27ef02502e76e34be9514fc4779.res"]
+
+[params]
+

@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://c3bnhfm6abfvg"
+path="res://.godot/imported/dark_elf_prince.aseprite-1a0bec306a42f78bb3ecbadc2231ada2.res"
+
+[deps]
+
+source_file="res://Assets/Snoblin/Snoblin_Dark_Elves/Assets/Dark Elf Prince/dark_elf_prince.aseprite"
+dest_files=["res://.godot/imported/dark_elf_prince.aseprite-1a0bec306a42f78bb3ecbadc2231ada2.res"]
+
+[params]
+

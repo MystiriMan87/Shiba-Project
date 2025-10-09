@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://gjg41fbfloj5"
+path="res://.godot/imported/skeleton_warrior.aseprite-6b72807fe5101bc771f11716c4344359.res"
+
+[deps]
+
+source_file="res://Assets/Snoblin/Snoblin_Skeleton_Warriors/Assets/Skeleton Warrior/skeleton_warrior.aseprite"
+dest_files=["res://.godot/imported/skeleton_warrior.aseprite-6b72807fe5101bc771f11716c4344359.res"]
+
+[params]
+

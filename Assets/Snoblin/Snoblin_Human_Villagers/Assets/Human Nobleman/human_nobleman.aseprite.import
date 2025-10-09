@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://bi5x3x4s44mpq"
+path="res://.godot/imported/human_nobleman.aseprite-719edbd2bbea530696b13b3c03724293.res"
+
+[deps]
+
+source_file="res://Assets/Snoblin/Snoblin_Human_Villagers/Assets/Human Nobleman/human_nobleman.aseprite"
+dest_files=["res://.godot/imported/human_nobleman.aseprite-719edbd2bbea530696b13b3c03724293.res"]
+
+[params]
+

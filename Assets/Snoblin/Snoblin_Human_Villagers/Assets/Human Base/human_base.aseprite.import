@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://d4kx4wq0mhfl0"
+path="res://.godot/imported/human_base.aseprite-427c4e7d3773bd0749f2bea7e8bd36a1.res"
+
+[deps]
+
+source_file="res://Assets/Snoblin/Snoblin_Human_Villagers/Assets/Human Base/human_base.aseprite"
+dest_files=["res://.godot/imported/human_base.aseprite-427c4e7d3773bd0749f2bea7e8bd36a1.res"]
+
+[params]
+

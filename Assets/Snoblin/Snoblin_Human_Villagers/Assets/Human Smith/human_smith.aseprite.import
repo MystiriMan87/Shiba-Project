@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://do34lrm2euaod"
+path="res://.godot/imported/human_smith.aseprite-dd0fed5bd8101d3100f204427565c809.res"
+
+[deps]
+
+source_file="res://Assets/Snoblin/Snoblin_Human_Villagers/Assets/Human Smith/human_smith.aseprite"
+dest_files=["res://.godot/imported/human_smith.aseprite-dd0fed5bd8101d3100f204427565c809.res"]
+
+[params]
+

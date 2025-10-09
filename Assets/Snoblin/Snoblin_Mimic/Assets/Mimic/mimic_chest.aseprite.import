@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://b1nep0eikroj0"
+path="res://.godot/imported/mimic_chest.aseprite-be325ada02c3d940308deb40eee36f20.res"
+
+[deps]
+
+source_file="res://Assets/Snoblin/Snoblin_Mimic/Assets/Mimic/mimic_chest.aseprite"
+dest_files=["res://.godot/imported/mimic_chest.aseprite-be325ada02c3d940308deb40eee36f20.res"]
+
+[params]
+

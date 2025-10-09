@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://3ddl5hyklbfu"
+path="res://.godot/imported/dark_elf_merchant.aseprite-296aea5748d4299e51dd8f7beff1a64e.res"
+
+[deps]
+
+source_file="res://Assets/Snoblin/Snoblin_Dark_Elves/Assets/Dark Elf Merchant/dark_elf_merchant.aseprite"
+dest_files=["res://.godot/imported/dark_elf_merchant.aseprite-296aea5748d4299e51dd8f7beff1a64e.res"]
+
+[params]
+

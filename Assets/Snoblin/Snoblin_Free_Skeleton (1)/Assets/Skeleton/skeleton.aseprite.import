@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://bwx17d6mxedd3"
+path="res://.godot/imported/skeleton.aseprite-e35bc80340774c3a2f89943396b8f9f9.res"
+
+[deps]
+
+source_file="res://Assets/Snoblin/Snoblin_Free_Skeleton (1)/Assets/Skeleton/skeleton.aseprite"
+dest_files=["res://.godot/imported/skeleton.aseprite-e35bc80340774c3a2f89943396b8f9f9.res"]
+
+[params]
+

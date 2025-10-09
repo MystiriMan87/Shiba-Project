@@ -1,7 +1,7 @@
 [gd_scene load_steps=22 format=3 uid="uid://hqa6411o6hsf"]
 
 [ext_resource type="Script" uid="uid://dqw7kqxhj2hen" path="res://scripts/player.gd" id="1_g2els"]
-[ext_resource type="Texture2D" uid="uid://bbtlix5m7kq1u" path="res://Assets/Snoblin_Prototype_Character/Assets/Prototype_Character/prototype_character.png" id="2_qhqgy"]
+[ext_resource type="Texture2D" uid="uid://bbtlix5m7kq1u" path="res://Assets/Snoblin/Snoblin_Prototype_Character/Assets/Prototype_Character/prototype_character.png" id="2_qhqgy"]
 [ext_resource type="Texture2D" uid="uid://cqmbgj0vttg85" path="res://Assets/oubliette_weapons - free/spr_wep_iron_axe_2.png" id="3_dqkch"]
 [ext_resource type="Script" uid="uid://cyfvy2j00ira6" path="res://scenes/trail_effect.gd" id="4_dqkch"]
 

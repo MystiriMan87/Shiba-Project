@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://d28fmianktpw4"
+path="res://.godot/imported/_heart_empty_animations.ase-f4004468284fbdfb9d3d562a74609c48.res"
+
+[deps]
+
+source_file="res://Assets/Snoblin/Snoblin_Animated_HUD_Bonus/Assets/Heart Container General/_heart_empty_animations.ase"
+dest_files=["res://.godot/imported/_heart_empty_animations.ase-f4004468284fbdfb9d3d562a74609c48.res"]
+
+[params]
+

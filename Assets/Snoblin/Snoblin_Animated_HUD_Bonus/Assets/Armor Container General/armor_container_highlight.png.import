@@ -1,0 +1,34 @@
+[remap]
+
+importer="texture"
+type="CompressedTexture2D"
+uid="uid://bbp13evsrb3eu"
+path="res://.godot/imported/armor_container_highlight.png-0a9d4ff14218c7bcaa1d1be5bb7a1253.ctex"
+metadata={
+"vram_texture": false
+}
+
+[deps]
+
+source_file="res://Assets/Snoblin/Snoblin_Animated_HUD_Bonus/Assets/Armor Container General/armor_container_highlight.png"
+dest_files=["res://.godot/imported/armor_container_highlight.png-0a9d4ff14218c7bcaa1d1be5bb7a1253.ctex"]
+
+[params]
+
+compress/mode=0
+compress/high_quality=false
+compress/lossy_quality=0.7
+compress/hdr_compression=1
+compress/normal_map=0
+compress/channel_pack=0
+mipmaps/generate=false
+mipmaps/limit=-1
+roughness/mode=0
+roughness/src_normal=""
+process/fix_alpha_border=true
+process/premult_alpha=false
+process/normal_map_invert_y=false
+process/hdr_as_srgb=false
+process/hdr_clamp_exposure=false
+process/size_limit=0
+detect_3d/compress_to=1
