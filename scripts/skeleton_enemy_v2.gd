@@ -8,9 +8,9 @@ extends CharacterBody2D
 @export var chase_duration = 5.0
 @export var attack_cooldown = 2.0
 @export var attack_hit_ratio = 0.45
-@export var min_animation_speed = 0.6
-@export var max_animation_speed = 1.6
-@export var attack_speed_multiplier = 1.25
+@export var min_animation_speed = 0.5
+@export var max_animation_speed = 1.3
+@export var attack_speed_multiplier = 1.1
 @export var separation_distance = 20.0
 @export var separation_force = 200.0
 @export var walk_acceleration = 300
@@ -32,12 +32,7 @@ var attack_timer = 0.0
 var target_velocity = Vector2.ZERO
 var is_moving = false
 var last_speed_ratio: float = 0.0
-
-# Manual animation system
-var animation_timer = 0.0
-var current_frame = 0
-var current_anim = "idle"
-var frame_duration = 0.2
+var facing_direction = "down"
 
 enum SkeletonState {
 	IDLE,
@@ -59,17 +54,16 @@ func _ready():
 	collision_layer = 4
 	collision_mask = 1
 
-	# Safety: ensure exported values are valid (some scenes may have saved them as null)
 	if typeof(walk_friction) == TYPE_NIL:
 		walk_friction = 200
 	if typeof(walk_acceleration) == TYPE_NIL:
 		walk_acceleration = 300
 	if typeof(min_animation_speed) == TYPE_NIL:
-		min_animation_speed = 0.6
+		min_animation_speed = 0.5
 	if typeof(max_animation_speed) == TYPE_NIL:
-		max_animation_speed = 1.6
+		max_animation_speed = 1.3
 	if typeof(attack_speed_multiplier) == TYPE_NIL:
-		attack_speed_multiplier = 1.25
+		attack_speed_multiplier = 1.1
 	if typeof(separation_distance) == TYPE_NIL:
 		separation_distance = 20.0
 	if typeof(separation_force) == TYPE_NIL:
@@ -95,7 +89,7 @@ func _ready():
 	call_deferred("find_player")
 	
 	if animation_player:
-		animation_player.play("idle")
+		animation_player.play("idle_down")
 		if not animation_player.animation_finished.is_connected(_on_animation_finished):
 			animation_player.animation_finished.connect(_on_animation_finished)
 
@@ -132,14 +126,28 @@ func _physics_process(delta):
 	apply_player_separation(delta)
 	move_and_collide(velocity * delta)
 
+func update_direction(direction: Vector2):
+	if direction == Vector2.ZERO:
+		return
+	
+	if abs(direction.x) > abs(direction.y):
+		facing_direction = "side"
+		sprite.flip_h = direction.x < 0
+	else:
+		if direction.y > 0:
+			facing_direction = "down"
+		else:
+			facing_direction = "up"
+
 func handle_idle_state(delta):
 	target_velocity = Vector2.ZERO
 	velocity = velocity.move_toward(target_velocity, walk_friction * delta)
 	is_moving = false
 	
-	if animation_player:
-		if animation_player.current_animation != "idle":
-			animation_player.play("idle")
+	if animation_player and not hurt_locked:
+		var idle_anim = "idle_" + facing_direction
+		if animation_player.current_animation != idle_anim:
+			animation_player.play(idle_anim)
 		animation_player.speed_scale = min_animation_speed
 	
 	if player_in_detection_range and player:
@@ -171,25 +179,21 @@ func handle_walking_state(delta):
 		is_moving = velocity.length() > 5
 		last_speed_ratio = clamp(velocity.length() / speed, 0.0, 1.0)
 		
-		if sprite and direction_to_player.x != 0:
-			sprite.flip_h = direction_to_player.x < 0
+		update_direction(direction_to_player)
 		
-		if is_moving:
+		if is_moving and not hurt_locked:
 			if animation_player:
-				var walk_anim = "movement"
-				if animation_player.has_animation("walk"):
-					walk_anim = "walk"
-				elif animation_player.has_animation("move"):
-					walk_anim = "move"
-				if animation_player.current_animation != walk_anim:
-					animation_player.play(walk_anim)
-				# speed-scale based on movement speed
+				var run_anim = "run_" + facing_direction
+				if animation_player.current_animation != run_anim:
+					animation_player.play(run_anim)
 				var anim_speed = lerp(min_animation_speed, max_animation_speed, last_speed_ratio)
 				animation_player.speed_scale = anim_speed
 		else:
-			if animation_player and animation_player.current_animation != "idle":
-				animation_player.play("idle")
-			animation_player.speed_scale = min_animation_speed
+			if animation_player and not hurt_locked:
+				var idle_anim = "idle_" + facing_direction
+				if animation_player.current_animation != idle_anim:
+					animation_player.play(idle_anim)
+				animation_player.speed_scale = min_animation_speed
 	else:
 		change_state(SkeletonState.IDLE)
 
@@ -212,13 +216,14 @@ func start_attack():
 	attack_timer = attack_cooldown
 	
 	velocity = Vector2.ZERO
+	var attack_anim = "attack_" + facing_direction
 	var attack_len := 0.5
-	if animation_player and animation_player.has_animation("attack"):
-		animation_player.play("attack")
-		# Make attack a bit faster, scaled by last movement speed
+	
+	if animation_player:
+		animation_player.play(attack_anim)
 		var base_speed = lerp(min_animation_speed, max_animation_speed, last_speed_ratio)
 		animation_player.speed_scale = base_speed * attack_speed_multiplier
-		attack_len = max(0.05, animation_player.get_animation("attack").length)
+		attack_len = max(0.05, animation_player.get_animation(attack_anim).length)
 	
 	var scaled: float = max(animation_player.speed_scale, 0.001)
 	var hit_time: float = (attack_len * attack_hit_ratio) / scaled
@@ -231,8 +236,6 @@ func start_attack():
 	if player:
 		dir = (player.global_position - global_position).normalized()
 	if dir != Vector2.ZERO:
-		if sprite:
-			sprite.flip_h = dir.x < 0
 		velocity = dir * lunge_speed
 	
 	var rest_time: float = (attack_len - (attack_len * attack_hit_ratio)) / scaled
@@ -259,47 +262,33 @@ func apply_player_separation(delta):
 		var penetration: float = min_dist - dist
 		var push_speed: float = separation_force * penetration
 		velocity += push_dir * push_speed * delta
-		# Hard correction to prevent sticking
 		var max_correction: float = min(penetration, 8.0)
 		global_position += push_dir * max_correction
 
-func _noop():
-	pass
-
 func _on_animation_finished(anim_name: String) -> void:
-	if anim_name == "attack" and is_attacking:
+	if anim_name.begins_with("attack") and is_attacking:
 		is_attacking = false
 		change_state(SkeletonState.WALKING)
+	elif anim_name.begins_with("hit"):
+		hurt_locked = false
 
 func take_damage(amount: int):
 	if is_dead or hurt_locked or damage_timer > 0.0:
 		return
 	
-	# Show damage number the same way as slimes
 	if get_tree() and get_tree().current_scene:
 		ParticleEffects.spawn_damage_number(get_tree().current_scene, global_position + Vector2(0, -18), amount)
 	
 	current_health -= amount
 	damage_timer = damage_cooldown
 	
-	# Play one-shot hurt animation (no loop)
-	if animation_player and animation_player.has_animation("hurt"):
+	if animation_player:
 		hurt_locked = true
-		var len: float = max(0.05, float(animation_player.get_animation("hurt").length))
-		animation_player.speed_scale = 1.0
-		animation_player.play("hurt")
-		# brief flash
-		sprite.modulate = Color.RED
-		await get_tree().create_timer(min(0.15, len * 0.25)).timeout
-		sprite.modulate = Color.WHITE
-		# wait for rest of hurt, but cap to avoid long stalls
-		await get_tree().create_timer(min(0.6, len)).timeout
-		hurt_locked = false
+		var hit_anim = "hit_" + facing_direction
+		animation_player.speed_scale = 0.8
+		animation_player.play(hit_anim)
 	else:
-		# fallback flash only
-		sprite.modulate = Color.RED
-		await get_tree().create_timer(0.1).timeout
-		sprite.modulate = Color.WHITE
+		hurt_locked = false
 	
 	if current_health <= 0:
 		die()
@@ -312,22 +301,20 @@ func die():
 	
 	var quest_manager = get_node_or_null("/root/QuestManager")
 	if quest_manager:
-		quest_manager.on_enemy_killed("skeleton_enemy")  # Must match quest target exactly!
+		quest_manager.on_enemy_killed("skeleton_enemy")
 	
-	
+	var death_anim = "die_" + facing_direction
 	var death_len := 0.6
-	if animation_player and animation_player.has_animation("death"):
-		if animation_player.current_animation != "death":
-			animation_player.play("death")
-		death_len = max(0.05, animation_player.get_animation("death").length)
+	
+	if animation_player:
+		animation_player.play(death_anim)
+		death_len = max(0.05, animation_player.get_animation(death_anim).length)
 	
 	var respawn_manager = get_tree().get_first_node_in_group("respawn_manager")
 	if respawn_manager:
 		respawn_manager.register_enemy_death(self)
 
-	# Spawn item drops just like slimes
 	DropSystem.handle_enemy_death(enemy_type, global_position, get_tree())
-	# Optional: skeletons can also drop keys like base enemies
 	_drop_keys_like_slime()
 	
 	collision_shape.disabled = true
