@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://cqk6unim2ftgo"]
+[gd_scene load_steps=8 format=3 uid="uid://cqk6unim2ftgo"]
 
 [ext_resource type="Script" uid="uid://bov65j62y0be8" path="res://scripts/PlayerUI.gd" id="1_lwipk"]
 [ext_resource type="Texture2D" uid="uid://d12anw6sa6wxg" path="res://Assets/16x64 Red Simple Healthbar.png" id="2_654h1"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://14jjco5gh3hy" path="res://Assets/Square.png" id="4_pc08v"]
 [ext_resource type="Texture2D" uid="uid://dysb32n4ws6ys" path="res://Assets/Triangle.png" id="5_a4em4"]
 [ext_resource type="Texture2D" uid="uid://dd0gqips5pn8y" path="res://Assets/L1.png" id="6_gxl1c"]
+[ext_resource type="Script" uid="uid://d2wr72yy2hh5q" path="res://fps_counter.gd" id="7_gxl1c"]
 
 [node name="PlayerUI" type="Control"]
 layout_mode = 3
@@ -39,15 +40,16 @@ script = ExtResource("3_pc08v")
 [node name="Label" type="Label" parent="."]
 layout_mode = 0
 offset_left = 1227.0
-offset_top = 743.0
+offset_top = 682.0
 offset_right = 2044.0
 offset_bottom = 1116.0
 theme_override_font_sizes/font_size = 31
-text = "
+text = "THIS IS A WORK IN PROGRESS
+ (REVAMPING CURRENT ASSETS)
 E - Interact
 Tab - INVENTORY
 Shift - Dash
-Q - Dash echo"
+J - Quest Log"
 horizontal_alignment = 1
 uppercase = true
 
@@ -93,3 +95,11 @@ offset_right = 1474.0
 offset_bottom = 921.0
 scale = Vector2(1.5, 1.5)
 texture = ExtResource("6_gxl1c")
+
+[node name="Label3" type="Label" parent="."]
+layout_mode = 0
+offset_left = 903.0
+offset_top = 999.0
+offset_right = 1068.0
+offset_bottom = 1036.0
+script = ExtResource("7_gxl1c")

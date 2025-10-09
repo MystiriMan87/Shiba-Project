@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://bfy8qij5td24"]
 
 [ext_resource type="Script" uid="uid://dcwkkmid5x4ar" path="res://scenes/gate_door.gd" id="1_m64i3"]
-[ext_resource type="Texture2D" uid="uid://ft8tuuu3merh" path="res://Assets/FREE___Top-Down Dungeon Tileset.png" id="1_qjoe1"]
+[ext_resource type="Texture2D" uid="uid://bqeb1u31owxjj" path="res://Assets/Snoblin/Snoblin_Dungeon_Tiles/Assets/dungeon_tiles.png" id="2_m64i3"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_a2q2l"]
 
@@ -20,7 +20,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [40]
+"values": [132]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -48,7 +48,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0.0333333, 0.466667, 0.866667, 1.26667),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
-"values": [37, 38, 39, 40]
+"values": [135, 134, 133, 132]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -57,7 +57,7 @@ tracks/1/path = NodePath("StaticBody2D/CollisionShape2D:disabled")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(1.66804),
+"times": PackedFloat32Array(1.36667),
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [false]
@@ -73,10 +73,10 @@ tracks/0/path = NodePath("Sprite2D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0.0333333, 0.466667, 0.7, 1),
+"times": PackedFloat32Array(0.0333333, 0.366667, 0.7, 1),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
-"values": [40, 39, 38, 37]
+"values": [132, 133, 134, 135]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -85,7 +85,7 @@ tracks/1/path = NodePath("StaticBody2D/CollisionShape2D:disabled")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(1.56387),
+"times": PackedFloat32Array(1.1),
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [true]
@@ -104,18 +104,20 @@ script = ExtResource("1_m64i3")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 z_index = -5
 z_as_relative = false
-texture = ExtResource("1_qjoe1")
-hframes = 16
-vframes = 9
-frame = 40
+texture = ExtResource("2_m64i3")
+hframes = 14
+vframes = 12
+frame = 132
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
 shape = SubResource("RectangleShape2D_a2q2l")
 disabled = true
 
 [node name="Area2D" type="Area2D" parent="."]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("CircleShape2D_w5nrq")
