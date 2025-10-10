@@ -3,16 +3,23 @@ extends Node2D
 @onready var anim: AnimationPlayer = $AnimationPlayer
 @onready var blocker: CollisionShape2D = $StaticBody2D/CollisionShape2D
 @onready var area: Area2D = $Area2D
+@onready var sprite: Sprite2D = $Sprite2D
 
 var is_open := false
 var is_animating := false
 var player_in_area := false
 var last_open_time := 0.0
+
 @export var close_cooldown := 0.25
 
 func _ready():
 	if area:
 		area.monitoring = true
+	
+	if sprite:
+		sprite.y_sort_enabled = true
+	y_sort_enabled = true
+
 func _open() -> void:
 	is_animating = true
 	anim.play("open")
@@ -23,7 +30,6 @@ func _open() -> void:
 
 func _close() -> void:
 	await get_tree().create_timer(0.08).timeout
-	# Don't close if player still inside or cooldown not elapsed
 	if _is_player_overlapping() or (Time.get_ticks_msec() - int(last_open_time * 1000.0)) < int(close_cooldown * 1000.0):
 		return
 	is_animating = true

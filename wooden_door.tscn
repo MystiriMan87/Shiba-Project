@@ -99,6 +99,7 @@ _data = {
 }
 
 [node name="WoodenDoor" type="Node2D"]
+y_sort_enabled = true
 script = ExtResource("1_jxvvp")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

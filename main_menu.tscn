@@ -1,9 +1,43 @@
-[gd_scene load_steps=5 format=3 uid="uid://byg0qtj4d0dqv"]
+[gd_scene load_steps=9 format=3 uid="uid://byg0qtj4d0dqv"]
 
 [ext_resource type="Script" uid="uid://buobjj1brmb24" path="res://main_menu.gd" id="1_7vrkn"]
 [ext_resource type="FontFile" uid="uid://blkgwe4swrid8" path="res://100-Sub-Assets-Free/Fonts/m5x7.ttf" id="2_fu7sn"]
+[ext_resource type="FontFile" uid="uid://cxmygrl8lpf7k" path="res://100-Sub-Assets-Free/Fonts/PixeloidSansBold-RpeJo.ttf" id="2_glbon"]
 [ext_resource type="FontFile" uid="uid://vkfuxgs5bk41" path="res://100-Sub-Assets-Free/Fonts/PixeloidSans-nR3g1.ttf" id="3_fu7sn"]
-[ext_resource type="Texture2D" uid="uid://yu3pqmbyr3a" path="res://fondo para itchio (3).png" id="4_jix8l"]
+[ext_resource type="Texture2D" uid="uid://bftgrleorv6kh" path="res://faith-spark-background1.jpg" id="5_nlkkf"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glbon"]
+bg_color = Color(0.28444, 0.150579, 0.437025, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qe12f"]
+bg_color = Color(0.605642, 0.425603, 0.846524, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.275224, 0.164267, 0.412473, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+shadow_size = 15
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8qtwp"]
+bg_color = Color(0.952941, 0, 0, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+shadow_size = 15
 
 [node name="MainMenu" type="Control"]
 layout_direction = 1
@@ -28,12 +62,16 @@ offset_right = 141.0
 offset_bottom = 56.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_fonts/font = ExtResource("2_fu7sn")
-theme_override_font_sizes/font_size = 100
-text = "Play
+theme_override_fonts/font = ExtResource("2_glbon")
+theme_override_font_sizes/font_size = 67
+theme_override_styles/hover = SubResource("StyleBoxFlat_glbon")
+theme_override_styles/normal = SubResource("StyleBoxFlat_qe12f")
+text = "PLAY
 "
+icon_alignment = 1
 
 [node name="Button2" type="Button" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -66,6 +104,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_fonts/font = ExtResource("2_fu7sn")
 theme_override_font_sizes/font_size = 100
+theme_override_styles/normal = SubResource("StyleBoxFlat_8qtwp")
 text = "Quit
 "
 
@@ -100,8 +139,6 @@ offset_bottom = -103.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/default_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0.111448, 0.348301, 1, 1)
-theme_override_colors/font_shadow_color = Color(0.975664, 5.60723e-06, 2.11775e-06, 1)
 theme_override_fonts/normal_font = ExtResource("2_fu7sn")
 theme_override_font_sizes/normal_font_size = 200
 text = "Finders Keepers"
@@ -129,7 +166,7 @@ layout_mode = 0
 offset_right = 1988.0
 offset_bottom = 1080.0
 mouse_filter = 2
-texture = ExtResource("4_jix8l")
-expand_mode = 1
+texture = ExtResource("5_nlkkf")
+expand_mode = 5
 
 [connection signal="pressed" from="Button" to="." method="_on_play_pressed"]

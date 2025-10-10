@@ -383,6 +383,7 @@ script = ExtResource("1_skeleton")
 max_health = 5
 speed = 125
 lunge_duration = 0.1
+wander_radius = 70.0
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_exbgd")

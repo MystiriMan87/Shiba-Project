@@ -45,7 +45,7 @@ var wander_target: Vector2 = Vector2.ZERO
 var wander_timer: float = 0.0
 var spawn_position: Vector2 = Vector2.ZERO
 
-enum SkeletonState {
+enum GoblinState {
 	IDLE,
 	WANDERING,
 	WALKING,
@@ -53,7 +53,7 @@ enum SkeletonState {
 	DEATH
 }
 
-var current_state = SkeletonState.IDLE
+var current_state = GoblinState.IDLE
 
 @onready var sprite = $Sprite2D
 @onready var animation_player = $AnimationPlayer
@@ -130,15 +130,15 @@ func _physics_process(delta):
 		attack_timer -= delta
 	
 	match current_state:
-		SkeletonState.IDLE:
+		GoblinState.IDLE:
 			handle_idle_state(delta)
-		SkeletonState.WANDERING:
+		GoblinState.WANDERING:
 			handle_wandering_state(delta)
-		SkeletonState.WALKING:
+		GoblinState.WALKING:
 			handle_walking_state(delta)
-		SkeletonState.ATTACKING:
+		GoblinState.ATTACKING:
 			handle_attacking_state(delta)
-		SkeletonState.DEATH:
+		GoblinState.DEATH:
 			handle_death_state(delta)
 	
 	apply_player_separation(delta)
@@ -169,7 +169,7 @@ func handle_idle_state(delta):
 		animation_player.speed_scale = min_animation_speed
 	
 	if player_in_detection_range and player:
-		change_state(SkeletonState.WALKING)
+		change_state(GoblinState.WALKING)
 		chase_timer = chase_duration
 		return
 	
@@ -177,11 +177,11 @@ func handle_idle_state(delta):
 		wander_timer -= delta
 		if wander_timer <= 0:
 			pick_wander_target()
-			change_state(SkeletonState.WANDERING)
+			change_state(GoblinState.WANDERING)
 
 func handle_wandering_state(delta):
 	if player_in_detection_range and player:
-		change_state(SkeletonState.WALKING)
+		change_state(GoblinState.WALKING)
 		chase_timer = chase_duration
 		return
 	
@@ -205,7 +205,7 @@ func handle_wandering_state(delta):
 	
 	if global_position.distance_to(wander_target) < 10:
 		wander_timer = randf_range(wander_wait_time_min, wander_wait_time_max)
-		change_state(SkeletonState.IDLE)
+		change_state(GoblinState.IDLE)
 
 func pick_wander_target():
 	var angle = randf() * TAU
@@ -214,13 +214,13 @@ func pick_wander_target():
 
 func handle_walking_state(delta):
 	if not player:
-		change_state(SkeletonState.IDLE)
+		change_state(GoblinState.IDLE)
 		return
 	
 	var distance_to_player = global_position.distance_to(player.global_position)
 	
 	if distance_to_player <= attack_range and attack_timer <= 0 and not hurt_locked:
-		change_state(SkeletonState.ATTACKING)
+		change_state(GoblinState.ATTACKING)
 		return
 	
 	if player_in_detection_range:
@@ -254,7 +254,7 @@ func handle_walking_state(delta):
 				animation_player.speed_scale = min_animation_speed
 	else:
 		wander_timer = randf_range(wander_wait_time_min, wander_wait_time_max)
-		change_state(SkeletonState.IDLE)
+		change_state(GoblinState.IDLE)
 
 func handle_attacking_state(delta):
 	target_velocity = Vector2.ZERO
@@ -267,7 +267,7 @@ func handle_attacking_state(delta):
 func handle_death_state(delta):
 	pass
 
-func change_state(new_state: SkeletonState):
+func change_state(new_state: GoblinState):
 	current_state = new_state
 
 func start_attack():
@@ -306,7 +306,7 @@ func start_attack():
 	if remain_time > 0.0:
 		await get_tree().create_timer(remain_time).timeout
 	is_attacking = false
-	change_state(SkeletonState.WALKING)
+	change_state(GoblinState.WALKING)
 
 func apply_player_separation(delta):
 	if not player:
@@ -327,9 +327,10 @@ func apply_player_separation(delta):
 func _on_animation_finished(anim_name: String) -> void:
 	if anim_name.begins_with("attack") and is_attacking:
 		is_attacking = false
-		change_state(SkeletonState.WALKING)
-	elif anim_name.begins_with("hit"):
+		change_state(GoblinState.WALKING)
+	elif anim_name.begins_with("hurt"):
 		hurt_locked = false
+		print("Hurt animation finished, unlocked")
 
 func take_damage(amount: int):
 	if is_dead or hurt_locked or damage_timer > 0.0:
@@ -343,9 +344,14 @@ func take_damage(amount: int):
 	
 	if animation_player:
 		hurt_locked = true
-		var hit_anim = "hit_" + facing_direction
-		animation_player.speed_scale = 0.8
-		animation_player.play(hit_anim)
+		var hit_anim = "hurt_" + facing_direction
+		
+		if animation_player.has_animation(hit_anim):
+			animation_player.speed_scale = 0.8
+			animation_player.play(hit_anim)
+		else:
+			print("WARNING: Animation not found: ", hit_anim)
+			hurt_locked = false
 	else:
 		hurt_locked = false
 	
@@ -356,7 +362,7 @@ func die():
 	if is_dead:
 		return
 	is_dead = true
-	current_state = SkeletonState.DEATH
+	current_state = GoblinState.DEATH
 	
 	var quest_manager = get_node_or_null("/root/QuestManager")
 	if quest_manager:
