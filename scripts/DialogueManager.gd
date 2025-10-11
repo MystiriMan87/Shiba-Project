@@ -3,14 +3,14 @@ extends Node
 # Dialogue data structure
 var dialogues = {
 	"npc_greeting": [
-		{"speaker": "Crazed Wizard", "text": "Hello traveler! What brings you to these forsaken caverns?."},
-		{"speaker": "Player", "text": "I came here for some loot to salvage."},
-		{"speaker": "Crazed Wizard", "text": "Looking for treasure hehe... (crazed mumbling) I wouldn't reccomend you go that way... that place is infested with vampires. How about this, go kill some skeletons, I will reward you handsomely."},
-		{"speaker": "Crazed Wizard", "text": "If you meet a merchant on your travels make sure to give him your coins in exhange for valuable.. valuable.. items! (mumbling)"},
+		{"speaker": "Crazed Wizard", "text": "Hello traveler! Thank you for defeating those skeletons for me!"},
+		{"speaker": "Crazed Wizard", "text": "I don't have any new quests fo now, come back later!"},
+		{"speaker": "Crazed Wizard", "text": "Before you go"},
+		{"speaker": "Crazed Wizard", "text": "If you meet a merchant on your travels through the dungeons make sure to give him your coins in exhange for valuable.. valuable.. items! (mumbling)"},
 	],
 	"skeleton_quest_start": [
-		 "Go kill some skeletons for me!",
-		 "Could you help me by defeating 3 of them?",
+		 "Greetings traveler, are you by chance going to decending into those caverns?",
+		 "Could you help me by defeating 3 skeletons while you are down there?",
 		 "I'll reward you handsomely for your trouble."
 	],
 	"skeleton_quest_active": [
@@ -22,7 +22,7 @@ var dialogues = {
 	"skeleton_quest_complete": [
 		"You did it! The dungeon feels safer already.",
 		"Thank you so much for your help!",
-		"Here's your reward as promised. Before you go, head into the dark corridors ahead and you will find the merchant, you can buy useful items from him!"
+		"You should've recieved your reward so check your inventory!"
 	],
 	"merchant_intro": [
 		{"speaker": "Merchant", "text": "Looking to buy some potions?"},

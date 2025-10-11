@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://deu077hu7c72v"]
+
+[ext_resource type="Script" uid="uid://bc3otgkd8y5py" path="res://viewport_culler.gd" id="1_mic5u"]
+
+[node name="viewport_culler" type="Node2D"]
+script = ExtResource("1_mic5u")

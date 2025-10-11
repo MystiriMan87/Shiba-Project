@@ -14,7 +14,7 @@ func _on_play_pressed():
 		get_tree().change_scene_to_packed(game_scene)
 	else:
 		# fallback
-		get_tree().change_scene_to_file("res://scenes/world.tscn")
+		get_tree().change_scene_to_file("res://scenes/Hub.tscn")
 
 func _on_quit_pressed():
 	get_tree().quit()

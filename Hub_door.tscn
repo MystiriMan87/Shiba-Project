@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://bcxwoqkh5cyse"]
+
+[ext_resource type="Script" uid="uid://c5rsgpqtss4hh" path="res://Hub_door.gd" id="1_i14ny"]
+[ext_resource type="Texture2D" uid="uid://bqeb1u31owxjj" path="res://Assets/Snoblin/Snoblin_Dungeon_Tiles/Assets/dungeon_tiles.png" id="2_8etx1"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3b7ls"]
+
+[node name="Hub_door" type="Area2D"]
+collision_layer = 0
+collision_mask = 15
+script = ExtResource("1_i14ny")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_3b7ls")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_8etx1")
+hframes = 14
+vframes = 12
+frame = 131

@@ -1,0 +1,63 @@
+[gd_scene load_steps=7 format=3 uid="uid://biog6iabi5q3k"]
+
+[ext_resource type="Texture2D" uid="uid://da2midj34r3qk" path="res://Assets/Snoblin/Snoblin_Default_Tilemap/Assets/world_objects.png" id="1_oufq8"]
+[ext_resource type="Texture2D" uid="uid://tj1xrpvfbv3u" path="res://light.png" id="2_b5him"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_b5him"]
+
+[sub_resource type="Animation" id="Animation_y2ey3"]
+resource_name = "burning"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.166667, 0.333333, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [36, 37, 38, 39]
+}
+
+[sub_resource type="Animation" id="Animation_dk7h0"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [36]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_t2ea5"]
+_data = {
+&"RESET": SubResource("Animation_dk7h0"),
+&"burning": SubResource("Animation_y2ey3")
+}
+
+[node name="Campfire" type="Node2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_b5him")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_oufq8")
+hframes = 10
+vframes = 5
+frame = 36
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_t2ea5")
+}
+
+[node name="PointLight2D" type="PointLight2D" parent="."]
+texture = ExtResource("2_b5him")

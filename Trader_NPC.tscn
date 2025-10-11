@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://d0p7ferp14mba" path="res://free-pixel-art-dungeon-objects-asset-pack/PNG/supplies_objects.png" id="2_lym72"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ts3gi"]
-radius = 45.0111
+radius = 36.0139
 
 [node name="CharacterBody2D2" type="CharacterBody2D"]
 script = ExtResource("1_lym72")

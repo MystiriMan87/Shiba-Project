@@ -23,13 +23,13 @@ func load_shop_items():
 			"price": 15,
 			"type": "consumable"
 		},
-		"max_health_upgrade": {
-			"id": "max_health_upgrade",
-			"name": "Heart Container",
-			"description": "Permanently increases max HP by 1",
-			"price": 20,
-			"type": "upgrade"
-		},
+		#"max_health_upgrade": {
+			#"id": "max_health_upgrade",
+			#"name": "Heart Container",
+			#"description": "Permanently increases max HP by 1",
+			#"price": 20,
+			#"type": "upgrade"
+		#},
 		#"iron_sword": {
 			#"id": "iron_sword",
 			#"name": "Iron Sword",
@@ -37,27 +37,27 @@ func load_shop_items():
 			#"price": 100,
 			#"type": "weapon"
 		#},
-		"iron_axe": {
-			"id": "iron_axe",
-			"name": "Iron Axe",
-			"description": "A heavy iron axe",
-			"price": 30,
+		#"iron_axe": {
+			#"id": "iron_axe",
+			#"name": "Iron Axe",
+			#"description": "A heavy iron axe",
+			#"price": 30,
+			#"type": "weapon"
+		#},
+		"steel_hammer": {
+			"id": "steel_hammer",
+			"name": "Steel Hammer",
+			"description": "A well-crafted steel hammer for smashing monsters to bits",
+			"price": 60,
 			"type": "weapon"
 		},
-		#"steel_sword": {
-			#"id": "steel_sword",
-			#"name": "Steel Sword",
-			#"description": "A well-crafted steel blade",
-			#"price": 200,
-			#"type": "weapon"
-		#},
-		#"iron_dagger": {
-			#"id": "iron_dagger",
-			#"name": "Iron Dagger",
-			#"description": "Fast and deadly",
-			#"price": 75,
-			#"type": "weapon"
-		#},
+		"stone_sword_huge": {
+			"id": "stone_sword_huge",
+			"name": "Huge Stone Sword",
+			"description": "a massive, rough, and heavy slab of iron, described as too big to be a traditional sword, weighing hundreds of pounds",
+			"price": 75,
+			"type": "weapon"
+		},
 		#"wooden_key": {
 			#"id": "wooden_key",
 			#"name": "Wooden Key",

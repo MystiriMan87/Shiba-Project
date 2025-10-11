@@ -25,13 +25,13 @@
 [ext_resource type="PackedScene" uid="uid://dspx1svbrq84n" path="res://scenes/SpikeTrap_alter.tscn" id="17_lakw3"]
 [ext_resource type="PackedScene" uid="uid://8a7m82fpuqoj" path="res://wooden_door.tscn" id="19_pm21f"]
 [ext_resource type="PackedScene" uid="uid://bkcsm36nf4kyd" path="res://dialogue_box.tscn" id="23_xgqkh"]
-[ext_resource type="PackedScene" uid="uid://bfjoojsctscj1" path="res://Miner_NPC.tscn" id="24_ctatt"]
 [ext_resource type="PackedScene" uid="uid://hkva3wgg66js" path="res://quest_log_ui.tscn" id="24_navra"]
 [ext_resource type="PackedScene" uid="uid://dtdn67h8hhagm" path="res://shop_ui.tscn" id="25_0nbtd"]
 [ext_resource type="PackedScene" uid="uid://bgg32r6jrhvd4" path="res://Trader_NPC.tscn" id="26_munwf"]
-[ext_resource type="Script" uid="uid://chsoa6deu0e0y" path="res://scenes/npc.gd" id="27_0nbtd"]
-[ext_resource type="Texture2D" uid="uid://bijlf6im51jrw" path="res://Assets/2D Pixel Dungeon Asset Pack/character and tileset/Dungeon_Character.png" id="27_ts3gi"]
+[ext_resource type="PackedScene" uid="uid://c42ybnvh2sa5t" path="res://merchat_npc.tscn" id="30_fh13f"]
 [ext_resource type="PackedScene" uid="uid://bmrnrfe6psbj2" path="res://quest_ui.tscn" id="31_luhhm"]
+[ext_resource type="Script" uid="uid://50e53w87g0k4" path="res://scenes/ladder_up.gd" id="33_4kbfs"]
+[ext_resource type="PackedScene" uid="uid://deu077hu7c72v" path="res://viewport_culler.tscn" id="33_rup4s"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_71j4m"]
 texture = ExtResource("4_k0juu")
@@ -5974,14 +5974,13 @@ texture = ExtResource("4_k0juu")
 [sub_resource type="TileSet" id="TileSet_jhx03"]
 sources/0 = SubResource("TileSetAtlasSource_q5onr")
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_ts3gi"]
-radius = 40.05
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fh13f"]
 
 [node name="Dungeon_World" type="Node2D"]
 script = ExtResource("1_4mrxx")
 
 [node name="Player" parent="." groups=["player"] instance=ExtResource("1_nnsk1")]
-position = Vector2(1536, 946)
+position = Vector2(1477, 666)
 
 [node name="PointLight2D" type="PointLight2D" parent="Player"]
 position = Vector2(-1, 3)
@@ -6154,9 +6153,10 @@ tile_map_data = PackedByteArray("AAAAAAAAAAABAAEAAAAAAAEAAAABAAIAAAAAAAIAAAABAAI
 tile_set = SubResource("TileSet_qfnet")
 
 [node name="TileMapLayer2" type="TileMapLayer" parent="TileMap"]
+z_index = -1
 position = Vector2(-1.11111, -10)
 scale = Vector2(5, 5)
-tile_map_data = PackedByteArray("AAAAAOr/AQADAAUAAAAEAOr/AQADAAUAAAABAOr/AQAFAAcAAAABAOv/AQAFAAgAAAADAOr/AQAFAAcAAAADAOv/AQAFAAgAAAAGAPP/AQAFAAcAAAAGAPT/AQAFAAgAAAABAPP/AQAFAAcAAAABAPT/AQAFAAgAAAADABkAAAA4AA4AAAADABoAAAA4AA8AAAAEABkAAAA5AA4AAAAEABoAAAA5AA8AAAA=")
+tile_map_data = PackedByteArray("AAAAAOr/AQADAAUAAAAEAOr/AQADAAUAAAABAOr/AQAFAAcAAAABAOv/AQAFAAgAAAADAOr/AQAFAAcAAAADAOv/AQAFAAgAAAAGAPP/AQAFAAcAAAAGAPT/AQAFAAgAAAABAPP/AQAFAAcAAAABAPT/AQAFAAgAAAADABkAAAA4AA4AAAADABoAAAA4AA8AAAAEABkAAAA5AA4AAAAEABoAAAA5AA8AAAASAAgAAQAAAAAAAAARAAgAAQACAAAAAAAUAAcAAQADAAEAAAA=")
 tile_set = SubResource("TileSet_fh13f")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="TileMap"]
@@ -6190,6 +6190,10 @@ layout_direction = 4
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = -97.0
+offset_top = -61.0
+offset_right = -97.0
+offset_bottom = -61.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -6222,7 +6226,6 @@ key_type = "iron"
 loot_items = Array[String](["health_potion", "steel_hammer", "coin", "coin"])
 
 [node name="CanvasModulate" type="CanvasModulate" parent="."]
-visible = false
 z_index = 1
 position = Vector2(62, 52)
 color = Color(0.470076, 0.470076, 0.470076, 1)
@@ -6293,27 +6296,21 @@ position = Vector2(489, -1302)
 max_health = 15
 
 [node name="Enemy" parent="Enemies" instance=ExtResource("1_rwgxs")]
-visible = false
 position = Vector2(16, 748)
 
 [node name="Enemy2" parent="Enemies" instance=ExtResource("1_rwgxs")]
-visible = false
 position = Vector2(141, 779)
 
 [node name="Enemy3" parent="Enemies" instance=ExtResource("1_rwgxs")]
-visible = false
 position = Vector2(52, 861)
 
 [node name="Enemy4" parent="Enemies" instance=ExtResource("1_rwgxs")]
-visible = false
 position = Vector2(492, 976)
 
 [node name="Enemy5" parent="Enemies" instance=ExtResource("1_rwgxs")]
-visible = false
 position = Vector2(639, 995)
 
 [node name="Enemy6" parent="Enemies" instance=ExtResource("1_rwgxs")]
-visible = false
 position = Vector2(543, 1083)
 
 [node name="SkeletonEnemyV2" parent="Enemies" instance=ExtResource("10_w7kh3")]
@@ -6337,28 +6334,27 @@ scale = Vector2(3.5, 3.5)
 wander_enabled = false
 
 [node name="SkeletonEnemyV6" parent="Enemies" instance=ExtResource("10_w7kh3")]
-visible = false
-position = Vector2(530, -1603)
+position = Vector2(400, -1200)
 scale = Vector2(3.5, 3.5)
 
 [node name="SkeletonEnemyV7" parent="Enemies" instance=ExtResource("10_w7kh3")]
-visible = false
-position = Vector2(-108, -1258)
+position = Vector2(-57, -1185)
 scale = Vector2(3.5, 3.5)
 
 [node name="SkeletonEnemyV3" parent="Enemies" instance=ExtResource("10_w7kh3")]
-visible = false
-position = Vector2(55, 1103)
+position = Vector2(40, 1021)
+scale = Vector2(3.5, 3.5)
+
+[node name="SkeletonEnemyV11" parent="Enemies" instance=ExtResource("10_w7kh3")]
+position = Vector2(517, 698)
 scale = Vector2(3.5, 3.5)
 
 [node name="SkeletonEnemyV4" parent="Enemies" instance=ExtResource("10_w7kh3")]
-visible = false
-position = Vector2(-511, 862)
+position = Vector2(-510, 691)
 scale = Vector2(3.5, 3.5)
 
 [node name="SkeletonEnemyV5" parent="Enemies" instance=ExtResource("10_w7kh3")]
-visible = false
-position = Vector2(-523, 1118)
+position = Vector2(-497, 1049)
 scale = Vector2(3.5, 3.5)
 
 [node name="GateDoor" parent="." instance=ExtResource("15_xo05s")]
@@ -6395,40 +6391,15 @@ visible = false
 [node name="QuestLogUI" parent="." instance=ExtResource("24_navra")]
 visible = false
 
-[node name="Crazed Wizard" parent="." instance=ExtResource("24_ctatt")]
-position = Vector2(402, 45)
-dialogue_id = "skeleton_quest_complete"
-audio_volume = -10.0
-is_quest_giver = true
-quest_to_give = "slay_skeletons"
-quest_dialogue_id = "skeleton_quest_start"
-quest_complete_dialogue_id = "skeleton_quest_complete"
-quest_active_dialogue_id = "skeleton_quest_active"
-
 [node name="ShopUI" parent="." instance=ExtResource("25_0nbtd")]
 visible = false
 
 [node name="MerchantShop" parent="." instance=ExtResource("26_munwf")]
-position = Vector2(968, 742)
+position = Vector2(315, -1843)
 interaction_range = 80.0
 
-[node name="MerchatNPC" type="CharacterBody2D" parent="."]
-position = Vector2(899, 748)
-script = ExtResource("27_0nbtd")
-dialogue_id = "merchant_intro"
-interaction_range = 80.0
-npc_name = "Merchant"
-dialogue_audio_path = ""
-
-[node name="Sprite2D" type="Sprite2D" parent="MerchatNPC"]
-scale = Vector2(3, 3)
-texture = ExtResource("27_ts3gi")
-hframes = 7
-vframes = 4
-frame = 17
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MerchatNPC"]
-shape = SubResource("CircleShape2D_ts3gi")
+[node name="MerchatNPC" parent="." instance=ExtResource("30_fh13f")]
+position = Vector2(246, -1837)
 
 [node name="QuestUI" parent="." instance=ExtResource("31_luhhm")]
 visible = false
@@ -6440,3 +6411,22 @@ scale = Vector2(4, 4)
 [node name="Torch9" parent="." instance=ExtResource("13_jhx03")]
 position = Vector2(413, -1556)
 scale = Vector2(4, 4)
+
+[node name="viewport_culler" parent="." instance=ExtResource("33_rup4s")]
+cull_margin = 300.0
+check_interval = 0.2
+
+[node name="LadderUp" type="Area2D" parent="."]
+z_index = -1
+position = Vector2(1475, 582)
+scale = Vector2(4.5, 4.5)
+script = ExtResource("33_4kbfs")
+
+[node name="Sprite2D" type="Sprite2D" parent="LadderUp"]
+texture = ExtResource("9_rup4s")
+hframes = 6
+vframes = 9
+frame = 9
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LadderUp"]
+shape = SubResource("RectangleShape2D_fh13f")
