@@ -336,6 +336,7 @@ visible = false
 shape = SubResource("CircleShape2D_w3xht")
 
 [node name="AttackArea" type="Area2D" parent="."]
+visible = false
 
 [node name="AttackCollison" type="CollisionShape2D" parent="AttackArea"]
 shape = SubResource("CircleShape2D_l5whe")

@@ -998,3 +998,12 @@ position = Vector2(1122, -35)
 scale = Vector2(3, 3)
 max_health = 8
 speed = 150
+
+[node name="Label" type="Label" parent="."]
+offset_left = 1046.0
+offset_top = -978.0
+offset_right = 1190.0
+offset_bottom = -914.0
+text = "WIP"
+horizontal_alignment = 1
+vertical_alignment = 1
