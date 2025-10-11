@@ -1,10 +1,48 @@
-[gd_scene load_steps=4 format=3 uid="uid://bfjoojsctscj1"]
+[gd_scene load_steps=7 format=3 uid="uid://bfjoojsctscj1"]
 
 [ext_resource type="Script" uid="uid://chsoa6deu0e0y" path="res://scenes/npc.gd" id="1_xff8c"]
-[ext_resource type="Texture2D" uid="uid://d1uje2bu5ul31" path="res://Assets/2D Pixel Dungeon Asset Pack/character and tileset/Dungeon_Character_2.png" id="2_xff8c"]
+[ext_resource type="Texture2D" uid="uid://cjf4wxdvmujsg" path="res://Assets/Snoblin/Snoblin_Human_Villagers/Assets/Human Monk/human_monk2.png" id="2_xff8c"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_0nbtd"]
 radius = 25.0799
+
+[sub_resource type="Animation" id="Animation_1ibxj"]
+resource_name = "idle"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.366667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [4, 5]
+}
+
+[sub_resource type="Animation" id="Animation_glddq"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_wise8"]
+_data = {
+&"RESET": SubResource("Animation_glddq"),
+&"idle": SubResource("Animation_1ibxj")
+}
 
 [node name="Wizard" type="CharacterBody2D"]
 script = ExtResource("1_xff8c")
@@ -15,9 +53,15 @@ npc_name = "Crazed Wizard"
 position = Vector2(-3.6781, -3.8147e-06)
 scale = Vector2(-3.15936, 3)
 texture = ExtResource("2_xff8c")
-hframes = 7
-vframes = 2
+hframes = 4
+vframes = 27
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(-2, -1)
 shape = SubResource("CircleShape2D_0nbtd")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_wise8")
+}
+autoplay = "idle"

@@ -16,6 +16,9 @@ var is_showing: bool = false
 @onready var survival_time_label: Label = null
 @onready var enemies_killed_label: Label = null
 
+@export var respawn_scene: String = "res://scenes/Hub.tscn"
+
+
 var game_start_time: float = 0.0
 var enemies_killed: int = 0
 var survival_time: float = 0.0

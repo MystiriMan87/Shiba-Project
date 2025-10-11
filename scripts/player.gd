@@ -246,9 +246,9 @@ class EchoGhost:
 @export var hurt_sound_base_pitch: float = 1.0
 @export var hurt_sound_pitch_variation: float = 0.1
 
-@export var background_music_path: String = "res://audio/background_music.ogg"
-@export var background_music_volume: float = -10.0
-@export var music_autoplay: bool = true
+#@export var background_music_path: String = "res://audio/background_music.ogg"
+#@export var background_music_volume: float = -10.0
+#@export var music_autoplay: bool = true
 
 var HitEffectScene := preload("res://scenes/HitEffect.tscn")
 
@@ -347,10 +347,18 @@ func _ready():
 	
 	add_to_group("player")
 	current_health = max_health
+	
+	await get_tree().process_frame 
+	await get_tree().process_frame
+
+	health_changed.emit(current_health)
+	update_health_display()
+
+	
 	update_health_display()
 	setup_pickup_system()
 	setup_sound_effects()
-	setup_background_music()
+	#setup_background_music()
 	# Dash particles disabled
 	
 	# Initialize dash energy
@@ -549,33 +557,33 @@ func play_hurt_sound():
 	hurt_audio_player.pitch_scale = clamp(final_pitch, 0.1, 3.0)
 	hurt_audio_player.play()
 
-func setup_background_music():
-	music_player = AudioStreamPlayer.new()
-	music_player.name = "MusicPlayer"
-	add_child(music_player)
-	
-	if background_music_path != "" and ResourceLoader.exists(background_music_path):
-		var music = load(background_music_path)
-		if music is AudioStream:
-			music_player.stream = music
-			music_player.volume_db = background_music_volume
-			music_player.bus = "Master"
-			music_player.autoplay = music_autoplay
-			
-			if music_autoplay:
-				music_player.play()
+#func setup_background_music():
+	#music_player = AudioStreamPlayer.new()
+	#music_player.name = "MusicPlayer"
+	#add_child(music_player)
+	#
+	#if background_music_path != "" and ResourceLoader.exists(background_music_path):
+		#var music = load(background_music_path)
+		#if music is AudioStream:
+			#music_player.stream = music
+			#music_player.volume_db = background_music_volume
+			#music_player.bus = "Master"
+			#music_player.autoplay = music_autoplay
+			#
+			#if music_autoplay:
+				#music_player.play()
 
-func play_background_music():
-	if music_player and music_player.stream and not music_player.playing:
-		music_player.play()
-
-func stop_background_music():
-	if music_player and music_player.playing:
-		music_player.stop()
-
-func set_music_volume(volume_db: float):
-	if music_player:
-		music_player.volume_db = volume_db
+#func play_background_music():
+	#if music_player and music_player.stream and not music_player.playing:
+		#music_player.play()
+#
+#func stop_background_music():
+	#if music_player and music_player.playing:
+		#music_player.stop()
+#
+#func set_music_volume(volume_db: float):
+	#if music_player:
+		#music_player.volume_db = volume_db
 
 func setup_pickup_system():
 	if not pickup_area:
@@ -836,8 +844,7 @@ func _physics_process(delta):
 	if is_swing_animating:
 		update_sword_swing_animation(delta)
 	
-	move_and_collide(velocity * delta)
-
+	move_and_slide()
 	# Regenerate dash energy when not dashing
 	if not is_dashing and dash_energy < max_dash_energy:
 		var before = dash_energy

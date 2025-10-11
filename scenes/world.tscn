@@ -1,4 +1,4 @@
-[gd_scene load_steps=53 format=4 uid="uid://dpcl1dclvepl8"]
+[gd_scene load_steps=55 format=4 uid="uid://dpcl1dclvepl8"]
 
 [ext_resource type="Script" uid="uid://c4k4k8r5ebb5c" path="res://scenes/world.gd" id="1_4mrxx"]
 [ext_resource type="PackedScene" uid="uid://hqa6411o6hsf" path="res://scenes/player.tscn" id="1_nnsk1"]
@@ -21,6 +21,7 @@
 [ext_resource type="PackedScene" uid="uid://cme4secwfuob2" path="res://torch.tscn" id="13_jhx03"]
 [ext_resource type="PackedScene" uid="uid://bfy8qij5td24" path="res://scenes/Gate_door.tscn" id="15_xo05s"]
 [ext_resource type="PackedScene" uid="uid://bu81gbln0icr0" path="res://scenes/SpikeTrap.tscn" id="16_dss4m"]
+[ext_resource type="PackedScene" uid="uid://bukx3e2x3wdgr" path="res://canvas_modulate.tscn" id="17_4kbfs"]
 [ext_resource type="PackedScene" uid="uid://dda8iy5rwprfp" path="res://scenes/vampire_enemy.tscn" id="17_7t5mc"]
 [ext_resource type="PackedScene" uid="uid://dspx1svbrq84n" path="res://scenes/SpikeTrap_alter.tscn" id="17_lakw3"]
 [ext_resource type="PackedScene" uid="uid://8a7m82fpuqoj" path="res://wooden_door.tscn" id="19_pm21f"]
@@ -31,6 +32,7 @@
 [ext_resource type="PackedScene" uid="uid://c42ybnvh2sa5t" path="res://merchat_npc.tscn" id="30_fh13f"]
 [ext_resource type="PackedScene" uid="uid://bmrnrfe6psbj2" path="res://quest_ui.tscn" id="31_luhhm"]
 [ext_resource type="Script" uid="uid://50e53w87g0k4" path="res://scenes/ladder_up.gd" id="33_4kbfs"]
+[ext_resource type="PackedScene" uid="uid://bq7bbdmxxgdbv" path="res://level_change_pedestal.tscn" id="33_f17e3"]
 [ext_resource type="PackedScene" uid="uid://deu077hu7c72v" path="res://viewport_culler.tscn" id="33_rup4s"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_71j4m"]
@@ -5978,6 +5980,8 @@ sources/0 = SubResource("TileSetAtlasSource_q5onr")
 
 [node name="Dungeon_World" type="Node2D"]
 script = ExtResource("1_4mrxx")
+background_music_path = "res://audio/01. Risk of Rain.mp3"
+background_music_volume = -10.0
 
 [node name="Player" parent="." groups=["player"] instance=ExtResource("1_nnsk1")]
 position = Vector2(1477, 666)
@@ -5990,12 +5994,16 @@ texture = ExtResource("12_q5onr")
 [node name="Goblin_enemy" parent="." instance=ExtResource("4_rup4s")]
 position = Vector2(274, 811)
 scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
 max_health = 5
 speed = 125
 
 [node name="Goblin_enemy4" parent="." instance=ExtResource("4_rup4s")]
 position = Vector2(192, 1688)
 scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
 max_health = 5
 speed = 125
 wander_enabled = false
@@ -6003,6 +6011,8 @@ wander_enabled = false
 [node name="Goblin_enemy5" parent="." instance=ExtResource("4_rup4s")]
 position = Vector2(304, 1688)
 scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
 max_health = 5
 speed = 125
 wander_enabled = false
@@ -6010,6 +6020,8 @@ wander_enabled = false
 [node name="Goblin_enemy6" parent="." instance=ExtResource("4_rup4s")]
 position = Vector2(400, 1687)
 scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
 max_health = 6
 speed = 125
 damage = 3
@@ -6018,12 +6030,16 @@ wander_enabled = false
 [node name="Goblin_enemy2" parent="." instance=ExtResource("4_rup4s")]
 position = Vector2(492, -1391)
 scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
 max_health = 5
 speed = 125
 
 [node name="Goblin_enemy3" parent="." instance=ExtResource("4_rup4s")]
 position = Vector2(-167, -1398)
 scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
 max_health = 5
 speed = 125
 
@@ -6156,7 +6172,7 @@ tile_set = SubResource("TileSet_qfnet")
 z_index = -1
 position = Vector2(-1.11111, -10)
 scale = Vector2(5, 5)
-tile_map_data = PackedByteArray("AAAAAOr/AQADAAUAAAAEAOr/AQADAAUAAAABAOr/AQAFAAcAAAABAOv/AQAFAAgAAAADAOr/AQAFAAcAAAADAOv/AQAFAAgAAAAGAPP/AQAFAAcAAAAGAPT/AQAFAAgAAAABAPP/AQAFAAcAAAABAPT/AQAFAAgAAAADABkAAAA4AA4AAAADABoAAAA4AA8AAAAEABkAAAA5AA4AAAAEABoAAAA5AA8AAAASAAgAAQAAAAAAAAARAAgAAQACAAAAAAAUAAcAAQADAAEAAAA=")
+tile_map_data = PackedByteArray("AAAAAOr/AQADAAUAAAAEAOr/AQADAAUAAAABAOr/AQAFAAcAAAABAOv/AQAFAAgAAAADAOr/AQAFAAcAAAADAOv/AQAFAAgAAAAGAPP/AQAFAAcAAAAGAPT/AQAFAAgAAAABAPP/AQAFAAcAAAABAPT/AQAFAAgAAAASAAgAAQAAAAAAAAARAAgAAQACAAAAAAAUAAcAAQADAAEAAAA=")
 tile_set = SubResource("TileSet_fh13f")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="TileMap"]
@@ -6225,10 +6241,8 @@ is_locked = false
 key_type = "iron"
 loot_items = Array[String](["health_potion", "steel_hammer", "coin", "coin"])
 
-[node name="CanvasModulate" type="CanvasModulate" parent="."]
-z_index = 1
+[node name="CanvasModulate" parent="." instance=ExtResource("17_4kbfs")]
 position = Vector2(62, 52)
-color = Color(0.470076, 0.470076, 0.470076, 1)
 
 [node name="Torch" parent="." instance=ExtResource("13_jhx03")]
 top_level = true
@@ -6281,81 +6295,121 @@ scale = Vector2(4, 4)
 
 [node name="Vampire_enemy" parent="Enemies" instance=ExtResource("17_7t5mc")]
 position = Vector2(444, -762)
+collision_layer = 8
+collision_mask = 9
 max_health = 15
 
 [node name="Vampire_enemy2" parent="Enemies" instance=ExtResource("17_7t5mc")]
 position = Vector2(126, -696)
+collision_layer = 8
+collision_mask = 9
 max_health = 15
 
 [node name="Vampire_enemy3" parent="Enemies" instance=ExtResource("17_7t5mc")]
 position = Vector2(-7, -1325)
+collision_layer = 8
+collision_mask = 9
 max_health = 15
 
 [node name="Vampire_enemy4" parent="Enemies" instance=ExtResource("17_7t5mc")]
 position = Vector2(489, -1302)
+collision_layer = 8
+collision_mask = 9
 max_health = 15
 
 [node name="Enemy" parent="Enemies" instance=ExtResource("1_rwgxs")]
 position = Vector2(16, 748)
+collision_layer = 8
+collision_mask = 9
 
 [node name="Enemy2" parent="Enemies" instance=ExtResource("1_rwgxs")]
 position = Vector2(141, 779)
+collision_layer = 8
+collision_mask = 9
 
 [node name="Enemy3" parent="Enemies" instance=ExtResource("1_rwgxs")]
 position = Vector2(52, 861)
+collision_layer = 8
+collision_mask = 9
 
 [node name="Enemy4" parent="Enemies" instance=ExtResource("1_rwgxs")]
 position = Vector2(492, 976)
+collision_layer = 8
+collision_mask = 9
 
 [node name="Enemy5" parent="Enemies" instance=ExtResource("1_rwgxs")]
 position = Vector2(639, 995)
+collision_layer = 8
+collision_mask = 9
 
 [node name="Enemy6" parent="Enemies" instance=ExtResource("1_rwgxs")]
 position = Vector2(543, 1083)
+collision_layer = 8
+collision_mask = 9
 
 [node name="SkeletonEnemyV2" parent="Enemies" instance=ExtResource("10_w7kh3")]
 position = Vector2(148, 1743)
 scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
 wander_enabled = false
 
 [node name="SkeletonEnemyV8" parent="Enemies" instance=ExtResource("10_w7kh3")]
 position = Vector2(253, 1743)
 scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
 wander_enabled = false
 
 [node name="SkeletonEnemyV9" parent="Enemies" instance=ExtResource("10_w7kh3")]
 position = Vector2(356, 1743)
 scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
 wander_enabled = false
 
 [node name="SkeletonEnemyV10" parent="Enemies" instance=ExtResource("10_w7kh3")]
 position = Vector2(450, 1741)
 scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
 wander_enabled = false
 
 [node name="SkeletonEnemyV6" parent="Enemies" instance=ExtResource("10_w7kh3")]
 position = Vector2(400, -1200)
 scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
 
 [node name="SkeletonEnemyV7" parent="Enemies" instance=ExtResource("10_w7kh3")]
 position = Vector2(-57, -1185)
 scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
 
 [node name="SkeletonEnemyV3" parent="Enemies" instance=ExtResource("10_w7kh3")]
 position = Vector2(40, 1021)
 scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
 
 [node name="SkeletonEnemyV11" parent="Enemies" instance=ExtResource("10_w7kh3")]
 position = Vector2(517, 698)
 scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
 
 [node name="SkeletonEnemyV4" parent="Enemies" instance=ExtResource("10_w7kh3")]
 position = Vector2(-510, 691)
 scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
 
 [node name="SkeletonEnemyV5" parent="Enemies" instance=ExtResource("10_w7kh3")]
 position = Vector2(-497, 1049)
 scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
 
 [node name="GateDoor" parent="." instance=ExtResource("15_xo05s")]
 position = Vector2(182, -901)
@@ -6386,13 +6440,10 @@ position = Vector2(181, -1621)
 scale = Vector2(4.9, 4.9)
 
 [node name="DialogueBox" parent="." instance=ExtResource("23_xgqkh")]
-visible = false
 
 [node name="QuestLogUI" parent="." instance=ExtResource("24_navra")]
-visible = false
 
 [node name="ShopUI" parent="." instance=ExtResource("25_0nbtd")]
-visible = false
 
 [node name="MerchantShop" parent="." instance=ExtResource("26_munwf")]
 position = Vector2(315, -1843)
@@ -6402,7 +6453,6 @@ interaction_range = 80.0
 position = Vector2(246, -1837)
 
 [node name="QuestUI" parent="." instance=ExtResource("31_luhhm")]
-visible = false
 
 [node name="Torch8" parent="." instance=ExtResource("13_jhx03")]
 position = Vector2(-87, -1552)
@@ -6430,3 +6480,7 @@ frame = 9
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="LadderUp"]
 shape = SubResource("RectangleShape2D_fh13f")
+
+[node name="Level_Change_Pedestal" parent="." instance=ExtResource("33_f17e3")]
+position = Vector2(300, 1886)
+scale = Vector2(5, 5)

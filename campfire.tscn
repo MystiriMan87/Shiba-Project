@@ -5,6 +5,21 @@
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_b5him"]
 
+[sub_resource type="Animation" id="Animation_dk7h0"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [36]
+}
+
 [sub_resource type="Animation" id="Animation_y2ey3"]
 resource_name = "burning"
 length = 0.6
@@ -20,21 +35,6 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
 "values": [36, 37, 38, 39]
-}
-
-[sub_resource type="Animation" id="Animation_dk7h0"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [36]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_t2ea5"]
@@ -58,6 +58,9 @@ frame = 36
 libraries = {
 &"": SubResource("AnimationLibrary_t2ea5")
 }
+autoplay = "burning"
 
 [node name="PointLight2D" type="PointLight2D" parent="."]
+color = Color(0.693961, 0.316185, 1.92523e-07, 1)
+energy = 0.7
 texture = ExtResource("2_b5him")

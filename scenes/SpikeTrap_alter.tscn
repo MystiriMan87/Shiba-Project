@@ -6,6 +6,7 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1dub5"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nbbtc"]
+size = Vector2(79, 80)
 
 [sub_resource type="Animation" id="Animation_kppvx"]
 length = 0.001
@@ -106,6 +107,7 @@ vframes = 9
 frame = 60
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
+position = Vector2(0.125, 0)
 scale = Vector2(0.25, 0.25)
 shape = SubResource("RectangleShape2D_nbbtc")
 

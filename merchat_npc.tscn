@@ -1,10 +1,48 @@
-[gd_scene load_steps=4 format=3 uid="uid://c42ybnvh2sa5t"]
+[gd_scene load_steps=7 format=3 uid="uid://c42ybnvh2sa5t"]
 
 [ext_resource type="Script" uid="uid://chsoa6deu0e0y" path="res://scenes/npc.gd" id="1_em63j"]
-[ext_resource type="Texture2D" uid="uid://bijlf6im51jrw" path="res://Assets/2D Pixel Dungeon Asset Pack/character and tileset/Dungeon_Character.png" id="2_wki2h"]
+[ext_resource type="Texture2D" uid="uid://bxy7odp82c7mq" path="res://Assets/Snoblin/Snoblin_Human_Villagers/Assets/Human Merchant/human_merchant2.png" id="2_em63j"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ts3gi"]
 radius = 24.0208
+
+[sub_resource type="Animation" id="Animation_wki2h"]
+resource_name = "idle"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [0, 1]
+}
+
+[sub_resource type="Animation" id="Animation_auf2s"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_vww7v"]
+_data = {
+&"RESET": SubResource("Animation_auf2s"),
+&"idle": SubResource("Animation_wki2h")
+}
 
 [node name="MerchatNPC" type="CharacterBody2D"]
 script = ExtResource("1_em63j")
@@ -15,10 +53,15 @@ dialogue_audio_path = ""
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(3, 3)
-texture = ExtResource("2_wki2h")
-hframes = 7
-vframes = 4
-frame = 17
+texture = ExtResource("2_em63j")
+hframes = 4
+vframes = 27
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_ts3gi")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_vww7v")
+}
+autoplay = "idle"

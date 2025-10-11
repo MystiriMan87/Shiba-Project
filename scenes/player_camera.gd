@@ -1,6 +1,6 @@
 extends Camera2D
 
-@export var follow_speed = 5.0 
+@export var follow_speed = 0.0
 @export var lookahead_distance = 50.0 
 @export var lookahead_smoothing = 3.0 
 @export var dead_zone_size = 20.0 
@@ -89,6 +89,7 @@ func _ready():
 		#crt_default_vignette_intensity = crt.vignette_intensity
 
 func _process(delta):
+	print("Current follow_speed: ", follow_speed)
 	if not player:
 		return
 	

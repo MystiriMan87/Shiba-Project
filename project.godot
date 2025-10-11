@@ -154,8 +154,9 @@ open_quest_log={
 
 2d_physics/layer_1="Enviorment"
 2d_physics/layer_2="Player Attacks"
-2d_physics/layer_3="Enemy Bodies"
-2d_physics/layer_4="Enemy Attacks Items"
+2d_physics/layer_3="Player"
+2d_physics/layer_4="Enemy Bodies"
+2d_physics/layer_5="Enemy Attack Items"
 
 [rendering]
 
