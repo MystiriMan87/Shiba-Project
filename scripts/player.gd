@@ -1115,6 +1115,10 @@ func die():
 		attack_area.monitoring = false
 	
 	player_died.emit()
+	
+	# Wait a moment then respawn at world.tscn
+	await get_tree().create_timer(1.0).timeout
+	get_tree().change_scene_to_file("res://scenes/world.tscn")
 
 func heal(amount: int):
 	var old_health = current_health

@@ -8,6 +8,11 @@ var dialogues = {
 		{"speaker": "Crazed Wizard", "text": "Before you go"},
 		{"speaker": "Crazed Wizard", "text": "If you meet a merchant on your travels through the dungeons make sure to give him your coins in exhange for valuable.. valuable.. items! (mumbling)"},
 	],
+	"npc_no_pass": [
+		{"speaker": "Explorer Dave", "text": "The entrance seems to be collapsed here, there are 2 tunnels to go around but I don't dare head that way."},
+		{"speaker": "Explorer Dave", "text": "If you're crazy enough to go there, once holds plenty of swift goblins the other contains hulking brutes."},
+		{"speaker": "Explorer Dave", "text": "Good luck"},
+	],
 	"skeleton_quest_start": [
 		 "Greetings traveler, are you by chance going to decending into those caverns?",
 		 "Could you help me by defeating 3 skeletons while you are down there?",
