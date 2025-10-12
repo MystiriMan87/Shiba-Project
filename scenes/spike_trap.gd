@@ -25,6 +25,8 @@ func _ready() -> void:
 func _on_body_entered(body: Node) -> void:
 	if not armed or not body.is_in_group("player"):
 		return
+	if not armed or not body.is_in_group("enemies"):
+		return
 
 	armed = false
 	if aspr and "stab" in aspr.sprite_frames.get_animation_names():

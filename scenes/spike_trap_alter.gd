@@ -1,7 +1,7 @@
 extends Area2D
 
-@export var linger_time: float = 1.5   # spikes stay extended (visual) before retract
-@export var rearm_time: float = 0.4    # cooldown after retract before it can hit again
+@export var linger_time: float = 1.5 
+@export var rearm_time: float = 0.4  
 @export var damage_fraction: float = 0.5  # 50% of current HP
 @onready var ap: AnimationPlayer = $AnimationPlayer
 @onready var rearm_timer: Timer = $RearmTimer

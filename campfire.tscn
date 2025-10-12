@@ -46,6 +46,7 @@ _data = {
 [node name="Campfire" type="Node2D"]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+texture_filter = 1
 shape = SubResource("RectangleShape2D_b5him")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

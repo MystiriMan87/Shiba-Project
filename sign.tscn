@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://dke0bymely4n"]
+
+[ext_resource type="Script" uid="uid://b6re6x32smylp" path="res://sign.gd" id="1_w2mlg"]
+[ext_resource type="Texture2D" uid="uid://da2midj34r3qk" path="res://Assets/Snoblin/Snoblin_Default_Tilemap/Assets/world_objects.png" id="2_q3tny"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tbceu"]
+
+[node name="Sign" type="Area2D" groups=["signs"]]
+script = ExtResource("1_w2mlg")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_q3tny")
+hframes = 10
+vframes = 5
+frame = 25
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_tbceu")

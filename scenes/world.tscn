@@ -6000,7 +6000,7 @@ max_health = 5
 speed = 125
 
 [node name="Goblin_enemy4" parent="." instance=ExtResource("4_rup4s")]
-position = Vector2(192, 1688)
+position = Vector2(459, 1543)
 scale = Vector2(3.5, 3.5)
 collision_layer = 8
 collision_mask = 9
@@ -6009,7 +6009,7 @@ speed = 125
 wander_enabled = false
 
 [node name="Goblin_enemy5" parent="." instance=ExtResource("4_rup4s")]
-position = Vector2(304, 1688)
+position = Vector2(571, 1543)
 scale = Vector2(3.5, 3.5)
 collision_layer = 8
 collision_mask = 9
@@ -6018,7 +6018,35 @@ speed = 125
 wander_enabled = false
 
 [node name="Goblin_enemy6" parent="." instance=ExtResource("4_rup4s")]
-position = Vector2(400, 1687)
+position = Vector2(667, 1542)
+scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
+max_health = 6
+speed = 125
+damage = 3
+wander_enabled = false
+
+[node name="Goblin_enemy7" parent="." instance=ExtResource("4_rup4s")]
+position = Vector2(-105, 1544)
+scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
+max_health = 5
+speed = 125
+wander_enabled = false
+
+[node name="Goblin_enemy8" parent="." instance=ExtResource("4_rup4s")]
+position = Vector2(7.00001, 1544)
+scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
+max_health = 5
+speed = 125
+wander_enabled = false
+
+[node name="Goblin_enemy9" parent="." instance=ExtResource("4_rup4s")]
+position = Vector2(103, 1543)
 scale = Vector2(3.5, 3.5)
 collision_layer = 8
 collision_mask = 9
@@ -6348,38 +6376,39 @@ collision_layer = 8
 collision_mask = 9
 
 [node name="SkeletonEnemyV2" parent="Enemies" instance=ExtResource("10_w7kh3")]
-position = Vector2(148, 1743)
-scale = Vector2(3.5, 3.5)
-collision_layer = 8
-collision_mask = 9
-wander_enabled = false
-
-[node name="SkeletonEnemyV8" parent="Enemies" instance=ExtResource("10_w7kh3")]
-position = Vector2(253, 1743)
-scale = Vector2(3.5, 3.5)
-collision_layer = 8
-collision_mask = 9
-wander_enabled = false
-
-[node name="SkeletonEnemyV9" parent="Enemies" instance=ExtResource("10_w7kh3")]
-position = Vector2(356, 1743)
-scale = Vector2(3.5, 3.5)
-collision_layer = 8
-collision_mask = 9
-wander_enabled = false
-
-[node name="SkeletonEnemyV10" parent="Enemies" instance=ExtResource("10_w7kh3")]
-position = Vector2(450, 1741)
+position = Vector2(296, 1740)
 scale = Vector2(3.5, 3.5)
 collision_layer = 8
 collision_mask = 9
 wander_enabled = false
 
 [node name="SkeletonEnemyV6" parent="Enemies" instance=ExtResource("10_w7kh3")]
-position = Vector2(400, -1200)
+position = Vector2(151, 1760)
 scale = Vector2(3.5, 3.5)
 collision_layer = 8
 collision_mask = 9
+wander_enabled = false
+
+[node name="SkeletonEnemyV8" parent="Enemies" instance=ExtResource("10_w7kh3")]
+position = Vector2(447, 1762)
+scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
+wander_enabled = false
+
+[node name="SkeletonEnemyV9" parent="Enemies" instance=ExtResource("10_w7kh3")]
+position = Vector2(-59.9999, 1596)
+scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
+wander_enabled = false
+
+[node name="SkeletonEnemyV10" parent="Enemies" instance=ExtResource("10_w7kh3")]
+position = Vector2(613, 1608)
+scale = Vector2(3.5, 3.5)
+collision_layer = 8
+collision_mask = 9
+wander_enabled = false
 
 [node name="SkeletonEnemyV7" parent="Enemies" instance=ExtResource("10_w7kh3")]
 position = Vector2(-57, -1185)
