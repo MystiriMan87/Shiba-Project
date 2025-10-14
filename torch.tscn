@@ -1,10 +1,7 @@
-[gd_scene load_steps=10 format=3 uid="uid://cme4secwfuob2"]
+[gd_scene load_steps=7 format=3 uid="uid://cme4secwfuob2"]
 
 [ext_resource type="Texture2D" uid="uid://c3wiv82uq4jry" path="res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/torch/torch_1.png" id="1_kx7w4"]
-[ext_resource type="Texture2D" uid="uid://bipp4egm3qq3n" path="res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/torch/torch_2.png" id="2_72pgl"]
-[ext_resource type="Texture2D" uid="uid://bstgt4iw5nxa2" path="res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/torch/torch_3.png" id="3_wfdi7"]
-[ext_resource type="Texture2D" uid="uid://nmfvii3xr2kx" path="res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/torch/torch_4.png" id="4_vkaj5"]
-[ext_resource type="Texture2D" uid="uid://tj1xrpvfbv3u" path="res://light.png" id="5_72pgl"]
+[ext_resource type="Texture2D" uid="uid://dmy2jt50kh0vy" path="res://Assets/Snoblin/Snoblin_Dungeon_Tiles/Assets/dungeon_objects.png" id="1_w3qnr"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_bright"]
 light_mode = 1
@@ -18,31 +15,31 @@ length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/path = NodePath("Sprite2D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("1_kx7w4")]
+"values": [42]
 }
 
 [sub_resource type="Animation" id="Animation_cfb3y"]
 resource_name = "torch_burn"
-length = 0.7
+length = 0.6
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/path = NodePath("Sprite2D:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.166667, 0.333333, 0.5),
 "transitions": PackedFloat32Array(1, 1, 1, 1),
 "update": 1,
-"values": [ExtResource("1_kx7w4"), ExtResource("2_72pgl"), ExtResource("3_wfdi7"), ExtResource("4_vkaj5")]
+"values": [42, 43, 44, 45]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_vsxk6"]
@@ -58,7 +55,10 @@ z_index = 1200
 z_as_relative = false
 texture_filter = 1
 material = SubResource("CanvasItemMaterial_bright")
-texture = ExtResource("1_kx7w4")
+texture = ExtResource("1_w3qnr")
+hframes = 6
+vframes = 9
+frame = 42
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -66,12 +66,8 @@ libraries = {
 }
 autoplay = "torch_burn"
 
-[node name="PointLight2D" type="PointLight2D" parent="."]
-visible = false
-energy = 1.5
-texture = ExtResource("5_72pgl")
-
 [node name="Glow" type="Sprite2D" parent="."]
+visible = false
 modulate = Color(1, 0.85, 0.4, 0.45)
 z_index = 1198
 z_as_relative = false

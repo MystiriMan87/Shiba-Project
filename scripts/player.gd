@@ -686,7 +686,6 @@ func check_npc_interaction():
 			npc.interact()
 			break
 
-
 func _input(event):
 	if event.is_action_pressed("open_quest_log"):
 		var quest_log = get_node_or_null("/root/QuestLogUI")
@@ -696,11 +695,9 @@ func _input(event):
 		if quest_log:
 			quest_log.open_quest_log()
 	
-	
 	if event.is_action_pressed("interact"):
 		check_npc_interaction()
 		
-	# Handle right stick for attack direction
 	if event is InputEventJoypadMotion:
 		if event.axis == JOY_AXIS_RIGHT_X or event.axis == JOY_AXIS_RIGHT_Y:
 			var right_stick = Vector2(
@@ -708,10 +705,8 @@ func _input(event):
 				Input.get_joy_axis(0, JOY_AXIS_RIGHT_Y)
 			)
 			
-			# Apply deadzone
 			if right_stick.length() > controller_deadzone:
 				mouse_attack_direction = right_stick.normalized()
-				# Update player facing direction
 				if right_stick.x != 0:
 					facing_direction = 1 if right_stick.x > 0 else -1
 
@@ -946,7 +941,7 @@ func emit_dash_afterimage():
 	
 	var ghost := Sprite2D.new()
 	ghost.texture = sprite.texture
-	ghost.hframes = sprite.hframes
+	ghost.hframes = sprite.hframes 
 	ghost.vframes = sprite.vframes
 	ghost.frame = sprite.frame
 	ghost.centered = sprite.centered

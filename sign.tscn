@@ -6,7 +6,11 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_tbceu"]
 
 [node name="Sign" type="Area2D" groups=["signs"]]
+collision_layer = 31
+collision_mask = 31
 script = ExtResource("1_w2mlg")
+dialogue_id = "sign-default"
+interaction_range = 80.0
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_q3tny")
@@ -16,3 +20,14 @@ frame = 25
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_tbceu")
+
+[node name="E" type="Label" parent="."]
+visible = false
+offset_left = -19.0
+offset_top = -31.0
+offset_right = 21.0
+offset_bottom = -8.0
+theme_override_font_sizes/font_size = 9
+text = "E"
+horizontal_alignment = 1
+vertical_alignment = 1

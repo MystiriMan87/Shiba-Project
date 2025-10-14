@@ -8,6 +8,12 @@ var dialogues = {
 		{"speaker": "Crazed Wizard", "text": "Before you go"},
 		{"speaker": "Crazed Wizard", "text": "If you meet a merchant on your travels through the dungeons make sure to give him your coins in exhange for valuable.. valuable.. items! (mumbling)"},
 	],
+	"sign-default": [
+		{"speaker": "Amazing Sign", "text": "Deep Dark Caverns"},
+		{"speaker": "Amazing Sign", "text": ""},
+		{"speaker": "Amazing Sign", "text": ""},
+		{"speaker": "Amazing Sign", "text": "Still clicking? Go play the game already."},
+	],
 	"npc_no_pass": [
 		{"speaker": "Explorer Dave", "text": "The entrance seems to be collapsed here, there are 2 tunnels to go around but I don't dare head that way."},
 		{"speaker": "Explorer Dave", "text": "If you're crazy enough to go there, one holds plenty of swift goblins the other contains hulking brutes."},

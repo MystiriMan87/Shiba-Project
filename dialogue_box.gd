@@ -67,6 +67,7 @@ func _on_type_timer_timeout():
 		continue_indicator.visible = true
 
 func _input(event):
+	#get_viewport().set_input_as_handled()
 	if not visible:
 		return
 	

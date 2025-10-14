@@ -6,8 +6,8 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3b7ls"]
 
 [node name="Hub_door" type="Area2D"]
-collision_layer = 0
-collision_mask = 15
+collision_layer = 31
+collision_mask = 31
 script = ExtResource("1_i14ny")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -18,3 +18,6 @@ texture = ExtResource("2_8etx1")
 hframes = 14
 vframes = 12
 frame = 131
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="body_exited" from="." to="." method="_on_body_exited"]

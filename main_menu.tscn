@@ -1,9 +1,9 @@
 [gd_scene load_steps=9 format=3 uid="uid://byg0qtj4d0dqv"]
 
 [ext_resource type="Script" uid="uid://buobjj1brmb24" path="res://main_menu.gd" id="1_7vrkn"]
-[ext_resource type="FontFile" uid="uid://blkgwe4swrid8" path="res://100-Sub-Assets-Free/Fonts/m5x7.ttf" id="2_fu7sn"]
-[ext_resource type="FontFile" uid="uid://cxmygrl8lpf7k" path="res://100-Sub-Assets-Free/Fonts/PixeloidSansBold-RpeJo.ttf" id="2_glbon"]
-[ext_resource type="FontFile" uid="uid://vkfuxgs5bk41" path="res://100-Sub-Assets-Free/Fonts/PixeloidSans-nR3g1.ttf" id="3_fu7sn"]
+[ext_resource type="FontFile" uid="uid://blkgwe4swrid8" path="res://Assets/100-Sub-Assets-Free/Fonts/m5x7.ttf" id="2_fu7sn"]
+[ext_resource type="FontFile" uid="uid://cxmygrl8lpf7k" path="res://Assets/100-Sub-Assets-Free/Fonts/PixeloidSansBold-RpeJo.ttf" id="2_glbon"]
+[ext_resource type="FontFile" uid="uid://vkfuxgs5bk41" path="res://Assets/100-Sub-Assets-Free/Fonts/PixeloidSans-nR3g1.ttf" id="3_fu7sn"]
 [ext_resource type="Texture2D" uid="uid://bftgrleorv6kh" path="res://faith-spark-background1.jpg" id="5_nlkkf"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glbon"]

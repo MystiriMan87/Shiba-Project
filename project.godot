@@ -41,6 +41,7 @@ enabled=PackedStringArray("res://addons/AsepriteWizard/plugin.cfg", "res://addon
 
 player=""
 signs=""
+ui=""
 
 [input]
 

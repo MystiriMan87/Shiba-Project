@@ -89,7 +89,7 @@ func _ready():
 		#crt_default_vignette_intensity = crt.vignette_intensity
 
 func _process(delta):
-	print("Current follow_speed: ", follow_speed)
+	#print("Currenat follow_speed: ", follow_speed)
 	if not player:
 		return
 	

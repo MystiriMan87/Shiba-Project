@@ -8,7 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://dd0gqips5pn8y" path="res://Assets/L1.png" id="6_gxl1c"]
 [ext_resource type="Script" uid="uid://d2wr72yy2hh5q" path="res://fps_counter.gd" id="7_gxl1c"]
 
-[node name="PlayerUI" type="Control"]
+[node name="PlayerUI" type="Control" groups=["ui"]]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -38,6 +38,7 @@ vframes = 5
 script = ExtResource("3_pc08v")
 
 [node name="Label" type="Label" parent="."]
+visible = false
 layout_mode = 0
 offset_left = -89.0
 offset_top = 735.0
@@ -70,6 +71,7 @@ horizontal_alignment = 1
 uppercase = true
 
 [node name="TextureRect" type="TextureRect" parent="."]
+visible = false
 layout_mode = 0
 offset_left = 115.0
 offset_top = 827.0
@@ -79,6 +81,7 @@ scale = Vector2(1.5, 1.5)
 texture = ExtResource("4_pc08v")
 
 [node name="TextureRect2" type="TextureRect" parent="."]
+visible = false
 layout_mode = 0
 offset_left = 114.0
 offset_top = 883.0
@@ -88,6 +91,7 @@ scale = Vector2(1.5, 1.5)
 texture = ExtResource("5_a4em4")
 
 [node name="TextureRect4" type="TextureRect" parent="."]
+visible = false
 layout_mode = 0
 offset_left = 110.0
 offset_top = 934.0

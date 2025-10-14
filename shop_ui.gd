@@ -198,7 +198,7 @@ func show_message(msg: String):
 func _on_close_pressed():
 	close_shop()
 
-func _input(event):
+func _unhandled_input(event):
 	if not visible:
 		return
 	

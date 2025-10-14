@@ -24,7 +24,7 @@ corner_radius_bottom_left = 10
 [node name="QuestLogUI" type="CanvasLayer"]
 script = ExtResource("1_imfox")
 
-[node name="Panel" type="Panel" parent="."]
+[node name="Panel" type="Panel" parent="." groups=["ui"]]
 custom_minimum_size = Vector2(800, 600)
 anchors_preset = 8
 anchor_left = 0.5

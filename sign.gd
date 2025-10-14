@@ -1,66 +1,38 @@
-extends Area2D
+extends Node2D
 
-@export var sign_text: String = "This is a sign"
-@export var interaction_range: float = 50.0
-@export var show_prompt_distance: float = 60.0
+@export var dialogue_id: String = "sign_default"
+@export var interaction_range: float = 60.0
 
-var player: Node = null
 var player_in_range: bool = false
+var player: Node = null
 
-@onready var collision_shape = $CollisionShape2D
+@onready var interaction_label: Label = null
 
 func _ready():
 	add_to_group("signs")
-	
-	# Setup collision for detection
-	if not collision_shape:
-		collision_shape = CollisionShape2D.new()
-		add_child(collision_shape)
-		var circle_shape = CircleShape2D.new()
-		circle_shape.radius = show_prompt_distance
-		collision_shape.shape = circle_shape
-	
-	collision_layer = 0
-	collision_mask = 1
-	
-	body_entered.connect(_on_body_entered)
-	body_exited.connect(_on_body_exited)
-	
-	find_player()
+	interaction_label = get_node_or_null("E")
+	if interaction_label:
+		interaction_label.visible = false
 
-func find_player():
-	var players = get_tree().get_nodes_in_group("player")
-	if players.size() > 0:
-		player = players[0]
-
-func _process(delta):
+func _physics_process(_delta):
 	if not player:
-		find_player()
+		player = get_tree().get_first_node_in_group("player")
 		return
 	
 	var distance = global_position.distance_to(player.global_position)
+	player_in_range = distance <= interaction_range
 	
-	if distance <= interaction_range and Input.is_action_just_pressed("interact"):
-		show_sign_text()
+	if interaction_label:
+		interaction_label.visible = player_in_range
 
-func _on_body_entered(body):
-	if body.is_in_group("player"):
-		player_in_range = true
-		player = body
-
-func _on_body_exited(body):
-	if body.is_in_group("player"):
-		player_in_range = false
-
-func show_sign_text():
-	# Display sign text in UI
-	var ui = get_node_or_null("/root/UI") or get_tree().current_scene.get_node_or_null("UI")
-	
-	if ui and ui.has_method("show_notification"):
-		ui.show_notification(sign_text, 3.0)
-	else:
-		# Fallback: print to console
-		print("Sign: ", sign_text)
+func _unhandled_input(event):
+	if player_in_range and event.is_action_pressed("interact"):
+		interact()
+		get_viewport().set_input_as_handled()
 
 func interact():
-	show_sign_text()
+	var dialogue_box = get_tree().current_scene.get_node_or_null("DialogueBox")
+	if dialogue_box and dialogue_box.has_method("start_dialogue"):
+		dialogue_box.start_dialogue(dialogue_id)
+	else:
+		print("DialogueBox not found in scene!")	
