@@ -21,8 +21,6 @@ class EchoGhost:
 
 	@onready var sprite: Sprite2D = null
 	@onready var shape: CollisionShape2D = null
-	
-	
 
 	func _ready():
 		set_physics_process(true)
@@ -67,11 +65,9 @@ class EchoGhost:
 			target = start_pos
 
 	func _physics_process(delta):
-		# If the path finished, remove immediately to avoid lingering ghost
 		if path.is_empty():
 			queue_free()
 			return
-		# Lifetime used only as safety; still allow path to drive existence
 		if lifetime > 0:
 			lifetime -= delta
 	
@@ -122,7 +118,6 @@ class EchoGhost:
 			var t := create_tween()
 			t.tween_property(img, "modulate:a", 0.0, afterimage_lifetime)
 			t.tween_callback(func(): img.queue_free())
-			# Fail-safe cleanup in case tween callback doesn't fire
 			var timer := get_tree().create_timer(afterimage_lifetime + 0.15)
 			timer.timeout.connect(func(): if is_instance_valid(img): img.queue_free())
 
@@ -173,7 +168,6 @@ class EchoGhost:
 					c2.take_damage(burst_damage)
 		queue_free()
 
-	# Brief white flash similar to player's dash flash
 	func flash_white(duration: float = 0.08):
 		if not sprite:
 			return
@@ -193,18 +187,15 @@ class EchoGhost:
 @export var attack_duration = 0.4
 @export var attack_cooldown = 0.1
 
-# Dash settings
 @export var dash_speed = 700
 @export var dash_duration = 0.10
 @export var dash_cooldown = 0.8
 @export var dash_iframe_duration = 0.1
 
-# Dash energy (meter)
 @export var max_dash_energy: int = 100
 @export var dash_cost: int = 25
 @export var dash_regen_rate: float = 20.0
 
-# Dash afterimage effect
 @export var dash_afterimage_interval = 0.03
 @export var dash_afterimage_lifetime = 0.2
 
@@ -246,9 +237,11 @@ class EchoGhost:
 @export var hurt_sound_base_pitch: float = 1.0
 @export var hurt_sound_pitch_variation: float = 0.1
 
-#@export var background_music_path: String = "res://audio/background_music.ogg"
-#@export var background_music_volume: float = -10.0
-#@export var music_autoplay: bool = true
+@export var footstep_sound_path: String = "res://audio/reverb-footstep-cave-basement-abandoned-place-315027.mp3"
+@export var footstep_volume: float = -10.0
+@export var footstep_pitch_base: float = 1.0
+@export var footstep_pitch_variation: float = 0.1
+@export var footstep_interval: float = 0.4
 
 var HitEffectScene := preload("res://scenes/HitEffect.tscn")
 
@@ -277,9 +270,6 @@ var swing_current_progress = 0.0
 var is_swing_animating = false
 
 var trail_positions = []
-
-# Effects
-#var HitEffectScene := preload("res://scenes/HitEffect.tscn")
 var max_trail_length = 8
 
 @export var trail_color = Color.CYAN
@@ -297,6 +287,16 @@ var knockback_threshold = 15.0
 
 var current_animation = ""
 var is_moving = false
+
+var footstep_audio_player: AudioStreamPlayer2D = null
+var footstep_timer: float = 0.0
+
+var hit_audio_player: AudioStreamPlayer2D = null
+var sword_slice_player: AudioStreamPlayer2D = null
+var dash_audio_player: AudioStreamPlayer2D = null
+var pickup_audio_player: AudioStreamPlayer2D = null
+var hurt_audio_player: AudioStreamPlayer2D = null
+var echo_audio_player: AudioStreamPlayer2D = null
 
 signal health_changed(new_health: int)
 signal player_died
@@ -330,20 +330,17 @@ var last_dash_start: Vector2 = Vector2.ZERO
 
 @onready var dash_particles: CPUParticles2D = null
 
-@onready var hit_audio_player: AudioStreamPlayer2D = null
-@onready var sword_slice_player: AudioStreamPlayer2D = null
-@onready var dash_audio_player: AudioStreamPlayer2D = null
-@onready var pickup_audio_player: AudioStreamPlayer2D = null
-@onready var hurt_audio_player: AudioStreamPlayer2D = null
-@onready var music_player: AudioStreamPlayer = null
-@onready var echo_audio_player: AudioStreamPlayer2D = null
-
 @onready var pickup_area = $PickupArea if has_node("PickupArea") else null
 @onready var pickup_collision = $PickupArea/CollisionShape2D if has_node("PickupArea/CollisionShape2D") else null
 
 func _ready():
 	var quest_manager = get_node("/root/QuestManager")
 	quest_manager.start_quest("tutorial_quest")
+	
+	print("Footstep audio player created: ", footstep_audio_player)
+	print("Footstep stream loaded: ", footstep_audio_player.stream if footstep_audio_player else "No player")
+	print("Footstep sound path: ", footstep_sound_path)
+	print("Path exists: ", ResourceLoader.exists(footstep_sound_path))
 	
 	add_to_group("player")
 	current_health = max_health
@@ -353,44 +350,34 @@ func _ready():
 
 	health_changed.emit(current_health)
 	update_health_display()
-
 	
 	update_health_display()
 	setup_pickup_system()
 	setup_sound_effects()
-	#setup_background_music()
-	# Dash particles disabled
 	
-	# Initialize dash energy
 	dash_energy = max_dash_energy
 	
-	# Detect controller for attack direction
 	if Input.get_connected_joypads().size() > 0:
 		print("Controller detected for attack direction")
 	dash_energy_changed.emit(dash_energy)
 	
-	# Echo recall action (Q)
 	if not InputMap.has_action("recall_echo"):
 		InputMap.add_action("recall_echo")
 	
-	# Add controller support for dash (Left Trigger)
 	if not InputMap.has_action("dash"):
 		InputMap.add_action("dash")
-		# Add keyboard input (Shift)
 		var shift_evt := InputEventKey.new()
 		shift_evt.physical_keycode = KEY_SHIFT
 		InputMap.action_add_event("dash", shift_evt)
-		# Add controller input (Left Shoulder Button)
 		var shoulder_evt := InputEventJoypadButton.new()
 		shoulder_evt.button_index = JOY_BUTTON_LEFT_SHOULDER
 		InputMap.action_add_event("dash", shoulder_evt)
 		var evq := InputEventKey.new()
 		evq.physical_keycode = KEY_Q
 		InputMap.action_add_event("recall_echo", evq)
-	# initialize echo charges
+	
 	echo_charges = echo_max_charges
 	
-	# Ensure a "dash" action exists and is bound to Shift
 	if not InputMap.has_action("dash"):
 		InputMap.add_action("dash")
 		var ev := InputEventKey.new()
@@ -410,11 +397,10 @@ func _ready():
 	
 	if animation_player:
 		play_animation("Idle_down")
-		
 
 func _on_body_entered(body: Node):
 	var fx = HitEffectScene.instantiate()
-	fx.global_position = body.global_position  # spawn on enemy
+	fx.global_position = body.global_position
 	get_tree().current_scene.add_child(fx)
 	fx.rotation = get_mouse_attack_direction().angle()
 	if fx is GPUParticles2D or fx is CPUParticles2D:
@@ -422,13 +408,24 @@ func _on_body_entered(body: Node):
 	
 	if body and body.has_method("take_damage"):
 		body.take_damage(attack_damage)
-		
-
 
 func setup_sound_effects():
 	hit_audio_player = AudioStreamPlayer2D.new()
 	hit_audio_player.name = "HitAudioPlayer"
 	add_child(hit_audio_player)
+	
+	footstep_audio_player = AudioStreamPlayer2D.new()
+	footstep_audio_player.name = "FootstepAudioPlayer"
+	add_child(footstep_audio_player)
+	
+	if footstep_sound_path != "" and ResourceLoader.exists(footstep_sound_path):
+		var footstep_sound = load(footstep_sound_path)
+		if footstep_sound is AudioStream:
+			footstep_audio_player.stream = footstep_sound
+			footstep_audio_player.volume_db = footstep_volume
+			footstep_audio_player.bus = "Master"
+			footstep_audio_player.max_distance = 500
+			footstep_audio_player.attenuation = 0.0
 	
 	if hit_sound_path != "" and ResourceLoader.exists(hit_sound_path):
 		var hit_sound = load(hit_sound_path)
@@ -439,7 +436,6 @@ func setup_sound_effects():
 			hit_audio_player.max_distance = 2000
 			hit_audio_player.attenuation = 0.0
 
-	# Dedicated audio player for sword slice when hitting enemies
 	sword_slice_player = AudioStreamPlayer2D.new()
 	sword_slice_player.name = "SwordSlicePlayer"
 	add_child(sword_slice_player)
@@ -489,7 +485,6 @@ func setup_sound_effects():
 			echo_audio_player.volume_db = echo_recall_sound_volume
 			echo_audio_player.bus = "Master"
 
-	# Dash SFX
 	dash_audio_player = AudioStreamPlayer2D.new()
 	dash_audio_player.name = "DashAudioPlayer"
 	add_child(dash_audio_player)
@@ -556,34 +551,21 @@ func play_hurt_sound():
 	
 	hurt_audio_player.pitch_scale = clamp(final_pitch, 0.1, 3.0)
 	hurt_audio_player.play()
-
-#func setup_background_music():
-	#music_player = AudioStreamPlayer.new()
-	#music_player.name = "MusicPlayer"
-	#add_child(music_player)
-	#
-	#if background_music_path != "" and ResourceLoader.exists(background_music_path):
-		#var music = load(background_music_path)
-		#if music is AudioStream:
-			#music_player.stream = music
-			#music_player.volume_db = background_music_volume
-			#music_player.bus = "Master"
-			#music_player.autoplay = music_autoplay
-			#
-			#if music_autoplay:
-				#music_player.play()
-
-#func play_background_music():
-	#if music_player and music_player.stream and not music_player.playing:
-		#music_player.play()
-#
-#func stop_background_music():
-	#if music_player and music_player.playing:
-		#music_player.stop()
-#
-#func set_music_volume(volume_db: float):
-	#if music_player:
-		#music_player.volume_db = volume_db
+	
+func play_footstep_sound():
+	if not footstep_audio_player or not footstep_audio_player.stream:
+		return
+	
+	if footstep_audio_player.playing:
+		footstep_audio_player.stop()
+	
+	var final_pitch = footstep_pitch_base
+	if footstep_pitch_variation > 0.0:
+		var pitch_offset = randf_range(-footstep_pitch_variation, footstep_pitch_variation)
+		final_pitch += pitch_offset
+	
+	footstep_audio_player.pitch_scale = clamp(final_pitch, 0.1, 3.0)
+	footstep_audio_player.play()
 
 func setup_pickup_system():
 	if not pickup_area:
@@ -626,7 +608,6 @@ func add_item_to_inventory(item_data: Dictionary):
 		if success:
 			play_pickup_sound()
 			show_pickup_notification(item_data)
-			# Cartoony popup for item pickup
 			var item_name: String = str(item_data.get("name", item_data.get("id", "Item")))
 			var qty: int = int(item_data.get("quantity", 1))
 			var qty_prefix: String = ""
@@ -641,7 +622,6 @@ func add_item_to_inventory(item_data: Dictionary):
 			if success:
 				play_pickup_sound()
 				show_pickup_notification(item_data)
-				# Cartoony popup for item pickup
 				var item_name2: String = str(item_data.get("name", item_data.get("id", "Item")))
 				var qty2: int = int(item_data.get("quantity", 1))
 				var qty2_prefix: String = ""
@@ -711,7 +691,6 @@ func _input(event):
 					facing_direction = 1 if right_stick.x > 0 else -1
 
 func _physics_process(delta):
-	# Update attack direction from right stick - always check, not just when active
 	var right_stick = Vector2(
 		Input.get_joy_axis(0, JOY_AXIS_RIGHT_X),
 		Input.get_joy_axis(0, JOY_AXIS_RIGHT_Y)
@@ -720,23 +699,18 @@ func _physics_process(delta):
 	if right_stick.length() > controller_deadzone:
 		mouse_attack_direction = right_stick.normalized()
 		right_stick_active = true
-		# Update facing direction
 		if right_stick.x != 0:
 			facing_direction = 1 if right_stick.x > 0 else -1
-		# Force redraw to update visual indicator
 		queue_redraw()
 	else:
 		right_stick_active = false
-		# Only fallback to movement direction if no right stick input AND we're moving
 		if velocity.length() > 0:
 			mouse_attack_direction = velocity.normalized()
-			# Force redraw to update visual indicator
 			queue_redraw()
 	
-	# Progress dash white-flash timer so it actually ends
 	if dash_flash_timer > 0.0:
 		dash_flash_timer -= delta
-	# Handle damage flash only when not in dash i-frames
+	
 	if damage_immunity_timer > 0:
 		damage_immunity_timer -= delta
 		if not is_dash_iframe:
@@ -755,20 +729,18 @@ func _physics_process(delta):
 		if attack_timer <= 0:
 			end_attack()
 
-	# Dash timers
 	if dash_cooldown_timer > 0.0:
 		dash_cooldown_timer -= delta
+	
 	if is_dashing:
 		dash_timer -= delta
 		if dash_timer <= 0.0:
 			is_dashing = false
-			# cache path for later recall (Q)
 			last_dash_path = echo_path.duplicate()
 			if echo_path.size() > 1:
 				spawn_echo_clone()
 			echo_path.clear()
 		else:
-			# spawn afterimages while dashing
 			dash_afterimage_timer -= delta
 			if dash_afterimage_timer <= 0.0:
 				emit_dash_afterimage()
@@ -777,26 +749,22 @@ func _physics_process(delta):
 	if cooldown_timer > 0:
 		cooldown_timer -= delta
 
-	# record echo path while dashing (do not end the dash here; just stop recording after duration)
 	if is_dashing:
 		echo_timer += delta
 		if echo_timer < echo_record_duration:
 			echo_path.append(global_position)
 	
 	if Input.is_action_just_pressed('Attack') and not is_attacking and cooldown_timer <= 0:
-		# Use controller direction if right stick is active, otherwise use mouse
 		if right_stick_active:
-			# mouse_attack_direction is already set by controller input
 			pass
 		else:
 			var mouse_pos = get_global_mouse_position()
 			mouse_attack_direction = (mouse_pos - global_position).normalized()
 		start_attack()
 	
-	# Handle chest interaction with E key
 	if Input.is_action_just_pressed('interact'):
 		interact_with_chests()
-	# Echo recall
+	
 	if Input.is_action_just_pressed('recall_echo'):
 		recall_echoes()
 	
@@ -806,11 +774,17 @@ func _physics_process(delta):
 	if direction.length() > 0 and not is_attacking:
 		last_direction = direction.normalized()
 
-	# Start dash if Shift pressed and we have energy
+	if is_moving and velocity.length() > speed_threshold:
+		footstep_timer -= delta
+		if footstep_timer <= 0.0:
+			play_footstep_sound()
+			footstep_timer = footstep_interval
+	else:
+		footstep_timer = 0.0
+
 	if Input.is_action_just_pressed('dash') and not is_dashing and dash_cooldown_timer <= 0.0 and not is_attacking and dash_energy >= dash_cost:
 		var dash_dir = direction
 		if dash_dir.length() == 0:
-			# If no input, dash toward last faced direction
 			dash_dir = last_direction
 		start_dash(dash_dir.normalized())
 	
@@ -840,12 +814,43 @@ func _physics_process(delta):
 		update_sword_swing_animation(delta)
 	
 	move_and_slide()
-	# Regenerate dash energy when not dashing
+	
 	if not is_dashing and dash_energy < max_dash_energy:
 		var before = dash_energy
 		dash_energy = min(max_dash_energy, int(round(dash_energy + dash_regen_rate * delta)))
 		if dash_energy != before:
 			dash_energy_changed.emit(dash_energy)
+
+func get_damage_against_enemy(enemy: Node) -> int:
+	var base_damage = attack_damage
+	
+	var item_manager = get_node_or_null("/root/ItemManager")
+	if item_manager and item_manager.has_method("has_item"):
+		if item_manager.has_item("magic_ring") > 0:
+			if enemy.is_in_group("ghosts") or enemy.name.to_lower().contains("ghost"):
+				base_damage *= 2
+				print("Magic Ring activated! Dealing 2x damage to ghost!")
+				_spawn_magic_ring_effect(enemy.global_position)
+
+	return base_damage
+	
+func _spawn_magic_ring_effect(position: Vector2):
+	var label := Label.new()
+	label.text = "✨ GHOST BANE!"
+	label.add_theme_font_size_override("font_size", 12)
+	label.add_theme_color_override("font_color", Color(0.6, 0.3, 1.0))
+	label.modulate.a = 0.0
+	label.z_index = 200
+	var parent = get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
+	if parent:
+		parent.add_child(label)
+		label.top_level = true
+		label.global_position = position + Vector2(0, -20)
+		var t = create_tween()
+		t.tween_property(label, "modulate:a", 1.0, 0.1)
+		t.tween_property(label, "global_position", position + Vector2(0, -40), 0.5)
+		t.tween_property(label, "modulate:a", 0.0, 0.3)
+		t.tween_callback(func(): label.queue_free())
 
 func start_dash(dir: Vector2):
 	is_dashing = true
@@ -866,74 +871,21 @@ func start_dash(dir: Vector2):
 	echo_spawned_this_dash = false
 	last_dash_start = global_position
 
-	# Spend dash energy
 	var before = dash_energy
 	dash_energy = max(0, dash_energy - dash_cost)
 	if dash_energy != before:
 		dash_energy_changed.emit(dash_energy)
-	# brief i-frames during dash start
 	damage_immunity_timer = max(damage_immunity_timer, dash_iframe_duration)
 	is_dash_iframe = true
 	flash_white(0.08)
-	# Dash particles disabled
 	dash_afterimage_timer = 0.0
 
-	# Camera feedback: shake and vignette pulse
 	var cam = get_tree().current_scene.get_node_or_null("PlayerCamera") if get_tree() and get_tree().current_scene else null
 	if cam:
 		if cam.has_method("shake_camera"):
 			cam.shake_camera(4.0, 0.10)
 		if cam.has_method("pulse_vignette"):
 			cam.pulse_vignette(0.22, 0.16, 0.10)
-
-	# spawn echo on dash start if we have room and later on recall
-
-#func setup_dash_particles():
-	#if dash_particles:
-		#return
-	#
-	#dash_particles = CPUParticles2D.new()
-	#dash_particles.name = "DashParticles"
-	#add_child(dash_particles)
-	#
-	## Basic white burst behind the player
-	#dash_particles.emitting = false
-	#dash_particles.one_shot = true
-	#dash_particles.amount = 24
-	#dash_particles.lifetime = 0.20
-	#dash_particles.preprocess = 0.0
-	#dash_particles.explosiveness = 0.9
-	#dash_particles.gravity = Vector2.ZERO
-	#dash_particles.initial_velocity_min = 120
-	#dash_particles.initial_velocity_max = 220
-	#dash_particles.spread = 60
-	#dash_particles.scale_amount_min = 0.5
-	#dash_particles.scale_amount_max = 1.0
-	#dash_particles.color = Color(1, 1, 1, 0.9)
-	#dash_particles.z_index = -1
-	## Ensure particles stay in world space so they don't move with the player after emission
-	#dash_particles.local_coords = false
-#
-	## Generate a small white circle texture so particles are visible
-	#var img := Image.create(8, 8, false, Image.FORMAT_RGBA8)
-	#img.fill(Color(0, 0, 0, 0))
-	#var center := Vector2(3.5, 3.5)
-	#for y in range(8):
-		#for x in range(8):
-			#var d = Vector2(x, y).distance_to(center)
-			#if d <= 3.0:
-				#img.set_pixel(x, y, Color(1, 1, 1, 1))
-	#var tex := ImageTexture.create_from_image(img)
-	#dash_particles.texture = tex
-
-#func emit_dash_particles():
-	#if not dash_particles:
-		#return
-	#
-	#dash_particles.global_position = global_position
-	#dash_particles.emitting = false
-	#dash_particles.restart()
-	#dash_particles.emitting = true
 
 func emit_dash_afterimage():
 	if not sprite:
@@ -964,7 +916,6 @@ func emit_dash_afterimage():
 		var t := create_tween()
 		t.tween_property(ghost, "modulate:a", 0.0, dash_afterimage_lifetime)
 		t.tween_callback(func(): ghost.queue_free())
-		# Fail-safe cleanup in case tween callback doesn't fire
 		var timer := get_tree().create_timer(dash_afterimage_lifetime + 0.15)
 		timer.timeout.connect(func(): if is_instance_valid(ghost): ghost.queue_free())
 
@@ -1049,7 +1000,6 @@ func take_damage(amount: int, source: Node = null):
 	
 	play_hurt_sound()
 
-	# Camera feedback on damage
 	var cam = get_tree().current_scene.get_node_or_null("PlayerCamera") if get_tree() and get_tree().current_scene else null
 	if cam:
 		if cam.has_method("shake_camera"):
@@ -1111,7 +1061,6 @@ func die():
 	
 	player_died.emit()
 	
-	# Wait a moment then respawn at world.tscn
 	await get_tree().create_timer(1.0).timeout
 	get_tree().change_scene_to_file("res://scenes/world.tscn")
 
@@ -1122,7 +1071,6 @@ func heal(amount: int):
 	if current_health != old_health:
 		health_changed.emit(current_health)
 		update_health_display()
-		# Cartoony popup for health gain
 		var gained = current_health - old_health
 		if gained > 0:
 			_spawn_potion_popup("HP +" + str(gained), Color(0.2, 0.9, 0.2))
@@ -1132,16 +1080,13 @@ func restore_dash(amount: int):
 	dash_energy = min(max_dash_energy, dash_energy + amount)
 	if dash_energy != before:
 		dash_energy_changed.emit(dash_energy)
-	# also refill echo charges when drinking dash potion
 	echo_charges = echo_max_charges
 	echoes_changed.emit(active_echoes.size())
 
-	# Camera vignette pulse feedback on potion use
 	var cam = get_tree().current_scene.get_node_or_null("PlayerCamera") if get_tree() and get_tree().current_scene else null
 	if cam and cam.has_method("pulse_vignette"):
 		cam.pulse_vignette(0.28, 0.22, 0.14)
 
-	# Cartoony popup next to player
 	_spawn_potion_popup("Dash +", Color(0.2, 0.8, 1.0))
 
 func _spawn_potion_popup(text: String, color: Color = Color.WHITE):
@@ -1162,12 +1107,9 @@ func _spawn_potion_popup(text: String, color: Color = Color.WHITE):
 	label.global_position = global_position + Vector2(0, -24)
 	var t = create_tween()
 	t.set_parallel(true)
-	# Pop scale effect
 	t.tween_property(label, "scale", Vector2(1.3, 1.3), 0.08)
-	# Fade in
 	t.tween_property(label, "modulate:a", 1.0, 0.08)
 	var t2 = create_tween()
-	# Rise and fade out
 	t2.tween_property(label, "global_position", label.global_position + Vector2(0, -36), 0.5)
 	t2.tween_property(label, "modulate:a", 0.0, 0.5)
 	t2.tween_callback(func(): if is_instance_valid(label): label.queue_free())
@@ -1201,7 +1143,6 @@ func start_attack():
 	
 	position_attack_hitbox(mouse_attack_direction)
 
-	# Camera feedback: light shake on attack
 	var cam = get_tree().current_scene.get_node_or_null("PlayerCamera") if get_tree() and get_tree().current_scene else null
 	if cam and cam.has_method("shake_camera"):
 		cam.shake_camera(6.0, 0.12)
@@ -1251,7 +1192,6 @@ func update_sword_swing_animation(delta):
 		is_swing_animating = false
 
 func _draw():
-	# Visual feedback for attack direction - only when using controller (right stick activity)
 	if right_stick_active:
 		var start_pos = Vector2.ZERO
 		var end_pos = mouse_attack_direction * 30
@@ -1327,40 +1267,17 @@ func position_attack_hitbox(direction: Vector2):
 
 func _on_attack_area_body_entered(body):
 	if body.has_method("take_damage"):
-		body.take_damage(attack_damage)
-		# Enemy hit: play sword slice with pitch variation
+		var damage = get_damage_against_enemy(body)
+		body.take_damage(damage)
 		play_sword_slice_sound()
-		# Spawn hit particles and ensure they play
-		if HitEffectScene:
-			#var fx = HitEffectScene.instantiate()
-			#fx.global_position = body.global_position
-			# Rotate particle effect to match current attack direction
-			#fx.rotation = mouse_attack_direction.angle()
-			var parent = get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
-			if parent:
-				#parent.add_child(fx)
-				## Find the particles node and ensure it has a round texture
-				#var particle_node: Node = null
-				#if fx is GPUParticles2D or fx is CPUParticles2D:
-					#particle_node = fx
-				#elif fx.has_node("GPUParticles2D"):
-					#particle_node = fx.get_node("GPUParticles2D")
-				#elif fx.has_node("CPUParticles2D"):
-					#particle_node = fx.get_node("CPUParticles2D")
-				#if particle_node and particle_node.has_method("restart"):
-					## Apply a soft round texture if none is assigned
-					#if "texture" in particle_node and particle_node.texture == null:
-						#particle_node.texture = _make_round_particle_texture(64)
-					#particle_node.restart()
-				# Failsafe cleanup
-				var t = get_tree().create_timer(0.7)
-				#t.timeout.connect(func(): if is_instance_valid(fx): fx.queue_free())
+		var parent = get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
+		if parent:
+			var t = get_tree().create_timer(0.7)
 		enemy_killed.emit()
 	elif body.has_method("on_sword_hit"):
 		body.on_sword_hit()
 		play_sword_slice_sound()
 	else:
-		# Non-enemy hit: play generic hit
 		play_hit_sound()
 
 func get_is_attacking() -> bool:
@@ -1423,7 +1340,6 @@ func spawn_echo_clone():
 	var fv: bool = sprite.flip_v if sprite else false
 	var ctr: bool = sprite.centered if sprite else true
 	var start_pos = echo_path[0] if echo_path.size() > 0 else global_position
-	# Configure before adding to scene so _ready sees correct values
 	echo.move_speed = echo_move_speed
 	echo.burst_damage = echo_burst_damage
 	echo.burst_radius = echo_burst_radius
@@ -1433,7 +1349,6 @@ func spawn_echo_clone():
 	echo.afterimage_lifetime = 0.20
 	echo.setup(tex, scale_v, start_pos, echo_path, hfr, vfr, frm, fh, fv, ctr)
 	parent.add_child(echo)
-	# Start with a brief flash to mimic player's dash
 	echo.flash_white(0.06)
 	active_echoes.append(echo)
 	while active_echoes.size() > echo_max_charges:
@@ -1445,25 +1360,7 @@ func spawn_echo_clone():
 	echoes_changed.emit(active_echoes.size())
 	echo_spawned.emit(echo_record_duration)
 
-# Create a soft round texture (white center, transparent edge) for particles
-#func _make_round_particle_texture(size: int = 64) -> Texture2D:
-	#size = max(8, size)
-	#var img := Image.create(size, size, false, Image.FORMAT_RGBA8)
-	#var center := Vector2(size * 0.5, size * 0.5)
-	#var radius := float(size) * 0.5
-	#for y in range(size):
-		#for x in range(size):
-			#var p := Vector2(x + 0.5, y + 0.5)
-			#var d := p.distance_to(center)
-			#var t: float = clamp(1.0 - (d / radius), 0.0, 1.0)
-			## Smooth edge
-			#var alpha := pow(t, 1.8)
-			#img.set_pixel(x, y, Color(1, 1, 1, alpha))
-	#var tex := ImageTexture.create_from_image(img)
-	#return tex
-
 func recall_echoes():
-	# Spawn a ghost that traces the last dash path from its start to current position
 	if echo_charges > 0 and last_dash_path.size() >= 1:
 		var ghost := EchoGhost.new()
 		var parent = get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
@@ -1488,7 +1385,6 @@ func recall_echoes():
 			if last_dash_path.size() >= 1:
 				path_for_ghost = last_dash_path.duplicate()
 			else:
-				# Fallback: use dash start
 				path_for_ghost.append(last_dash_start)
 			path_for_ghost.append(global_position)
 			ghost.setup(tex, scale_v, last_dash_start, path_for_ghost, hfr, vfr, frm, fh, fv, ctr)
@@ -1496,7 +1392,6 @@ func recall_echoes():
 			ghost.flash_white(0.06)
 			echo_charges -= 1
 			echoes_changed.emit(active_echoes.size())
-	# Clear previously queued passive echoes
 	for e in active_echoes:
 		if is_instance_valid(e) and e.has_method("queue_free"):
 			e.queue_free()
@@ -1525,4 +1420,3 @@ func spawn_dash_echo_from_path(path_points: Array[Vector2]) -> void:
 	echo.afterimage_interval = 0.03
 	echo.afterimage_lifetime = 0.20
 	parent.add_child(echo)
-	

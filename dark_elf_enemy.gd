@@ -17,7 +17,7 @@ extends CharacterBody2D
 @export var walk_friction = 200
 @export var lunge_speed: float = 150.0
 @export var lunge_duration: float = 0.12
-@export var enemy_type: String = "darkelf"
+@export var enemy_type: String = "Dark_Elf"
 
 @export_group("Wandering")
 @export var wander_enabled: bool = true
@@ -380,7 +380,7 @@ func die():
 		respawn_manager.register_enemy_death(self)
 
 	DropSystem.handle_enemy_death(enemy_type, global_position, get_tree())
-	_drop_keys_like_slime()
+	#_drop_keys_like_slime()
 	
 	collision_shape.disabled = true
 	
@@ -391,17 +391,17 @@ func die():
 	tween.parallel().tween_property(sprite, "scale", Vector2(1.5, 0.5), 0.6)
 	tween.tween_callback(queue_free)
 
-func _drop_keys_like_slime():
-	var key_drop_chance = 0.3
-	if randf() < key_drop_chance:
-		var key_type = "iron"
-		var key_id = key_type + "_key"
-		var pickup_scene = load("res://scenes/PickupItem.tscn")
-		if pickup_scene:
-			var pickup = pickup_scene.instantiate()
-			get_tree().current_scene.add_child(pickup)
-			pickup.global_position = global_position + Vector2(randf_range(-20, 20), -20)
-			pickup.set_item(key_id, 1)
+#func _drop_keys_like_slime():
+	#var key_drop_chance = 0.3
+	#if randf() < key_drop_chance:
+		#var key_type = "iron"
+		#var key_id = key_type + "_key"
+		#var pickup_scene = load("res://scenes/PickupItem.tscn")
+		#if pickup_scene:
+			#var pickup = pickup_scene.instantiate()
+			#get_tree().current_scene.add_child(pickup)
+			#pickup.global_position = global_position + Vector2(randf_range(-20, 20), -20)
+			#pickup.set_item(key_id, 1)
 
 func _on_detection_area_entered(body):
 	if body.is_in_group("player"):

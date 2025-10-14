@@ -30,7 +30,6 @@ QuestManager="*res://scripts/QuestManager.gd"
 
 window/size/viewport_width=1980
 window/size/viewport_height=1080
-window/size/mode=2
 window/stretch/mode="viewport"
 
 [editor_plugins]

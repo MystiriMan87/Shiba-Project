@@ -198,16 +198,16 @@ func load_items_database():
 			"max_stack": 5,
 			"weapon_scale": 1.5
 		},
-		"magic_crystal": {
-			"id": "magic_crystal",
-			"name": "Magic Crystal",
-			"type": "material",
-			"icon_path": "res://textures/items/materials/magic_crystal.png",
-			"description": "A mysterious glowing crystal",
+		"magic_ring": {
+			"id": "magic_ring",
+			"name": "Magic Ring",
+			"type": "equipment",
+			"icon_path": "res://Assets/Ring Sprites.png",
+			"description": "A mysterious glowing ring, said to be used against ghosts",
 			"rarity": "rare",
-			"stackable": true,
-			"max_stack": 10,
-			"weapon_scale": 1.5
+			"stackable": false,
+			"max_stack": 1,
+			"weapon_scale": 1.0
 		},
 		"coin": {
 			"id": "coin",
@@ -243,18 +243,18 @@ func load_items_database():
 			"max_stack": 5,
 			"weapon_scale": 1.5
 		},
-		"magic_ring": {
-			"id": "magic_ring",
-			"name": "Magic Ring",
-			"type": "accessory",
-			"icon_path": "res://textures/items/accessories/magic_ring.png",
-			"description": "A ring imbued with magical energy.",
-			"rarity": "rare",
-			"stackable": false,
-			"max_stack": 1,
-			"magic_bonus": 10,
-			"weapon_scale": 1.5
-		},
+		#"magic_ring": {
+			#"id": "magic_ring",
+			#"name": "Magic Ring",
+			#"type": "accessory",
+			#"icon_path": "res://textures/items/accessories/magic_ring.png",
+			#"description": "A ring imbued with magical energy.",
+			#"rarity": "rare",
+			#"stackable": false,
+			#"max_stack": 1,
+			#"magic_bonus": 10,
+			#"weapon_scale": 1.5
+		#},
 		"ancient_artifact": {
 			"id": "ancient_artifact",
 			"name": "Ancient Artifact",

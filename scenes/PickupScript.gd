@@ -124,6 +124,8 @@ func setup_sprite():
 		sprite = Sprite2D.new()
 		sprite.name = "Sprite2D"
 		add_child(sprite)
+		
+	
 	
 	var icon_path = item_data.get("icon_path", "res://icon.svg")
 	if ResourceLoader.exists(icon_path):

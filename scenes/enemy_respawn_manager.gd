@@ -1,8 +1,6 @@
 extends Node
-
 @export var respawn_delay = 3.0
 @export var max_respawns = -1
-
 var respawn_data = []
 
 func _ready():
@@ -50,6 +48,8 @@ func get_enemy_scene_path(enemy: Node) -> String:
 			"slime": "res://scenes/slime_enemy.tscn",
 			"big_slime": "res://scenes/slime_enemy_big.tscn",
 			"skeleton": "res://scenes/skeleton_enemy.tscn",
+			"goblin": "res://scenes/goblin_enemy.tscn",
+			"ghost": "res://ghost_enemy.tscn"
 		}
 		if enemy_type in enemy_scene_map:
 			print("Respawn Manager: Found scene path for enemy_type: ", enemy_scene_map[enemy_type])
@@ -63,6 +63,8 @@ func get_enemy_scene_path(enemy: Node) -> String:
 		"slime": "res://scenes/slime_enemy.tscn",
 		"big_slime": "res://scenes/slime_enemy_big.tscn",
 		"skeleton": "res://scenes/skeleton_enemy.tscn",
+		"goblin": "res://scenes/goblin_enemy.tscn",
+		"ghost": "res://ghost_enemy.tscn"
 	}
 	
 	for enemy_type in enemy_scene_map:
@@ -70,9 +72,9 @@ func get_enemy_scene_path(enemy: Node) -> String:
 			print("Respawn Manager: Found scene path for enemy name: ", enemy_scene_map[enemy_type])
 			return enemy_scene_map[enemy_type]
 	
-	# Default fallback for any other enemies
-	print("Respawn Manager: Using default fallback scene path")
-	return "res://scenes/slime_enemy.tscn"
+	# Default fallback - return empty string to prevent spawning wrong enemies
+	print("Respawn Manager: WARNING - Unknown enemy type, not respawning")
+	return ""
 
 func get_enemy_respawn_count(enemy: Node) -> int:
 	if enemy.has_meta("respawn_count"):
@@ -112,10 +114,10 @@ func clear_respawn_queue():
 func set_respawn_delay(new_delay: float):
 	respawn_delay = new_delay
 
-var respawning_enabled = true
+var respawning_enabled = false
 
 func enable_respawning():
-	respawning_enabled = true
+	respawning_enabled = false
 
 func disable_respawning():
 	respawning_enabled = false
