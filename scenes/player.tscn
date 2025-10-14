@@ -252,6 +252,8 @@ hit_sound_path = "res://audio/hit_sound.mp3"
 hit_sound_volume = -10.0
 pickup_sound_path = "res://audio/pickup_sound.mp3"
 hurt_sound_path = "res://audio/hurt_sound.mp3"
+footstep_sound_path = "res://audio/st3-footstep-sfx-323056.mp3"
+footstep_interval = 0.6
 trail_color = Color(1, 1, 1, 1)
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

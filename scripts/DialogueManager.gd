@@ -15,7 +15,7 @@ var dialogues = {
 		{"speaker": "Amazing Sign", "text": "Still clicking? Go play the game already."},
 	],
 	"npc_no_pass": [
-		{"speaker": "Explorer Dave", "text": "The entrance seems to be collapsed here, there are 2 tunnels to go around but I don't dare head that way."},
+		{"speaker": "Explorer Dave", "text": "Someone took the ladder from here, there are 2 tunnels to go around but I don't dare head that way."},
 		{"speaker": "Explorer Dave", "text": "If you're crazy enough to go there, one holds plenty of swift goblins the other contains hulking brutes."},
 		{"speaker": "Explorer Dave", "text": "Before you go, if you are having trouble defeating the ghosts, the goblins have a chance to drop a magic ring to help you! Good luck"},
 	],

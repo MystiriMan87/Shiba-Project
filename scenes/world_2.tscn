@@ -447,12 +447,14 @@ texture = ExtResource("9_phgsc")
 3:7/0 = 0
 4:7/0 = 0
 5:7/0 = 0
+5:7/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 0:8/0 = 0
 1:8/0 = 0
 2:8/0 = 0
 3:8/0 = 0
 4:8/0 = 0
 5:8/0 = 0
+5:8/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_s8ivg"]
 texture = ExtResource("11_pvi7j")
@@ -463,6 +465,8 @@ texture = ExtResource("11_pvi7j")
 4:0/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_ab5jv"]
+physics_layer_0/collision_layer = 31
+physics_layer_0/collision_mask = 31
 sources/0 = SubResource("TileSetAtlasSource_f53ia")
 sources/1 = SubResource("TileSetAtlasSource_7uo55")
 sources/2 = SubResource("TileSetAtlasSource_s8ivg")
@@ -482,6 +486,7 @@ corner_radius_bottom_left = 15
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource("9_emu1g")
+background_music_volume = -10.0
 
 [node name="QuestUI" parent="." instance=ExtResource("1_hgrhv")]
 visible = false
@@ -1219,6 +1224,7 @@ position = Vector2(-672, -96)
 scale = Vector2(3, 3)
 
 [node name="CanvasModulate" parent="." instance=ExtResource("13_a2svu")]
+visible = false
 color = Color(0.270222, 0.270222, 0.270222, 1)
 
 [node name="Area2D" type="Area2D" parent="."]

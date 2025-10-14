@@ -20,11 +20,11 @@ func _ready():
 		print("PlayerCamera not found as child of world!")
 		
 	if debug_spawn_startup_items:
-		spawn_pickup_item("iron_sword", Vector2(200, 300))
-		spawn_pickup_item("health_potion", Vector2(300, 300), 3)
-		spawn_pickup_item("iron_axe", Vector2(400, 300))
-		spawn_pickup_item("magic_crystal", Vector2(500, 300), 2)
-		spawn_pickup_item("wooden_bow", Vector2(600, 300))
+		#spawn_pickup_item("iron_sword", Vector2(200, 300))
+		#spawn_pickup_item("health_potion", Vector2(300, 300), 3)
+		#spawn_pickup_item("iron_axe", Vector2(400, 300))
+		#spawn_pickup_item("magic_crystal", Vector2(500, 300), 2)
+		#spawn_pickup_item("wooden_bow", Vector2(600, 300))
 		
 		print("Spawned test pickup items")
 		
@@ -50,11 +50,11 @@ func _ready():
 		item_manager.add_item_to_inventory("health_potion", 3)
 		item_manager.add_item_to_inventory("dash_flask", 2)
 
-	# Spawn a starting weapon on the floor in the main room (near player)
+	## Spawn a starting weapon on the floor in the main room (near player)
 	var player = get_tree().get_first_node_in_group("player")
-	if player:
-		var spawn_pos = player.global_position + Vector2(120, 40)
-		spawn_pickup_item("iron_axe", spawn_pos, 1)
+	#if player:
+		#var spawn_pos = player.global_position + Vector2(120, 40)
+		#spawn_pickup_item("iron_axe", spawn_pos, 1)
 
 	# Add line-of-sight overlay that follows player
 	var los := LineOfSight.new()

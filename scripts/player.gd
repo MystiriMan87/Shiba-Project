@@ -238,7 +238,7 @@ class EchoGhost:
 @export var hurt_sound_pitch_variation: float = 0.1
 
 @export var footstep_sound_path: String = "res://audio/reverb-footstep-cave-basement-abandoned-place-315027.mp3"
-@export var footstep_volume: float = -10.0
+@export var footstep_volume: float = -20.0
 @export var footstep_pitch_base: float = 1.0
 @export var footstep_pitch_variation: float = 0.1
 @export var footstep_interval: float = 0.4
@@ -337,11 +337,6 @@ func _ready():
 	var quest_manager = get_node("/root/QuestManager")
 	quest_manager.start_quest("tutorial_quest")
 	
-	print("Footstep audio player created: ", footstep_audio_player)
-	print("Footstep stream loaded: ", footstep_audio_player.stream if footstep_audio_player else "No player")
-	print("Footstep sound path: ", footstep_sound_path)
-	print("Path exists: ", ResourceLoader.exists(footstep_sound_path))
-	
 	add_to_group("player")
 	current_health = max_health
 	
@@ -410,10 +405,6 @@ func _on_body_entered(body: Node):
 		body.take_damage(attack_damage)
 
 func setup_sound_effects():
-	hit_audio_player = AudioStreamPlayer2D.new()
-	hit_audio_player.name = "HitAudioPlayer"
-	add_child(hit_audio_player)
-	
 	footstep_audio_player = AudioStreamPlayer2D.new()
 	footstep_audio_player.name = "FootstepAudioPlayer"
 	add_child(footstep_audio_player)
@@ -426,6 +417,10 @@ func setup_sound_effects():
 			footstep_audio_player.bus = "Master"
 			footstep_audio_player.max_distance = 500
 			footstep_audio_player.attenuation = 0.0
+	
+	hit_audio_player = AudioStreamPlayer2D.new()
+	hit_audio_player.name = "HitAudioPlayer"
+	add_child(hit_audio_player)
 	
 	if hit_sound_path != "" and ResourceLoader.exists(hit_sound_path):
 		var hit_sound = load(hit_sound_path)
@@ -553,9 +548,15 @@ func play_hurt_sound():
 	hurt_audio_player.play()
 	
 func play_footstep_sound():
+	print("Play footstep called")
+	print("Footstep player exists: ", footstep_audio_player != null)
+	print("Has stream: ", footstep_audio_player.stream if footstep_audio_player else "No player")
+	
 	if not footstep_audio_player or not footstep_audio_player.stream:
+		print("Footstep player or stream is null, returning")
 		return
 	
+	print("Playing footstep sound")
 	if footstep_audio_player.playing:
 		footstep_audio_player.stop()
 	
@@ -566,7 +567,8 @@ func play_footstep_sound():
 	
 	footstep_audio_player.pitch_scale = clamp(final_pitch, 0.1, 3.0)
 	footstep_audio_player.play()
-
+	print("Footstep should be playing now")
+	
 func setup_pickup_system():
 	if not pickup_area:
 		pickup_area = Area2D.new()

@@ -33,7 +33,7 @@ func start_dialogue(dialogue_id: String):
 	
 	current_index = 0
 	show()
-	get_tree().paused = true
+	get_tree().paused = false
 	display_current_line()
 
 func display_current_line():
