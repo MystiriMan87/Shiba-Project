@@ -489,16 +489,12 @@ script = ExtResource("9_emu1g")
 background_music_volume = -10.0
 
 [node name="QuestUI" parent="." instance=ExtResource("1_hgrhv")]
-visible = false
 
 [node name="DialogueBox" parent="." instance=ExtResource("2_dr8ba")]
-visible = false
 
 [node name="QuestLogUI" parent="." instance=ExtResource("3_v5b4n")]
-visible = false
 
 [node name="DialogueBox2" parent="." instance=ExtResource("2_dr8ba")]
-visible = false
 
 [node name="ItemManager" parent="." instance=ExtResource("4_ysdsq")]
 
@@ -1224,7 +1220,6 @@ position = Vector2(-672, -96)
 scale = Vector2(3, 3)
 
 [node name="CanvasModulate" parent="." instance=ExtResource("13_a2svu")]
-visible = false
 color = Color(0.270222, 0.270222, 0.270222, 1)
 
 [node name="Area2D" type="Area2D" parent="."]

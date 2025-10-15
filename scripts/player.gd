@@ -13,6 +13,10 @@ class EchoGhost:
 	@export var move_hit_radius: float = 12.0
 	@export var burst_radius: float = 48.0
 	@export var burst_damage: int = 2
+	
+	var magic_ring_sprite: Sprite2D = null
+	var ring_follow_distance: float = 30.0
+	var ring_follow_speed: float = 8.0
 
 	var path: Array[Vector2] = []
 	var idx: int = 0
@@ -1422,3 +1426,32 @@ func spawn_dash_echo_from_path(path_points: Array[Vector2]) -> void:
 	echo.afterimage_interval = 0.03
 	echo.afterimage_lifetime = 0.20
 	parent.add_child(echo)
+	
+func update_magic_ring_display():
+	var item_manager = get_node_or_null("/root/ItemManager")
+	if not item_manager:
+		return
+	
+	var has_ring = item_manager.has_item("magic_ring") > 0
+	
+	if has_ring and not magic_ring_sprite:
+		# Create the ring sprite
+		magic_ring_sprite = Sprite2D.new()
+		magic_ring_sprite.name = "MagicRingFollower"
+		magic_ring_sprite.z_index = -1  # Behind player
+		
+		# Load the ring texture
+		var ring_texture = load("res://Assets/Ring Sprites.png")
+		if ring_texture:
+			magic_ring_sprite.texture = ring_texture
+			magic_ring_sprite.scale = Vector2(0.6, 0.6)  # Smaller size
+		
+		var parent = get_tree().current_scene
+		if parent:
+			parent.add_child(magic_ring_sprite)
+			magic_ring_sprite.global_position = global_position
+	
+	elif not has_ring and magic_ring_sprite:
+		# Remove ring if player no longer has it
+		magic_ring_sprite.queue_free()
+		magic_ring_sprite = null
