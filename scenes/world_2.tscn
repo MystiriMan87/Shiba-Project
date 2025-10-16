@@ -1296,7 +1296,8 @@ scale = Vector2(4, 4)
 
 [node name="Chest" parent="." instance=ExtResource("21_7uo55")]
 position = Vector2(-684, 32)
-is_locked = false
+loot_spawn_offset = Vector2(0, 8)
+loot_spawn_radius_base = 1.0
 
 [node name="Torch" parent="." instance=ExtResource("22_s8ivg")]
 position = Vector2(-76, -831)

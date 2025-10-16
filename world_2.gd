@@ -11,8 +11,6 @@ func _ready():
 	await get_tree().process_frame
 	setup_background_music()
 	
-	var ref_a = get_tree().current_scene.get_node("Player")
-	ref_a.update_magic_ring_display()
 	
 	var camera = get_node_or_null("PlayerCamera")
 	if camera:
@@ -57,6 +55,10 @@ func _ready():
 	if player:
 		var spawn_pos = player.global_position + Vector2(120, 40)
 		spawn_pickup_item("iron_axe", spawn_pos, 1)
+		
+	#var player = get_node_or_null("Player")  
+	if player and player.has_method("update_magic_ring_display"):
+		player.update_magic_ring_display()
 
 	# Add line-of-sight overlay that follows player
 	var los := LineOfSight.new()

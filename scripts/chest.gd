@@ -4,6 +4,11 @@ class_name Chest
 @export var is_locked: bool = true
 @export var key_type: String = "wooden"  # wooden, iron, golden
 @export var loot_items: Array[String] = ["health_potion", "coin"]
+@export var loot_spawn_offset: Vector2 = Vector2(0, 8)  
+@export var loot_spawn_radius_base: float = 1.0 
+@export var loot_pop_height: float = 5.0
+@export var loot_animation_duration: float = 0.25  
+@export var can_reclose: bool = false 
 
 var is_open: bool = false
 var player_near: bool = false
@@ -15,200 +20,223 @@ var is_animating: bool = false
 
 func _ready():
 	add_to_group("chests")
+	
+	# Setup area if it doesn't exist
 	if not area:
 		area = Area2D.new()
+		area.name = "Area2D"
 		add_child(area)
 		var collision = CollisionShape2D.new()
 		area.add_child(collision)
 		var shape = CircleShape2D.new()
 		shape.radius = 40
 		collision.shape = shape
-		# Set collision layer to 8 (for player pickup detection)
 		area.collision_layer = 8
 		area.collision_mask = 0
 	
-	area.body_entered.connect(_on_body_entered)
-	area.body_exited.connect(_on_body_exited)
+	if not area.body_entered.is_connected(_on_body_entered):
+		area.body_entered.connect(_on_body_entered)
+	if not area.body_exited.is_connected(_on_body_exited):
+		area.body_exited.connect(_on_body_exited)
 	
-	# Set up sprite
+	# Setup sprite if it doesn't exist
 	if not sprite:
 		sprite = Sprite2D.new()
+		sprite.name = "Sprite2D"
 		add_child(sprite)
 	
-	update_sprite()
-
-func update_sprite():
-	if not sprite:
-		return
+	# Setup animation player if it doesn't exist
+	if not animation_player:
+		animation_player = AnimationPlayer.new()
+		animation_player.name = "AnimationPlayer"
+		add_child(animation_player)
+		print("⚠ Warning: AnimationPlayer not found. Chest needs 'open' and 'close' animations!")
 	
-	# Try to load chest textures first
-	var texture_path = ""
+	# Connect to animation finished signal
+	if animation_player and not animation_player.animation_finished.is_connected(_on_animation_finished):
+		animation_player.animation_finished.connect(_on_animation_finished)
+	
+	# Set initial state
 	if is_open:
-		texture_path = "res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/chest/chest_open_1.png"
-	elif is_locked:
-		texture_path = "res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/chest/chest_2.png"
+		# If chest starts open, play the open animation instantly
+		if animation_player and animation_player.has_animation("open"):
+			animation_player.play("open")
+			animation_player.seek(999, true)  # Jump to end of animation
 	else:
-		texture_path = "res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/chest/chest_1.png"
+		# Start in closed state
+		if animation_player and animation_player.has_animation("close"):
+			animation_player.play("close")
+			animation_player.seek(999, true)  # Jump to end of animation
+
+func interact():
+	if is_animating:
+		return  # Don't allow interaction while animating
 	
-	if ResourceLoader.exists(texture_path):
-		sprite.texture = load(texture_path)
+	if not is_open:
+		# Try to open the chest
+		if is_locked:
+			if try_unlock():
+				open_chest()
+			else:
+				print("Chest is locked! Need ", key_type, " key.")
+				show_locked_message()
+		else:
+			open_chest()
 	else:
-		# Fallback to colored squares
-		var color = Color.GREEN if is_open else (Color.RED if is_locked else Color.BROWN)
-		var image = Image.create(32, 32, false, Image.FORMAT_RGBA8)
-		image.fill(color)
-		var texture = ImageTexture.new()
-		texture.set_image(image)
-		sprite.texture = texture
+		# Chest is already open
+		if can_reclose:
+			close_chest()
+		else:
+			print("Chest is already open")
 
-func clamp_to_viewport(p: Vector2, margin: float = 32.0) -> Vector2:
-	var rect: Rect2 = get_viewport().get_visible_rect()
-	var min_v = rect.position + Vector2(margin, margin)
-	var max_v = rect.position + rect.size - Vector2(margin, margin)
-	var x = clamp(p.x, min_v.x, max_v.x)
-	var y = clamp(p.y, min_v.y, max_v.y)
-	return Vector2(x, y)
-
-# Remove _input - we'll handle this in the player script instead
-
-@export var loot_throw_delay: float = 2.0
-@export var loot_throw_spread_degrees: float = 70.0
-@export var loot_throw_speed_min: float = 120.0
-@export var loot_throw_speed_max: float = 180.0
-@export var loot_spawn_offset: Vector2 = Vector2(0, -16)
-@export var loot_spawn_radius_base: float = 24.0
-@export var loot_spawn_radius_step: float = 10.0
+func try_unlock() -> bool:
+	var item_manager = get_node_or_null("/root/ItemManager")
+	if not item_manager:
+		print("ItemManager not found!")
+		return false
+	
+	var key_id = key_type + "_key"
+	if item_manager.has_item(key_id) > 0:
+		item_manager.remove_item_from_inventory(key_id, 1)
+		is_locked = false
+		print("Unlocked chest with ", key_id)
+		show_unlock_message()
+		return true
+	
+	return false
 
 func open_chest():
-	if is_locked:
-		var item_manager = get_node("/root/ItemManager")
-		if item_manager and item_manager.has_item(key_type + "_key"):
-			item_manager.remove_item_from_inventory(key_type + "_key", 1)
-			is_locked = false
-		else:
-			print("Need " + key_type + " key!")
-			return
-			
+	if not animation_player:
+		print("⚠ No AnimationPlayer found!")
+		finish_opening()
+		return
+	
+	if not animation_player.has_animation("open"):
+		print("⚠ 'open' animation not found!")
+		finish_opening()
+		return
+	
+	is_animating = true
+	animation_player.play("open")
+	print("Playing chest open animation")
+	
+	# Notify quest system
 	var quest_manager = get_node_or_null("/root/QuestManager")
 	if quest_manager:
 		quest_manager.on_chest_opened()
-	
-	# Play opening animation
-	play_opening_animation()
 
-func play_opening_animation():
+func close_chest():
+	if not animation_player:
+		print("⚠ No AnimationPlayer found!")
+		is_open = false
+		return
+	
+	if not animation_player.has_animation("close"):
+		print("⚠ 'close' animation not found!")
+		is_open = false
+		return
+	
 	is_animating = true
+	animation_player.play("close")
+	print("Playing chest close animation")
+
+func _on_animation_finished(anim_name: String):
+	is_animating = false
 	
-	var frames = [
-		"res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/chest/chest_1.png",
-		"res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/chest/chest_2.png", 
-		"res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/chest/chest_3.png",
-		"res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/chest/chest_4.png",
-		"res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/chest/chest_open_1.png",
-		"res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/chest/chest_open_2.png",
-		"res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/chest/chest_open_3.png",
-		"res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/chest/chest_open_4.png"
-	]
-	
-	var tween = create_tween()
-	var frame_duration = 0.1
-	
-	for i in range(frames.size()):
-		if ResourceLoader.exists(frames[i]):
-			tween.tween_callback(func(): sprite.texture = load(frames[i]))
-			tween.tween_interval(frame_duration)
-	
-	# Add a subtle bounce/flash for polish
-	tween.tween_callback(func():
-		if sprite:
-			var t = create_tween()
-			t.tween_property(sprite, "scale", sprite.scale * 1.06, 0.08)
-			t.tween_property(sprite, "modulate:a", 0.95, 0.08)
-			t.tween_property(sprite, "scale", sprite.scale, 0.08)
-			t.tween_property(sprite, "modulate:a", 1.0, 0.05)
-			t.tween_callback(finish_opening)
-		else:
-			finish_opening()
-	)
+	if anim_name == "open":
+		finish_opening()
+	elif anim_name == "close":
+		is_open = false
+		print("Chest closed")
 
 func finish_opening():
 	is_open = true
-	is_animating = false
+	print("Chest opened! Spawning loot...")
+	spawn_loot()
+
+func spawn_loot():
 	var scene_root = get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
 	if not scene_root:
+		print("⚠ Could not find scene root to spawn loot")
 		return
+	
 	var count = loot_items.size()
 	if count <= 0:
+		print("No loot items configured for this chest")
 		return
-	var radius = clamp(loot_spawn_radius_base, 16.0, 40.0)
+	
+	var radius = loot_spawn_radius_base
+	
 	for i in range(count):
+		# Calculate position in a circle around the chest
 		var angle = (i * TAU) / float(max(1, count))
 		var dir = Vector2(cos(angle), sin(angle))
+		
+		# Start position (inside/at chest)
+		var start_pos = global_position + Vector2(0, -8)
+		
+		# Arc peak (items jump up)
+		var up_pos = start_pos + Vector2(0, -loot_pop_height)
+		
+		# Final landing position (close to chest)
 		var target_pos = global_position + loot_spawn_offset + dir * radius
-		var start_pos = global_position + Vector2(0, -6)
-		var up_pos = start_pos + Vector2(0, -20)
+		
+		# Create the pickup item
 		var pickup: Node = PickupItem.create_pickup_item(loot_items[i], start_pos, 1)
+		if not pickup:
+			print("⚠ Failed to create pickup for: ", loot_items[i])
+			continue
+		
 		scene_root.add_child(pickup)
+		
+		# Setup pickup properties
 		if pickup is Node2D:
 			pickup.z_as_relative = true
 			pickup.z_index = 0
 			pickup.top_level = false
 			(pickup as Node2D).global_position = start_pos
 			(pickup as Node2D).modulate.a = 0.0
+		
 		if pickup.has_method("set_pickup_delay"):
-			pickup.set_pickup_delay(0.6)
+			pickup.set_pickup_delay(0.4)  # Reduced from 0.6
+		
 		if "auto_pickup" in pickup:
 			pickup.auto_pickup = true
+		
+		# Animate the item popping out with a nice arc
 		var t = create_tween()
-		t.tween_property(pickup, "modulate:a", 1.0, 0.12)
-		t.tween_property(pickup, "global_position", up_pos, 0.10)
-		t.tween_property(pickup, "global_position", target_pos, 0.18)
-	print("Chest spawned ", count, " items at radius ", radius)
-
-func spawn_and_throw_item(item_id: String, direction: Vector2):
-	var scene = load("res://scenes/PickupItem.tscn")
-	if not scene:
-		print("Pickup scene missing for ", item_id)
-		return
+		t.set_ease(Tween.EASE_OUT)
+		t.set_trans(Tween.TRANS_QUAD)
+		
+		# Fade in quickly
+		t.tween_property(pickup, "modulate:a", 1.0, 0.08)
+		
+		# Jump up
+		t.parallel().tween_property(pickup, "global_position", up_pos, loot_animation_duration * 0.4)
+		
+		# Fall to landing spot
+		t.tween_property(pickup, "global_position", target_pos, loot_animation_duration * 0.6).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
 	
-	var pickup = scene.instantiate()
-	# Add under the chest's parent so transforms remain consistent with chest scale
-	var parent = get_parent() if get_parent() else get_tree().current_scene
-	parent.add_child(pickup)
-	
-	# Compute spawn offset relative to chest's global scale
-	var scale_factor = (abs(global_scale.x) + abs(global_scale.y)) * 0.5
-	var offset_distance = 8.0 * max(1.0, scale_factor)
-	var spawn_pos = global_position + direction.normalized() * offset_distance
-	
-	if pickup is Node2D:
-		pickup.top_level = false
-		pickup.z_as_relative = true
-		pickup.z_index = 0
-		pickup.global_position = spawn_pos
-	else:
-		pickup.set("global_position", spawn_pos)
+	print("Spawned ", count, " items from chest")
 
-	if pickup.has_method("set_item"):
-		pickup.set_item(item_id, 1)
-	if pickup.has_method("set_pickup_delay"):
-		pickup.set_pickup_delay(loot_throw_delay)
-	if pickup.has_method("throw_from"):
-		var speed = randf_range(loot_throw_speed_min, loot_throw_speed_max) * max(1.0, scale_factor)
-		pickup.throw_from(spawn_pos, direction, speed)
+func show_locked_message():
+	if sprite:
+		var t = create_tween()
+		t.tween_property(sprite, "modulate", Color(1.0, 0.3, 0.3), 0.1)
+		t.tween_property(sprite, "modulate", Color.WHITE, 0.1)
 
-	print("Spawned ", item_id, " at ", spawn_pos)
+func show_unlock_message():
+	if sprite:
+		var t = create_tween()
+		t.tween_property(sprite, "scale", sprite.scale * 1.1, 0.1)
+		t.tween_property(sprite, "scale", sprite.scale, 0.1)
 
 func _on_body_entered(body):
 	if body.has_method("add_item_to_inventory"):
 		player_near = true
+		print("Player near chest")
 
 func _on_body_exited(body):
 	if body.has_method("add_item_to_inventory"):
 		player_near = false
-
-func interact():
-	# Player proximity is already checked by the player script,
-	# so open as long as we're close enough to interact.
-	if not is_open and not is_animating:
-		open_chest()
+		print("Player left chest")

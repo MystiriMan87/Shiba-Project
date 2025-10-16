@@ -1,7 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://d14w75lwsi7ls"]
+[gd_scene load_steps=9 format=3 uid="uid://d14w75lwsi7ls"]
 
 [ext_resource type="Script" uid="uid://d2dvfwfocjyoi" path="res://scripts/chest.gd" id="1_chest"]
-[ext_resource type="Texture2D" uid="uid://bvdwa3wisfysb" path="res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/chest/chest_1.png" id="2_sy5e1"]
+[ext_resource type="Texture2D" uid="uid://dmy2jt50kh0vy" path="res://Assets/Snoblin/Snoblin_Dungeon_Tiles/Assets/dungeon_objects.png" id="2_sy5e1"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_gqd3d"]
 radius = 6.675
@@ -9,17 +9,95 @@ radius = 6.675
 [sub_resource type="CircleShape2D" id="CircleShape2D_yue2o"]
 radius = 27.3333
 
+[sub_resource type="Animation" id="Animation_sy5e1"]
+resource_name = "open"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("2_sy5e1")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.233333),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [4, 10]
+}
+
+[sub_resource type="Animation" id="Animation_gqd3d"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [ExtResource("2_sy5e1")]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [4]
+}
+
+[sub_resource type="Animation" id="Animation_yue2o"]
+resource_name = "close"
+length = 0.4
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [10, 4]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_yhylo"]
+_data = {
+&"RESET": SubResource("Animation_gqd3d"),
+&"close": SubResource("Animation_yue2o"),
+&"open": SubResource("Animation_sy5e1")
+}
+
 [node name="Chest" type="StaticBody2D"]
 scale = Vector2(4, 4)
 script = ExtResource("1_chest")
-loot_spawn_offset = Vector2(0, 0)
-loot_spawn_radius_base = 50.0
-loot_spawn_radius_step = 30.0
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 z_index = 600
 z_as_relative = false
 texture = ExtResource("2_sy5e1")
+hframes = 6
+vframes = 9
+frame = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 texture_filter = 1
@@ -35,3 +113,6 @@ texture_filter = 1
 shape = SubResource("CircleShape2D_yue2o")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_yhylo")
+}

@@ -1,5 +1,7 @@
 extends CharacterBody2D
 
+signal player_ready
+
 class EchoGhost:
 	extends Area2D
 	@export var lifetime: float = 1.0
@@ -351,6 +353,8 @@ func _ready():
 		if not item_manager.item_picked_up.is_connected(_on_item_picked_up):
 			item_manager.item_picked_up.connect(_on_item_picked_up)
 	update_magic_ring_display()
+	
+	player_ready.emit()  
 
 func _on_body_entered(body: Node):
 	var fx = HitEffectScene.instantiate()
@@ -376,8 +380,7 @@ func setup_sound_effects():
 			footstep_audio_player.max_distance = 500
 			footstep_audio_player.attenuation = 0.0
 			
-	#footstep_audio_player.stream = FOOTSTEP_SOUND
-	#hit_audio_player.stream = HIT_SOUND
+	
 	
 	# Hit Audio Player
 	hit_audio_player = AudioStreamPlayer2D.new()
@@ -484,6 +487,10 @@ func setup_sound_effects():
 			"HurtAudioPlayer": hurt_audio_player = player
 			"EchoAudioPlayer": echo_audio_player = player
 			"DashAudioPlayer": dash_audio_player = player
+			
+	footstep_audio_player.stream = FOOTSTEP_SOUND
+	hit_audio_player.stream = HIT_SOUND
+	pickup_audio_player.stream = PICKUP_SOUND
 
 func play_sound_with_pitch(player: AudioStreamPlayer2D, base_pitch: float, variation: float):
 	if not player or not player.stream:
@@ -586,10 +593,18 @@ func get_input():
 	return input
 
 func interact_with_chests():
+	print("Player trying to interact with chests...")
 	var chests = get_tree().get_nodes_in_group("chests")
+	print("Found ", chests.size(), " objects in 'chests' group")
+	
 	for chest in chests:
-		if chest.global_position.distance_to(global_position) < 50:
-			chest.interact()
+		var distance = chest.global_position.distance_to(global_position)
+		print("Distance to ", chest.name, ": ", distance)
+		
+		if distance < 50:
+			print("Interacting with: ", chest.name)
+			if chest.has_method("interact"):
+				chest.interact()
 			break
 
 func check_npc_interaction():
@@ -1163,8 +1178,104 @@ func recall_echoes():
 func update_magic_ring_display():
 	var item_manager = get_node_or_null("/root/ItemManager")
 	if not item_manager:
+		print("⚠ ItemManager not found")
 		return
+	
 	var has_ring = item_manager.has_item("magic_ring") > 0
+	print("Updating magic ring display. Has ring: ", has_ring)
+	
+	if has_ring and not magic_ring_sprite:
+		# Create the ring sprite
+		magic_ring_sprite = Sprite2D.new()
+		magic_ring_sprite.name = "MagicRingFollower"
+		magic_ring_sprite.z_index = 10  # Changed from -1 to 10 to render ABOVE player
+		
+		var ring_texture = load("res://Assets/Ring Sprites.png")
+		if ring_texture:
+			magic_ring_sprite.texture = ring_texture
+			magic_ring_sprite.scale = Vector2(1.5, 1.5)
+			magic_ring_sprite.modulate = Color(1.2, 1.2, 1.5)
+			print("✓ Ring texture loaded")
+		else:
+			print("✗ Failed to load ring texture")
+			return
+		
+		# IMPORTANT: Add as child of player, not scene
+		# This way it moves with the player automatically
+		add_child(magic_ring_sprite)
+		
+		# Position relative to player
+		magic_ring_sprite.position = Vector2(0, ring_follow_distance)
+		
+		print("✓ Magic ring sprite added to player")
+		print("  Ring position: ", magic_ring_sprite.position)
+		print("  Ring global position: ", magic_ring_sprite.global_position)
+		print("  Ring z_index: ", magic_ring_sprite.z_index)
+		print("  Ring visible: ", magic_ring_sprite.visible)
+		print("  Ring scale: ", magic_ring_sprite.scale)
+	
+	elif has_ring and magic_ring_sprite:
+		# Ring already exists, just make sure it's visible
+		magic_ring_sprite.visible = true
+		print("✓ Magic ring already exists")
+		print("  Is instance valid: ", is_instance_valid(magic_ring_sprite))
+		print("  Parent: ", magic_ring_sprite.get_parent())
+	
+	elif not has_ring and magic_ring_sprite:
+		# Player doesn't have ring, remove it
+		magic_ring_sprite.queue_free()
+		magic_ring_sprite = null
+		print("✓ Magic ring removed (player doesn't have it)")
+	#var item_manager = get_node_or_null("/root/ItemManager")
+	if not item_manager:
+		print("⚠ ItemManager not found")
+		return
+	
+	#var has_ring = item_manager.has_item("magic_ring") > 0
+	print("Updating magic ring display. Has ring: ", has_ring)
+	
+	if has_ring and not magic_ring_sprite:
+		# Create the ring sprite
+		magic_ring_sprite = Sprite2D.new()
+		magic_ring_sprite.name = "MagicRingFollower"
+		magic_ring_sprite.z_index = -1
+		
+		var ring_texture = load("res://Assets/Ring Sprites.png")
+		if ring_texture:
+			magic_ring_sprite.texture = ring_texture
+			magic_ring_sprite.scale = Vector2(1.5, 1.5)
+			magic_ring_sprite.modulate = Color(1.2, 1.2, 1.5)
+			print("✓ Ring texture loaded")
+		else:
+			print("✗ Failed to load ring texture")
+		
+		# Add to current scene
+		var parent = get_tree().current_scene
+		if not parent:
+			# Fallback: try to get the parent directly
+			parent = get_parent()
+		
+		if parent:
+			parent.add_child(magic_ring_sprite)
+			magic_ring_sprite.global_position = global_position
+			print("✓ Magic ring sprite added to scene")
+		else:
+			print("✗ Could not find parent to add ring to")
+	
+	elif has_ring and magic_ring_sprite:
+		# Ring already exists, just make sure it's visible
+		magic_ring_sprite.visible = true
+		print("✓ Magic ring already exists, ensuring visibility")
+	
+	elif not has_ring and magic_ring_sprite:
+		# Player doesn't have ring, remove it
+		magic_ring_sprite.queue_free()
+		magic_ring_sprite = null
+		print("✓ Magic ring removed (player doesn't have it)")
+	#var item_manager = get_node_or_null("/root/ItemManager")
+	if not item_manager:
+		return
+	#var has_ring = item_manager.has_item("magic_ring") > 0
 	if has_ring and not magic_ring_sprite:
 		magic_ring_sprite = Sprite2D.new()
 		magic_ring_sprite.name = "MagicRingFollower"
