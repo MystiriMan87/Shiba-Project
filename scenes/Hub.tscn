@@ -1235,6 +1235,8 @@ z_index = 1
 position = Vector2(197, -177)
 scale = Vector2(1.5, 1.5)
 collision_layer = 31
+hit_sound_path = "res://audio/hit_sound.mp3"
+pickup_sound_path = "res://audio/pickup_sound.mp3"
 
 [node name="TileMap" type="TileMap" parent="."]
 format = 2

@@ -4,11 +4,10 @@
 [ext_resource type="FontFile" uid="uid://blkgwe4swrid8" path="res://Assets/100-Sub-Assets-Free/Fonts/m5x7.ttf" id="2_l4r40"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w63dr"]
-bg_color = Color(0.392157, 0.00392157, 0, 0.501961)
-corner_radius_top_left = 50
-corner_radius_top_right = 50
-corner_radius_bottom_right = 50
-corner_radius_bottom_left = 50
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [sub_resource type="LabelSettings" id="LabelSettings_l4r40"]
 font_size = 65

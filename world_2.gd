@@ -11,6 +11,9 @@ func _ready():
 	await get_tree().process_frame
 	setup_background_music()
 	
+	var ref_a = get_tree().current_scene.get_node("Player")
+	ref_a.update_magic_ring_display()
+	
 	var camera = get_node_or_null("PlayerCamera")
 	if camera:
 		camera.follow_speed = 0.0

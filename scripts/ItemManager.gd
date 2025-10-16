@@ -209,6 +209,28 @@ func load_items_database():
 			"max_stack": 1,
 			"weapon_scale": 1.0
 		},
+		#"magic_ring_damage": {
+			#"id": "magic_ring_damage",
+			#"name": "Magic Ring Damage",
+			#"type": "equipment",
+			#"icon_path": "res://Assets/Ring Sprites - Green.png",
+			#"description": "A mysterious glowing ring, said to boost damage",
+			#"rarity": "rare",
+			#"stackable": false,
+			#"max_stack": 1,
+			#"weapon_scale": 1.0
+		#},
+		#"magic_ring_speed": {
+			#"id": "magic_ring_speed",
+			#"name": "Magic Ring Speed",
+			#"type": "equipment",
+			#"icon_path": "res://Assets/Ring Sprites - Gold_Red.png",
+			#"description": "A mysterious glowing ring, said to boost speed",
+			#"rarity": "rare",
+			#"stackable": false,
+			#"max_stack": 1,
+			#"weapon_scale": 1.0
+		#},
 		"coin": {
 			"id": "coin",
 			"name": "Gold Coin",

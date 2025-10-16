@@ -6049,7 +6049,6 @@ background_music_volume = -20.0
 
 [node name="Player" parent="." groups=["player"] instance=ExtResource("1_nnsk1")]
 position = Vector2(1477, 666)
-footstep_volume = -50.0
 
 [node name="PointLight2D" type="PointLight2D" parent="Player"]
 position = Vector2(-1, 3)
@@ -6227,6 +6226,7 @@ key_type = "iron"
 loot_items = Array[String](["health_potion", "steel_hammer", "coin", "coin"])
 
 [node name="CanvasModulate" parent="." instance=ExtResource("17_4kbfs")]
+visible = false
 position = Vector2(62, 52)
 
 [node name="Torch" parent="." instance=ExtResource("13_jhx03")]
@@ -6378,10 +6378,13 @@ position = Vector2(181, -1621)
 scale = Vector2(4.9, 4.9)
 
 [node name="DialogueBox" parent="." instance=ExtResource("23_xgqkh")]
+visible = false
 
 [node name="QuestLogUI" parent="." instance=ExtResource("24_navra")]
+visible = false
 
 [node name="ShopUI" parent="." instance=ExtResource("25_0nbtd")]
+visible = false
 
 [node name="MerchantShop" parent="." instance=ExtResource("26_munwf")]
 visible = false

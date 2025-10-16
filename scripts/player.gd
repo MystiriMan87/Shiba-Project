@@ -2,7 +2,6 @@ extends CharacterBody2D
 
 class EchoGhost:
 	extends Area2D
-
 	@export var lifetime: float = 1.0
 	@export var move_speed: float = 900.0
 	@export var echo_damage: int = 1
@@ -13,16 +12,10 @@ class EchoGhost:
 	@export var move_hit_radius: float = 12.0
 	@export var burst_radius: float = 48.0
 	@export var burst_damage: int = 2
-	
-	var magic_ring_sprite: Sprite2D = null
-	var ring_follow_distance: float = 30.0
-	var ring_follow_speed: float = 8.0
-
 	var path: Array[Vector2] = []
 	var idx: int = 0
 	var target: Vector2 = Vector2.ZERO
 	var _afterimage_timer: float = 0.0
-
 	@onready var sprite: Sprite2D = null
 	@onready var shape: CollisionShape2D = null
 
@@ -63,10 +56,7 @@ class EchoGhost:
 		sprite.flip_h = flip_h
 		sprite.flip_v = flip_v
 		sprite.centered = centered
-		if path.size() > 0:
-			target = path[0]
-		else:
-			target = start_pos
+		target = path[0] if path.size() > 0 else start_pos
 
 	func _physics_process(delta):
 		if path.is_empty():
@@ -74,12 +64,10 @@ class EchoGhost:
 			return
 		if lifetime > 0:
 			lifetime -= delta
-	
 		_afterimage_timer -= delta
 		if _afterimage_timer <= 0.0:
 			_emit_afterimage()
 			_afterimage_timer = afterimage_interval
-
 		var to_target = target - global_position
 		var step = move_speed * delta
 		if to_target.length() <= step:
@@ -92,7 +80,6 @@ class EchoGhost:
 			target = path[idx]
 		else:
 			global_position += to_target.normalized() * step
-
 		if damage_on_move:
 			_apply_move_damage()
 
@@ -154,7 +141,6 @@ class EchoGhost:
 		r.tween_property(ring, "scale", Vector2(20, 20), 0.2)
 		r.tween_property(ring, "modulate:a", 0.0, 0.2)
 		r.tween_callback(func(): if is_instance_valid(ring): ring.queue_free())
-
 		var space2 := get_world_2d().direct_space_state
 		if space2:
 			var circle2 := CircleShape2D.new()
@@ -181,8 +167,7 @@ class EchoGhost:
 		t.tween_interval(duration)
 		t.tween_callback(func():
 			if is_instance_valid(self) and sprite:
-				sprite.modulate = original_mod
-		)
+				sprite.modulate = original_mod)
 
 @export var speed = 300
 @export var friction = 0.2
@@ -190,125 +175,53 @@ class EchoGhost:
 @export var attack_damage = 1
 @export var attack_duration = 0.4
 @export var attack_cooldown = 0.1
-
 @export var dash_speed = 700
 @export var dash_duration = 0.10
 @export var dash_cooldown = 0.8
 @export var dash_iframe_duration = 0.1
-
 @export var max_dash_energy: int = 100
 @export var dash_cost: int = 25
 @export var dash_regen_rate: float = 20.0
-
 @export var dash_afterimage_interval = 0.03
 @export var dash_afterimage_lifetime = 0.2
-
 @export var max_health = 5
 @export var damage_immunity_duration = 0.3
 @export var knockback_resistance = 0.5
-
 @export var min_animation_speed = 0.5
 @export var max_animation_speed = 4.0
 @export var speed_threshold = 50
-
 @export var swing_arc_degrees = 120
 @export var swing_duration = 0.3
 @export var swing_offset_distance = 30
 @export var enable_trail_effect = true
 @export var trail_fade_duration = 0.2
-
 @export var attack_range = 50
 @export var swing_arc_half_angle = 60
-
 @export var pickup_range = 40
 @export var auto_pickup_enabled = true
-
 @export_group("Sound Effects")
 @export var hit_sound_path: String = "res://audio/hit_sound.wav"
-@export var hit_sound_volume: float = 0.0
+@export var hit_sound_volume: float = -10.0
 @export var hit_sound_base_pitch: float = 0.8
 @export var hit_sound_pitch_variation: float = 0.1
-
 @export var pickup_sound_path: String = "res://audio/pickup_sound.wav"
-@export var pickup_sound_volume: float = 0.0
+@export var pickup_sound_volume: float = -5.0
 @export var dash_sound_base_pitch: float = 1.0
 @export var dash_sound_pitch_variation: float = 0.05
 @export var pickup_sound_base_pitch: float = 1.0
 @export var pickup_sound_pitch_variation: float = 0.2
-
 @export var hurt_sound_path: String = "res://audio/hurt_sound.wav"
 @export var hurt_sound_volume: float = 0.0
 @export var hurt_sound_base_pitch: float = 1.0
 @export var hurt_sound_pitch_variation: float = 0.1
-
 @export var footstep_sound_path: String = "res://audio/reverb-footstep-cave-basement-abandoned-place-315027.mp3"
-@export var footstep_volume: float = -20.0
+@export var footstep_volume: float = -10.0
 @export var footstep_pitch_base: float = 1.0
 @export var footstep_pitch_variation: float = 0.1
 @export var footstep_interval: float = 0.4
-
-var HitEffectScene := preload("res://scenes/HitEffect.tscn")
-
-var is_attacking = false
-var attack_timer = 0.0
-var cooldown_timer = 0.0
-var last_direction = Vector2.DOWN
-
-var is_dashing = false
-var dash_timer = 0.0
-var dash_cooldown_timer = 0.0
-var dash_direction = Vector2.ZERO
-var is_dash_iframe = false
-var dash_flash_timer = 0.0
-var dash_afterimage_timer = 0.0
-
-var dash_energy: int = 0
-
-var mouse_attack_direction = Vector2.RIGHT
-var controller_deadzone: float = 0.3
-var facing_direction: int = 1
-var right_stick_active: bool = false
-var swing_start_angle = 0.0
-var swing_end_angle = 0.0
-var swing_current_progress = 0.0
-var is_swing_animating = false
-
-var trail_positions = []
-var max_trail_length = 8
-
-@export var trail_color = Color.CYAN
+@export var trail_color = Color.WHITE
 @export var trail_width = 3.0
 @export var trail_max_alpha = 0.8
-
-var current_health: int = 0
-var is_taking_damage = false
-var damage_immunity_timer = 0.0
-var damage_flash_timer = 0.0
-var damage_flash_duration = 0.1
-var player_knockback_velocity = Vector2.ZERO
-var knockback_friction = 0.8
-var knockback_threshold = 15.0
-
-var current_animation = ""
-var is_moving = false
-
-var footstep_audio_player: AudioStreamPlayer2D = null
-var footstep_timer: float = 0.0
-
-var hit_audio_player: AudioStreamPlayer2D = null
-var sword_slice_player: AudioStreamPlayer2D = null
-var dash_audio_player: AudioStreamPlayer2D = null
-var pickup_audio_player: AudioStreamPlayer2D = null
-var hurt_audio_player: AudioStreamPlayer2D = null
-var echo_audio_player: AudioStreamPlayer2D = null
-
-signal health_changed(new_health: int)
-signal player_died
-signal enemy_killed
-signal dash_energy_changed(new_energy: int)
-signal echoes_changed(count: int)
-signal echo_spawned(duration: float)
-
 @export var echo_record_duration: float = 1.0
 @export var echo_max_charges: int = 3
 @export var echo_move_speed: float = 900.0
@@ -317,6 +230,58 @@ signal echo_spawned(duration: float)
 @export var echo_recall_sound_path: String = ""
 @export var echo_recall_sound_volume: float = 0.0
 
+const FOOTSTEP_SOUND = preload("res://audio/reverb-footstep-cave-basement-abandoned-place-315027.mp3")
+const HIT_SOUND = preload("res://audio/hit_sound.mp3")
+const PICKUP_SOUND = preload("res://audio/pickup_sound.mp3")
+const HURT_SOUND = preload("res://audio/hurt_sound.mp3")
+const SWORD_SLICE_SOUND = preload("res://audio/violent-sword-slice-393848.mp3")
+const DASH_SOUND = preload("res://audio/dash-sfx.mp3")
+
+
+var HitEffectScene := preload("res://scenes/HitEffect.tscn")
+var is_attacking = false
+var attack_timer = 0.0
+var cooldown_timer = 0.0
+var last_direction = Vector2.DOWN
+var is_dashing = false
+var dash_timer = 0.0
+var dash_cooldown_timer = 0.0
+var dash_direction = Vector2.ZERO
+var is_dash_iframe = false
+var dash_flash_timer = 0.0
+var dash_afterimage_timer = 0.0
+var dash_energy: int = 0
+var mouse_attack_direction = Vector2.RIGHT
+var controller_deadzone: float = 0.3
+var facing_direction: int = 1
+var right_stick_active: bool = false
+var swing_start_angle = 0.0
+var swing_end_angle = 0.0
+var swing_current_progress = 0.0
+var is_swing_animating = false
+var trail_positions = []
+var max_trail_length = 8
+var magic_ring_sprite: Sprite2D = null
+var ring_follow_distance: float = 30.0
+var ring_follow_speed: float = 8.0
+var current_health: int = 0
+var is_taking_damage = false
+var damage_immunity_timer = 0.0
+var damage_flash_timer = 0.0
+var damage_flash_duration = 0.1
+var player_knockback_velocity = Vector2.ZERO
+var knockback_friction = 0.8
+var knockback_threshold = 15.0
+var current_animation = ""
+var is_moving = false
+var footstep_audio_player: AudioStreamPlayer2D = null
+var footstep_timer: float = 0.0
+var hit_audio_player: AudioStreamPlayer2D = null
+var sword_slice_player: AudioStreamPlayer2D = null
+var dash_audio_player: AudioStreamPlayer2D = null
+var pickup_audio_player: AudioStreamPlayer2D = null
+var hurt_audio_player: AudioStreamPlayer2D = null
+var echo_audio_player: AudioStreamPlayer2D = null
 var echo_path: Array[Vector2] = []
 var echo_timer: float = 0.0
 var active_echoes: Array[Node] = []
@@ -325,44 +290,40 @@ var echo_charges: int = 3
 var last_dash_path: Array[Vector2] = []
 var last_dash_start: Vector2 = Vector2.ZERO
 
+signal health_changed(new_health: int)
+signal player_died
+signal enemy_killed
+signal dash_energy_changed(new_energy: int)
+signal echoes_changed(count: int)
+signal echo_spawned(duration: float)
+
 @onready var sprite = $Sprite2D
 @onready var animation_player = $AnimationPlayer
 @onready var attack_area = $AttackArea if has_node("AttackArea") else null
 @onready var attack_collision = $AttackArea/CollisionShape2D if has_node("AttackArea/CollisionShape2D") else null
 @onready var attack_sprite = $AttackSprite if has_node("AttackSprite") else null
 @onready var health_bar = $HealthBar if has_node("HealthBar") else null
-
 @onready var dash_particles: CPUParticles2D = null
-
 @onready var pickup_area = $PickupArea if has_node("PickupArea") else null
 @onready var pickup_collision = $PickupArea/CollisionShape2D if has_node("PickupArea/CollisionShape2D") else null
 
 func _ready():
 	var quest_manager = get_node("/root/QuestManager")
 	quest_manager.start_quest("tutorial_quest")
-	
 	add_to_group("player")
 	current_health = max_health
-	
 	await get_tree().process_frame 
 	await get_tree().process_frame
-
 	health_changed.emit(current_health)
-	update_health_display()
-	
 	update_health_display()
 	setup_pickup_system()
 	setup_sound_effects()
-	
 	dash_energy = max_dash_energy
-	
 	if Input.get_connected_joypads().size() > 0:
 		print("Controller detected for attack direction")
 	dash_energy_changed.emit(dash_energy)
-	
 	if not InputMap.has_action("recall_echo"):
 		InputMap.add_action("recall_echo")
-	
 	if not InputMap.has_action("dash"):
 		InputMap.add_action("dash")
 		var shift_evt := InputEventKey.new()
@@ -374,28 +335,22 @@ func _ready():
 		var evq := InputEventKey.new()
 		evq.physical_keycode = KEY_Q
 		InputMap.action_add_event("recall_echo", evq)
-	
 	echo_charges = echo_max_charges
-	
-	if not InputMap.has_action("dash"):
-		InputMap.add_action("dash")
-		var ev := InputEventKey.new()
-		ev.physical_keycode = KEY_SHIFT
-		InputMap.action_add_event("dash", ev)
-	
 	if attack_area:
 		attack_area.monitoring = false
 		attack_area.collision_layer = 2
 		attack_area.collision_mask = 4
-		
 		if not attack_area.body_entered.is_connected(_on_attack_area_body_entered):
 			attack_area.body_entered.connect(_on_attack_area_body_entered)
-	
 	collision_layer = 1
 	collision_mask = 1
-	
 	if animation_player:
 		play_animation("Idle_down")
+	var item_manager = get_node_or_null("/root/ItemManager")
+	if item_manager:
+		if not item_manager.item_picked_up.is_connected(_on_item_picked_up):
+			item_manager.item_picked_up.connect(_on_item_picked_up)
+	update_magic_ring_display()
 
 func _on_body_entered(body: Node):
 	var fx = HitEffectScene.instantiate()
@@ -404,15 +359,14 @@ func _on_body_entered(body: Node):
 	fx.rotation = get_mouse_attack_direction().angle()
 	if fx is GPUParticles2D or fx is CPUParticles2D:
 		fx.emitting = true	
-	
 	if body and body.has_method("take_damage"):
 		body.take_damage(attack_damage)
 
 func setup_sound_effects():
+	# Footstep Audio Player
 	footstep_audio_player = AudioStreamPlayer2D.new()
 	footstep_audio_player.name = "FootstepAudioPlayer"
 	add_child(footstep_audio_player)
-	
 	if footstep_sound_path != "" and ResourceLoader.exists(footstep_sound_path):
 		var footstep_sound = load(footstep_sound_path)
 		if footstep_sound is AudioStream:
@@ -421,11 +375,14 @@ func setup_sound_effects():
 			footstep_audio_player.bus = "Master"
 			footstep_audio_player.max_distance = 500
 			footstep_audio_player.attenuation = 0.0
+			
+	#footstep_audio_player.stream = FOOTSTEP_SOUND
+	#hit_audio_player.stream = HIT_SOUND
 	
+	# Hit Audio Player
 	hit_audio_player = AudioStreamPlayer2D.new()
 	hit_audio_player.name = "HitAudioPlayer"
 	add_child(hit_audio_player)
-	
 	if hit_sound_path != "" and ResourceLoader.exists(hit_sound_path):
 		var hit_sound = load(hit_sound_path)
 		if hit_sound is AudioStream:
@@ -435,6 +392,7 @@ func setup_sound_effects():
 			hit_audio_player.max_distance = 2000
 			hit_audio_player.attenuation = 0.0
 
+	# Sword Slice Player
 	sword_slice_player = AudioStreamPlayer2D.new()
 	sword_slice_player.name = "SwordSlicePlayer"
 	add_child(sword_slice_player)
@@ -448,10 +406,10 @@ func setup_sound_effects():
 			sword_slice_player.max_distance = 2000
 			sword_slice_player.attenuation = 0.0
 
+	# Pickup Audio Player
 	pickup_audio_player = AudioStreamPlayer2D.new()
 	pickup_audio_player.name = "PickupAudioPlayer"
 	add_child(pickup_audio_player)
-	
 	if pickup_sound_path != "" and ResourceLoader.exists(pickup_sound_path):
 		var pickup_sound = load(pickup_sound_path)
 		if pickup_sound is AudioStream:
@@ -461,10 +419,10 @@ func setup_sound_effects():
 			pickup_audio_player.max_distance = 2000
 			pickup_audio_player.attenuation = 0.0
 
+	# Hurt Audio Player
 	hurt_audio_player = AudioStreamPlayer2D.new()
 	hurt_audio_player.name = "HurtAudioPlayer"
 	add_child(hurt_audio_player)
-	
 	if hurt_sound_path != "" and ResourceLoader.exists(hurt_sound_path):
 		var hurt_sound = load(hurt_sound_path)
 		if hurt_sound is AudioStream:
@@ -474,6 +432,7 @@ func setup_sound_effects():
 			hurt_audio_player.max_distance = 2000
 			hurt_audio_player.attenuation = 0.0
 
+	# Echo Audio Player
 	echo_audio_player = AudioStreamPlayer2D.new()
 	echo_audio_player.name = "EchoAudioPlayer"
 	add_child(echo_audio_player)
@@ -484,6 +443,7 @@ func setup_sound_effects():
 			echo_audio_player.volume_db = echo_recall_sound_volume
 			echo_audio_player.bus = "Master"
 
+	# Dash Audio Player
 	dash_audio_player = AudioStreamPlayer2D.new()
 	dash_audio_player.name = "DashAudioPlayer"
 	add_child(dash_audio_player)
@@ -493,86 +453,62 @@ func setup_sound_effects():
 		if ds is AudioStream:
 			dash_audio_player.stream = ds
 			dash_audio_player.bus = "Master"
+			dash_audio_player.volume_db = 0.0
+	var sound_configs = [
+		["FootstepAudioPlayer", footstep_sound_path, footstep_volume, footstep_audio_player],
+		["HitAudioPlayer", hit_sound_path, hit_sound_volume, hit_audio_player],
+		["SwordSlicePlayer", "res://audio/violent-sword-slice-393848.mp3", -6.0, sword_slice_player],
+		["PickupAudioPlayer", pickup_sound_path, pickup_sound_volume, pickup_audio_player],
+		["HurtAudioPlayer", hurt_sound_path, hurt_sound_volume, hurt_audio_player],
+		["EchoAudioPlayer", echo_recall_sound_path, echo_recall_sound_volume, echo_audio_player],
+		["DashAudioPlayer", "res://audio/dash-sfx.mp3", 0.0, dash_audio_player]
+	]
+	
+	for config in sound_configs:
+		var player = AudioStreamPlayer2D.new()
+		player.name = config[0]
+		add_child(player)
+		if config[1] != "" and ResourceLoader.exists(config[1]):
+			var sound = load(config[1])
+			if sound is AudioStream:
+				player.stream = sound
+				player.volume_db = config[2]
+				player.bus = "Master"
+				player.max_distance = 500 if "Footstep" in config[0] else 2000
+				player.attenuation = 0.0
+		match config[0]:
+			"FootstepAudioPlayer": footstep_audio_player = player
+			"HitAudioPlayer": hit_audio_player = player
+			"SwordSlicePlayer": sword_slice_player = player
+			"PickupAudioPlayer": pickup_audio_player = player
+			"HurtAudioPlayer": hurt_audio_player = player
+			"EchoAudioPlayer": echo_audio_player = player
+			"DashAudioPlayer": dash_audio_player = player
+
+func play_sound_with_pitch(player: AudioStreamPlayer2D, base_pitch: float, variation: float):
+	if not player or not player.stream:
+		return
+	if player.playing:
+		player.stop()
+	var final_pitch = base_pitch + randf_range(-variation, variation) if variation > 0.0 else base_pitch
+	player.pitch_scale = clamp(final_pitch, 0.1, 3.0)
+	player.play()
 
 func play_hit_sound():
-	if not hit_audio_player or not hit_audio_player.stream:
-		return
-	
-	if hit_audio_player.playing:
-		hit_audio_player.stop()
-	
-	var final_pitch = hit_sound_base_pitch
-	if hit_sound_pitch_variation > 0.0:
-		var pitch_offset = randf_range(-hit_sound_pitch_variation, hit_sound_pitch_variation)
-		final_pitch += pitch_offset
-	
-	hit_audio_player.pitch_scale = clamp(final_pitch, 0.1, 3.0)
-	hit_audio_player.play()
+	play_sound_with_pitch(hit_audio_player, hit_sound_base_pitch, hit_sound_pitch_variation)
 
 func play_sword_slice_sound():
-	if not sword_slice_player or not sword_slice_player.stream:
-		return
-	if sword_slice_player.playing:
-		sword_slice_player.stop()
-	var final_pitch = hit_sound_base_pitch
-	if hit_sound_pitch_variation > 0.0:
-		var pitch_offset = randf_range(-hit_sound_pitch_variation, hit_sound_pitch_variation)
-		final_pitch += pitch_offset
-	sword_slice_player.pitch_scale = clamp(final_pitch, 0.1, 3.0)
-	sword_slice_player.play()
+	play_sound_with_pitch(sword_slice_player, hit_sound_base_pitch, hit_sound_pitch_variation)
 
 func play_pickup_sound():
-	if not pickup_audio_player or not pickup_audio_player.stream:
-		return
-	
-	if pickup_audio_player.playing:
-		pickup_audio_player.stop()
-	
-	var final_pitch = pickup_sound_base_pitch
-	if pickup_sound_pitch_variation > 0.0:
-		var pitch_offset = randf_range(-pickup_sound_pitch_variation, pickup_sound_pitch_variation)
-		final_pitch += pitch_offset
-	
-	pickup_audio_player.pitch_scale = clamp(final_pitch, 0.1, 3.0)
-	pickup_audio_player.play()
+	play_sound_with_pitch(pickup_audio_player, pickup_sound_base_pitch, pickup_sound_pitch_variation)
 
 func play_hurt_sound():
-	if not hurt_audio_player or not hurt_audio_player.stream:
-		return
-	
-	if hurt_audio_player.playing:
-		hurt_audio_player.stop()
-	
-	var final_pitch = hurt_sound_base_pitch
-	if hurt_sound_pitch_variation > 0.0:
-		var pitch_offset = randf_range(-hurt_sound_pitch_variation, hurt_sound_pitch_variation)
-		final_pitch += pitch_offset
-	
-	hurt_audio_player.pitch_scale = clamp(final_pitch, 0.1, 3.0)
-	hurt_audio_player.play()
-	
+	play_sound_with_pitch(hurt_audio_player, hurt_sound_base_pitch, hurt_sound_pitch_variation)
+
 func play_footstep_sound():
-	print("Play footstep called")
-	print("Footstep player exists: ", footstep_audio_player != null)
-	print("Has stream: ", footstep_audio_player.stream if footstep_audio_player else "No player")
-	
-	if not footstep_audio_player or not footstep_audio_player.stream:
-		print("Footstep player or stream is null, returning")
-		return
-	
-	print("Playing footstep sound")
-	if footstep_audio_player.playing:
-		footstep_audio_player.stop()
-	
-	var final_pitch = footstep_pitch_base
-	if footstep_pitch_variation > 0.0:
-		var pitch_offset = randf_range(-footstep_pitch_variation, footstep_pitch_variation)
-		final_pitch += pitch_offset
-	
-	footstep_audio_player.pitch_scale = clamp(final_pitch, 0.1, 3.0)
-	footstep_audio_player.play()
-	print("Footstep should be playing now")
-	
+	play_sound_with_pitch(footstep_audio_player, footstep_pitch_base, footstep_pitch_variation)
+
 func setup_pickup_system():
 	if not pickup_area:
 		pickup_area = Area2D.new()
@@ -580,14 +516,12 @@ func setup_pickup_system():
 		pickup_area.collision_layer = 0
 		pickup_area.collision_mask = 8
 		add_child(pickup_area)
-		
 		pickup_collision = CollisionShape2D.new()
 		pickup_collision.name = "CollisionShape2D"
 		var circle_shape = CircleShape2D.new()
 		circle_shape.radius = pickup_range
 		pickup_collision.shape = circle_shape
 		pickup_area.add_child(pickup_collision)
-	
 	if pickup_area:
 		if not pickup_area.area_entered.is_connected(_on_pickup_area_entered):
 			pickup_area.area_entered.connect(_on_pickup_area_entered)
@@ -608,7 +542,6 @@ func _on_pickup_body_entered(body: Node2D):
 
 func add_item_to_inventory(item_data: Dictionary):
 	var item_manager = get_node("/root/ItemManager") if has_node("/root/ItemManager") else null
-	
 	if item_manager:
 		var success = item_manager.add_item_to_inventory(item_data.get("id", ""), item_data.get("quantity", 1))
 		if success:
@@ -616,10 +549,7 @@ func add_item_to_inventory(item_data: Dictionary):
 			show_pickup_notification(item_data)
 			var item_name: String = str(item_data.get("name", item_data.get("id", "Item")))
 			var qty: int = int(item_data.get("quantity", 1))
-			var qty_prefix: String = ""
-			if qty > 1:
-				qty_prefix = str(qty) + " "
-			var txt: String = "+" + qty_prefix + item_name
+			var txt: String = "+" + (str(qty) + " " if qty > 1 else "") + item_name
 			_spawn_potion_popup(txt, Color(1.0, 0.85, 0.2))
 	else:
 		var ui = get_node("../UI") if has_node("../UI") else null
@@ -630,10 +560,7 @@ func add_item_to_inventory(item_data: Dictionary):
 				show_pickup_notification(item_data)
 				var item_name2: String = str(item_data.get("name", item_data.get("id", "Item")))
 				var qty2: int = int(item_data.get("quantity", 1))
-				var qty2_prefix: String = ""
-				if qty2 > 1:
-					qty2_prefix = str(qty2) + " "
-				var txt2: String = "+" + qty2_prefix + item_name2
+				var txt2: String = "+" + (str(qty2) + " " if qty2 > 1 else "") + item_name2
 				_spawn_potion_popup(txt2, Color(1.0, 0.85, 0.2))
 
 func show_pickup_notification(item_data: Dictionary):
@@ -664,7 +591,7 @@ func interact_with_chests():
 		if chest.global_position.distance_to(global_position) < 50:
 			chest.interact()
 			break
-			
+
 func check_npc_interaction():
 	var npcs = get_tree().get_nodes_in_group("npcs")
 	for npc in npcs:
@@ -677,20 +604,15 @@ func _input(event):
 		var quest_log = get_node_or_null("/root/QuestLogUI")
 		if not quest_log:
 			quest_log = get_tree().current_scene.get_node_or_null("QuestLogUI")
-		
 		if quest_log:
 			quest_log.open_quest_log()
-	
 	if event.is_action_pressed("interact"):
 		check_npc_interaction()
-		
 	if event is InputEventJoypadMotion:
 		if event.axis == JOY_AXIS_RIGHT_X or event.axis == JOY_AXIS_RIGHT_Y:
 			var right_stick = Vector2(
 				Input.get_joy_axis(0, JOY_AXIS_RIGHT_X),
-				Input.get_joy_axis(0, JOY_AXIS_RIGHT_Y)
-			)
-			
+				Input.get_joy_axis(0, JOY_AXIS_RIGHT_Y))
 			if right_stick.length() > controller_deadzone:
 				mouse_attack_direction = right_stick.normalized()
 				if right_stick.x != 0:
@@ -699,9 +621,7 @@ func _input(event):
 func _physics_process(delta):
 	var right_stick = Vector2(
 		Input.get_joy_axis(0, JOY_AXIS_RIGHT_X),
-		Input.get_joy_axis(0, JOY_AXIS_RIGHT_Y)
-	)
-	
+		Input.get_joy_axis(0, JOY_AXIS_RIGHT_Y))
 	if right_stick.length() > controller_deadzone:
 		mouse_attack_direction = right_stick.normalized()
 		right_stick_active = true
@@ -713,10 +633,8 @@ func _physics_process(delta):
 		if velocity.length() > 0:
 			mouse_attack_direction = velocity.normalized()
 			queue_redraw()
-	
 	if dash_flash_timer > 0.0:
 		dash_flash_timer -= delta
-	
 	if damage_immunity_timer > 0:
 		damage_immunity_timer -= delta
 		if not is_dash_iframe:
@@ -729,15 +647,12 @@ func _physics_process(delta):
 		if sprite and sprite.modulate != Color.WHITE and dash_flash_timer <= 0.0:
 			sprite.modulate = Color.WHITE
 		is_dash_iframe = false
-	
 	if is_attacking:
 		attack_timer -= delta
 		if attack_timer <= 0:
 			end_attack()
-
 	if dash_cooldown_timer > 0.0:
 		dash_cooldown_timer -= delta
-	
 	if is_dashing:
 		dash_timer -= delta
 		if dash_timer <= 0.0:
@@ -751,35 +666,25 @@ func _physics_process(delta):
 			if dash_afterimage_timer <= 0.0:
 				emit_dash_afterimage()
 				dash_afterimage_timer = dash_afterimage_interval
-	
 	if cooldown_timer > 0:
 		cooldown_timer -= delta
-
 	if is_dashing:
 		echo_timer += delta
 		if echo_timer < echo_record_duration:
 			echo_path.append(global_position)
-	
 	if Input.is_action_just_pressed('Attack') and not is_attacking and cooldown_timer <= 0:
-		if right_stick_active:
-			pass
-		else:
+		if not right_stick_active:
 			var mouse_pos = get_global_mouse_position()
 			mouse_attack_direction = (mouse_pos - global_position).normalized()
 		start_attack()
-	
 	if Input.is_action_just_pressed('interact'):
 		interact_with_chests()
-	
 	if Input.is_action_just_pressed('recall_echo'):
 		recall_echoes()
-	
 	var direction = get_input()
 	is_moving = direction.length() > 0
-	
 	if direction.length() > 0 and not is_attacking:
 		last_direction = direction.normalized()
-
 	if is_moving and velocity.length() > speed_threshold:
 		footstep_timer -= delta
 		if footstep_timer <= 0.0:
@@ -787,49 +692,41 @@ func _physics_process(delta):
 			footstep_timer = footstep_interval
 	else:
 		footstep_timer = 0.0
-
 	if Input.is_action_just_pressed('dash') and not is_dashing and dash_cooldown_timer <= 0.0 and not is_attacking and dash_energy >= dash_cost:
-		var dash_dir = direction
-		if dash_dir.length() == 0:
-			dash_dir = last_direction
+		var dash_dir = direction if direction.length() > 0 else last_direction
 		start_dash(dash_dir.normalized())
-	
 	if is_dashing:
 		velocity = dash_direction * dash_speed
 		player_knockback_velocity = Vector2.ZERO
 	elif player_knockback_velocity.length() > knockback_threshold:
-		var knockback_influence = 0.7
-		var input_influence = 1.0 - knockback_influence
-		
-		var target_velocity = (player_knockback_velocity * knockback_influence) + (direction.normalized() * speed * input_influence)
+		var target_velocity = (player_knockback_velocity * 0.7) + (direction.normalized() * speed * 0.3)
 		velocity = velocity.lerp(target_velocity, acceleration)
-		
 		player_knockback_velocity = player_knockback_velocity.lerp(Vector2.ZERO, knockback_friction)
 	else:
 		player_knockback_velocity = Vector2.ZERO
-		
 		if direction.length() > 0:
 			velocity = velocity.lerp(direction.normalized() * speed, acceleration)
 		else:
 			velocity = velocity.lerp(Vector2.ZERO, friction)
-	
 	update_animation()
 	update_sprite_flip(velocity)
-	
 	if is_swing_animating:
 		update_sword_swing_animation(delta)
-	
 	move_and_slide()
-	
 	if not is_dashing and dash_energy < max_dash_energy:
 		var before = dash_energy
 		dash_energy = min(max_dash_energy, int(round(dash_energy + dash_regen_rate * delta)))
 		if dash_energy != before:
 			dash_energy_changed.emit(dash_energy)
+	if magic_ring_sprite and is_instance_valid(magic_ring_sprite):
+		var target_pos = global_position - (velocity.normalized() * ring_follow_distance)
+		if velocity.length() < 10:
+			target_pos = global_position + Vector2(0, ring_follow_distance)
+		magic_ring_sprite.global_position = magic_ring_sprite.global_position.lerp(target_pos, ring_follow_speed * delta)
+		magic_ring_sprite.position.y += sin(Time.get_ticks_msec() * 0.003) * 0.5
 
 func get_damage_against_enemy(enemy: Node) -> int:
 	var base_damage = attack_damage
-	
 	var item_manager = get_node_or_null("/root/ItemManager")
 	if item_manager and item_manager.has_method("has_item"):
 		if item_manager.has_item("magic_ring") > 0:
@@ -837,9 +734,8 @@ func get_damage_against_enemy(enemy: Node) -> int:
 				base_damage *= 2
 				print("Magic Ring activated! Dealing 2x damage to ghost!")
 				_spawn_magic_ring_effect(enemy.global_position)
-
 	return base_damage
-	
+
 func _spawn_magic_ring_effect(position: Vector2):
 	var label := Label.new()
 	label.text = "✨ GHOST BANE!"
@@ -865,18 +761,10 @@ func start_dash(dir: Vector2):
 	dash_direction = dir
 	echo_path.clear()
 	if dash_audio_player and dash_audio_player.stream:
-		if dash_audio_player.playing:
-			dash_audio_player.stop()
-		var final_pitch = dash_sound_base_pitch
-		if dash_sound_pitch_variation > 0.0:
-			var pitch_offset = randf_range(-dash_sound_pitch_variation, dash_sound_pitch_variation)
-			final_pitch += pitch_offset
-		dash_audio_player.pitch_scale = clamp(final_pitch, 0.1, 3.0)
-		dash_audio_player.play()
+		play_sound_with_pitch(dash_audio_player, dash_sound_base_pitch, dash_sound_pitch_variation)
 	echo_timer = 0.0
 	echo_spawned_this_dash = false
 	last_dash_start = global_position
-
 	var before = dash_energy
 	dash_energy = max(0, dash_energy - dash_cost)
 	if dash_energy != before:
@@ -885,7 +773,6 @@ func start_dash(dir: Vector2):
 	is_dash_iframe = true
 	flash_white(0.08)
 	dash_afterimage_timer = 0.0
-
 	var cam = get_tree().current_scene.get_node_or_null("PlayerCamera") if get_tree() and get_tree().current_scene else null
 	if cam:
 		if cam.has_method("shake_camera"):
@@ -896,7 +783,6 @@ func start_dash(dir: Vector2):
 func emit_dash_afterimage():
 	if not sprite:
 		return
-	
 	var ghost := Sprite2D.new()
 	ghost.texture = sprite.texture
 	ghost.hframes = sprite.hframes 
@@ -911,11 +797,9 @@ func emit_dash_afterimage():
 	ghost.modulate = Color(1, 1, 1, 0.8)
 	ghost.top_level = true
 	ghost.global_position = global_position
-
 	var mat := CanvasItemMaterial.new()
 	mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 	ghost.material = mat
-
 	var parent := get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
 	if parent:
 		parent.add_child(ghost)
@@ -928,45 +812,36 @@ func emit_dash_afterimage():
 func flash_white(duration: float = 0.08):
 	if not sprite:
 		return
-	
 	var original_material: Material = sprite.material
 	var mat := CanvasItemMaterial.new()
 	mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 	sprite.material = mat
 	sprite.modulate = Color(1, 1, 1, 1)
 	dash_flash_timer = duration
-	
 	var t = create_tween()
 	t.tween_interval(duration)
 	t.tween_callback(func():
 		sprite.material = original_material
 		if dash_flash_timer <= 0.0:
-			sprite.modulate = Color.WHITE
-	)
+			sprite.modulate = Color.WHITE)
 
 func update_animation():
 	if is_attacking:
 		return
-	
 	var new_animation = ""
 	var current_speed = velocity.length()
-	
 	var direction_string = get_direction_string(last_direction)
-	
 	if is_moving and current_speed > speed_threshold:
 		new_animation = "Walk_" + direction_string
 	else:
 		new_animation = "Idle_" + direction_string
-	
 	if new_animation != current_animation:
 		play_animation(new_animation)
-	
 	update_animation_speed(current_speed)
 
 func update_animation_speed(current_speed: float):
 	if not animation_player:
 		return
-	
 	var speed_ratio = current_speed / speed
 	var animation_speed = lerp(min_animation_speed, max_animation_speed, speed_ratio)
 	animation_speed = clamp(animation_speed, min_animation_speed, max_animation_speed)
@@ -976,22 +851,17 @@ func get_direction_string(direction: Vector2) -> String:
 	if abs(direction.x) > abs(direction.y):
 		return "side"
 	else:
-		if direction.y > 0:
-			return "down"
-		else:
-			return "up"
+		return "down" if direction.y > 0 else "up"
 
 func update_sprite_flip(current_velocity: Vector2):
 	if not sprite:
 		return
-	
 	if abs(current_velocity.x) > abs(current_velocity.y) and abs(current_velocity.x) > speed_threshold:
 		sprite.flip_h = current_velocity.x < 0
 
 func play_animation(animation_name: String):
 	if not animation_player:
 		return
-	
 	if animation_player.has_animation(animation_name):
 		animation_player.play(animation_name)
 		current_animation = animation_name
@@ -1003,27 +873,20 @@ func play_animation(animation_name: String):
 func take_damage(amount: int, source: Node = null):
 	if damage_immunity_timer > 0:
 		return false
-	
 	play_hurt_sound()
-
 	var cam = get_tree().current_scene.get_node_or_null("PlayerCamera") if get_tree() and get_tree().current_scene else null
 	if cam:
 		if cam.has_method("shake_camera"):
 			cam.shake_camera(10.0, 0.18)
 		if cam.has_method("pulse_vignette"):
 			cam.pulse_vignette(0.30, 0.18, 0.12)
-	
 	current_health -= amount
 	damage_immunity_timer = damage_immunity_duration
 	damage_flash_timer = damage_flash_duration
-	
 	health_changed.emit(current_health)
-	
 	update_health_display()
-	
 	if sprite:
 		sprite.modulate = Color.RED
-	
 	if source and source.has_method("get_knockback_force"):
 		var knockback_direction = (global_position - source.global_position).normalized()
 		var knockback_force = source.get_knockback_force() if source.has_method("get_knockback_force") else 150
@@ -1031,49 +894,34 @@ func take_damage(amount: int, source: Node = null):
 	elif source:
 		var knockback_direction = (global_position - source.global_position).normalized()
 		apply_knockback(knockback_direction, 150)
-	
 	if current_health <= 0:
 		die()
-	
 	return true
 
 func update_health_display():
 	if health_bar and is_instance_valid(health_bar):
-		var mh = 0
-		if typeof(max_health) != TYPE_NIL:
-			mh = int(max_health)
-		health_bar.max_value = mh
-		var cv = 0
-		if typeof(current_health) != TYPE_NIL:
-			cv = int(current_health)
-		health_bar.value = clamp(cv, 0, mh)
+		health_bar.max_value = int(max_health)
+		health_bar.value = clamp(int(current_health), 0, int(max_health))
 
 func die():
 	print("Player died!")
-	
 	is_attacking = false
 	is_swing_animating = false
 	velocity = Vector2.ZERO
 	player_knockback_velocity = Vector2.ZERO
-	
 	if animation_player:
 		animation_player.stop()
-	
 	if attack_sprite:
 		attack_sprite.visible = false
-	
 	if attack_area:
 		attack_area.monitoring = false
-	
 	player_died.emit()
-	
 	await get_tree().create_timer(1.0).timeout
 	get_tree().change_scene_to_file("res://scenes/world.tscn")
 
 func heal(amount: int):
 	var old_health = current_health
 	current_health = min(current_health + amount, max_health)
-	
 	if current_health != old_health:
 		health_changed.emit(current_health)
 		update_health_display()
@@ -1088,11 +936,9 @@ func restore_dash(amount: int):
 		dash_energy_changed.emit(dash_energy)
 	echo_charges = echo_max_charges
 	echoes_changed.emit(active_echoes.size())
-
 	var cam = get_tree().current_scene.get_node_or_null("PlayerCamera") if get_tree() and get_tree().current_scene else null
 	if cam and cam.has_method("pulse_vignette"):
 		cam.pulse_vignette(0.28, 0.22, 0.14)
-
 	_spawn_potion_popup("Dash +", Color(0.2, 0.8, 1.0))
 
 func _spawn_potion_popup(text: String, color: Color = Color.WHITE):
@@ -1120,12 +966,6 @@ func _spawn_potion_popup(text: String, color: Color = Color.WHITE):
 	t2.tween_property(label, "modulate:a", 0.0, 0.5)
 	t2.tween_callback(func(): if is_instance_valid(label): label.queue_free())
 
-func get_dash_energy() -> int:
-	return dash_energy
-
-func get_max_dash_energy() -> int:
-	return max_dash_energy
-
 func apply_knockback(direction: Vector2, force: float):
 	var knockback_force = force * knockback_resistance
 	knockback_force = clamp(knockback_force, 80, 250)
@@ -1134,21 +974,15 @@ func apply_knockback(direction: Vector2, force: float):
 func start_attack():
 	is_attacking = true
 	attack_timer = attack_duration
-	
 	start_mouse_sword_swing_animation()
-	
 	var direction_string = get_direction_string(mouse_attack_direction)
 	var attack_animation = "hit_" + direction_string
 	play_animation(attack_animation)
-	
 	if animation_player:
 		animation_player.speed_scale = 1.0
-	
 	if attack_area:
 		attack_area.monitoring = true
-	
 	position_attack_hitbox(mouse_attack_direction)
-
 	var cam = get_tree().current_scene.get_node_or_null("PlayerCamera") if get_tree() and get_tree().current_scene else null
 	if cam and cam.has_method("shake_camera"):
 		cam.shake_camera(6.0, 0.12)
@@ -1156,14 +990,11 @@ func start_attack():
 func start_mouse_sword_swing_animation():
 	if not attack_sprite:
 		return
-	
 	is_swing_animating = true
 	swing_current_progress = 0.0
-	
 	var mouse_angle = mouse_attack_direction.angle()
 	swing_start_angle = mouse_angle - deg_to_rad(swing_arc_half_angle)
 	swing_end_angle = mouse_angle + deg_to_rad(swing_arc_half_angle)
-	
 	var start_position = Vector2(cos(swing_start_angle), sin(swing_start_angle)) * attack_range
 	attack_sprite.position = start_position
 	attack_sprite.rotation = swing_start_angle
@@ -1171,29 +1002,23 @@ func start_mouse_sword_swing_animation():
 	attack_sprite.modulate.a = 1.0
 	attack_sprite.flip_h = false
 	attack_sprite.flip_v = false
-	
 	if enable_trail_effect:
 		trail_positions.clear()
 
 func update_sword_swing_animation(delta):
 	if not is_swing_animating or not attack_sprite:
 		return
-	
 	swing_current_progress += delta / swing_duration
 	swing_current_progress = clamp(swing_current_progress, 0.0, 1.0)
-	
-	var ease_progress = ease_out_quad(swing_current_progress)
+	var ease_progress = 1.0 - (1.0 - swing_current_progress) * (1.0 - swing_current_progress)
 	var current_angle = lerp_angle(swing_start_angle, swing_end_angle, ease_progress)
-	
 	var sword_position = Vector2(cos(current_angle), sin(current_angle)) * attack_range
 	attack_sprite.position = sword_position
 	attack_sprite.rotation = current_angle
 	attack_sprite.flip_v = false
 	attack_sprite.flip_h = false
-	
 	if enable_trail_effect:
 		update_sword_trail()
-	
 	if swing_current_progress >= 1.0:
 		is_swing_animating = false
 
@@ -1203,72 +1028,54 @@ func _draw():
 		var end_pos = mouse_attack_direction * 30
 		draw_line(start_pos, end_pos, Color.WHITE, 2.0)
 		draw_arc(Vector2.ZERO, attack_range * 0.3, 0, PI/2, 16, Color.WHITE, 1.0)
-	
 	if not enable_trail_effect or trail_positions.size() < 2:
 		return
-	
 	for i in range(trail_positions.size() - 1):
 		var trail_start_pos = to_local(trail_positions[i])
 		var trail_end_pos = to_local(trail_positions[i + 1])
-		
 		var alpha = float(i) / float(trail_positions.size() - 1)
 		var color = trail_color
 		color.a = alpha * trail_max_alpha
-		
 		draw_line(trail_start_pos, trail_end_pos, color, trail_width)
-
-func ease_out_quad(t: float) -> float:
-	return 1.0 - (1.0 - t) * (1.0 - t)
 
 func update_sword_trail():
 	if not attack_sprite:
 		return
-	
 	var sword_tip_offset = Vector2(cos(attack_sprite.rotation), sin(attack_sprite.rotation)) * 20
 	var sword_tip_position = attack_sprite.global_position + sword_tip_offset
 	trail_positions.append(sword_tip_position)
-	
 	if trail_positions.size() > max_trail_length:
 		trail_positions.pop_front()
-	
 	queue_redraw()
 
 func end_attack():
 	is_attacking = false
 	is_swing_animating = false
 	cooldown_timer = attack_cooldown
-	
 	if attack_area:
 		attack_area.monitoring = false
-	
 	if enable_trail_effect:
 		trail_positions.clear()
 		queue_redraw()
-	
 	if attack_sprite:
 		fade_out_sword()
 
 func fade_out_sword():
 	if not attack_sprite:
 		return
-	
 	var tween = create_tween()
 	tween.tween_property(attack_sprite, "modulate:a", 0.0, 0.1)
 	tween.tween_callback(func(): 
 		attack_sprite.visible = false
-		attack_sprite.modulate.a = 1.0
-	)
+		attack_sprite.modulate.a = 1.0)
 
 func position_attack_hitbox(direction: Vector2):
 	if not attack_collision:
 		return
-	
 	var offset_distance = 32
 	var hitbox_offset = direction * offset_distance
-	
 	if attack_collision:
 		attack_collision.position = hitbox_offset
-	
 	attack_collision.rotation = direction.angle()
 
 func _on_attack_area_body_entered(body):
@@ -1276,61 +1083,12 @@ func _on_attack_area_body_entered(body):
 		var damage = get_damage_against_enemy(body)
 		body.take_damage(damage)
 		play_sword_slice_sound()
-		var parent = get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
-		if parent:
-			var t = get_tree().create_timer(0.7)
 		enemy_killed.emit()
 	elif body.has_method("on_sword_hit"):
 		body.on_sword_hit()
 		play_sword_slice_sound()
 	else:
 		play_hit_sound()
-
-func get_is_attacking() -> bool:
-	return is_attacking
-
-func get_facing_direction() -> Vector2:
-	if is_attacking:
-		return mouse_attack_direction
-	return last_direction
-
-func get_mouse_attack_direction() -> Vector2:
-	return mouse_attack_direction
-
-func is_alive() -> bool:
-	return current_health > 0
-
-func get_current_health() -> int:
-	return current_health
-
-func get_max_health() -> int:
-	return max_health
-
-func get_health() -> int:
-	return current_health
-
-func can_take_damage() -> bool:
-	return damage_immunity_timer <= 0
-
-func get_knockback_resistance() -> float:
-	return knockback_resistance
-
-func set_pickup_range(new_range: float):
-	pickup_range = new_range
-	if pickup_collision and pickup_collision.shape is CircleShape2D:
-		pickup_collision.shape.radius = pickup_range
-
-func get_pickup_range() -> float:
-	return pickup_range
-
-func toggle_auto_pickup():
-	auto_pickup_enabled = !auto_pickup_enabled
-
-func on_enemy_killed():
-	enemy_killed.emit()
-
-func get_spawn_position() -> Vector2:
-	return Vector2(0, 0)
 
 func spawn_echo_clone():
 	var echo: EchoGhost = EchoGhost.new()
@@ -1361,8 +1119,6 @@ func spawn_echo_clone():
 		var old = active_echoes.pop_front()
 		if is_instance_valid(old):
 			old.queue_free()
-		echoes_changed.emit(active_echoes.size())
-	
 	echoes_changed.emit(active_echoes.size())
 	echo_spawned.emit(echo_record_duration)
 
@@ -1387,11 +1143,7 @@ func recall_echoes():
 			ghost.move_hit_radius = 14.0
 			ghost.afterimage_interval = 0.04
 			ghost.afterimage_lifetime = 0.18
-			var path_for_ghost: Array[Vector2] = []
-			if last_dash_path.size() >= 1:
-				path_for_ghost = last_dash_path.duplicate()
-			else:
-				path_for_ghost.append(last_dash_start)
+			var path_for_ghost: Array[Vector2] = last_dash_path.duplicate() if last_dash_path.size() >= 1 else [last_dash_start]
 			path_for_ghost.append(global_position)
 			ghost.setup(tex, scale_v, last_dash_start, path_for_ghost, hfr, vfr, frm, fh, fv, ctr)
 			parent.add_child(ghost)
@@ -1408,50 +1160,50 @@ func recall_echoes():
 			echo_audio_player.stop()
 		echo_audio_player.play()
 
-func get_echo_count() -> int:
-	return active_echoes.size()
-	
-func spawn_dash_echo_from_path(path_points: Array[Vector2]) -> void:
-	if path_points.size() < 2:
-		return
-	var parent = get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
-	if not parent:
-		return
-	var echo := EchoGhost.new()
-	echo.global_position = path_points[0]
-	echo.path = path_points.duplicate()
-	echo.move_speed = 900.0
-	echo.echo_damage = 2
-	echo.move_hit_radius = 14.0
-	echo.afterimage_interval = 0.03
-	echo.afterimage_lifetime = 0.20
-	parent.add_child(echo)
-	
 func update_magic_ring_display():
 	var item_manager = get_node_or_null("/root/ItemManager")
 	if not item_manager:
 		return
-	
 	var has_ring = item_manager.has_item("magic_ring") > 0
-	
 	if has_ring and not magic_ring_sprite:
-		# Create the ring sprite
 		magic_ring_sprite = Sprite2D.new()
 		magic_ring_sprite.name = "MagicRingFollower"
-		magic_ring_sprite.z_index = -1  # Behind player
-		
-		# Load the ring texture
+		magic_ring_sprite.z_index = -1
 		var ring_texture = load("res://Assets/Ring Sprites.png")
 		if ring_texture:
 			magic_ring_sprite.texture = ring_texture
-			magic_ring_sprite.scale = Vector2(0.6, 0.6)  # Smaller size
-		
+			magic_ring_sprite.scale = Vector2(1.5, 1.5)
+			magic_ring_sprite.modulate = Color(1.2, 1.2, 1.5)
 		var parent = get_tree().current_scene
 		if parent:
 			parent.add_child(magic_ring_sprite)
 			magic_ring_sprite.global_position = global_position
-	
 	elif not has_ring and magic_ring_sprite:
-		# Remove ring if player no longer has it
 		magic_ring_sprite.queue_free()
 		magic_ring_sprite = null
+
+func _on_item_picked_up(item_data):
+	if item_data.get("id") == "magic_ring":
+		update_magic_ring_display()
+
+# Getters
+func get_is_attacking() -> bool: return is_attacking
+func get_facing_direction() -> Vector2: return mouse_attack_direction if is_attacking else last_direction
+func get_mouse_attack_direction() -> Vector2: return mouse_attack_direction
+func is_alive() -> bool: return current_health > 0
+func get_current_health() -> int: return current_health
+func get_max_health() -> int: return max_health
+func get_health() -> int: return current_health
+func can_take_damage() -> bool: return damage_immunity_timer <= 0
+func get_knockback_resistance() -> float: return knockback_resistance
+func set_pickup_range(new_range: float):
+	pickup_range = new_range
+	if pickup_collision and pickup_collision.shape is CircleShape2D:
+		pickup_collision.shape.radius = pickup_range
+func get_pickup_range() -> float: return pickup_range
+func toggle_auto_pickup(): auto_pickup_enabled = !auto_pickup_enabled
+func on_enemy_killed(): enemy_killed.emit()
+func get_spawn_position() -> Vector2: return Vector2(0, 0)
+func get_echo_count() -> int: return active_echoes.size()
+func get_dash_energy() -> int: return dash_energy
+func get_max_dash_energy() -> int: return max_dash_energy

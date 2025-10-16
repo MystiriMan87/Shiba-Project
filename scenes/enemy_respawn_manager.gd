@@ -49,7 +49,8 @@ func get_enemy_scene_path(enemy: Node) -> String:
 			"big_slime": "res://scenes/slime_enemy_big.tscn",
 			"skeleton": "res://scenes/skeleton_enemy.tscn",
 			"goblin": "res://scenes/goblin_enemy.tscn",
-			"ghost": "res://ghost_enemy.tscn"
+			"ghost": "res://ghost_enemy.tscn",
+			"goblin_rogue": "res://dark_elf_enemy.tscn"
 		}
 		if enemy_type in enemy_scene_map:
 			print("Respawn Manager: Found scene path for enemy_type: ", enemy_scene_map[enemy_type])

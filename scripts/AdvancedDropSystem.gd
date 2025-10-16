@@ -9,7 +9,10 @@ var loot_tables = {
 		"possible_drops": [
 			{"item_id": "coin", "chance": 0.9, "min_qty": 1, "max_qty": 4},
 			{"item_id": "health_potion", "chance": 0.1, "min_qty": 1, "max_qty": 1},
-			{"item_id": "iron_dagger", "chance": 0.05, "min_qty": 1, "max_qty": 1}
+			{"item_id": "iron_dagger", "chance": 0.05, "min_qty": 1, "max_qty": 1},
+			#{"item_id": "magic_ring_damage", "chance": 0.3, "min_qty": 1, "max_qty": 1},
+			#{"item_id": "magic_ring_speed", "chance": 0.3, "min_qty": 1, "max_qty": 1}
+			
 		]
 	},
 	"slime": {
@@ -36,7 +39,17 @@ var loot_tables = {
 			#{"item_id": "iron_dagger", "chance": 0.05, "min_qty": 1, "max_qty": 1},
 			{"item_id": "magic_ring", "chance": 0.3, "min_qty": 1, "max_qty": 1}
 		]
+	},
+	"goblin_rogue": {
+		"guaranteed_drops": [],
+		"possible_drops": [
+			{"item_id": "coin", "chance": 0.9, "min_qty": 1, "max_qty": 4},
+			{"item_id": "health_potion", "chance": 0.1, "min_qty": 1, "max_qty": 1},
+			#{"item_id": "iron_dagger", "chance": 0.05, "min_qty": 1, "max_qty": 1},
+			{"item_id": "magic_ring", "chance": 0.3, "min_qty": 1, "max_qty": 1}
+		]
 	}
+	
 	#"orc": {
 		#"guaranteed_drops": [
 			#{"item_id": "coin", "min_qty": 3, "max_qty": 8}

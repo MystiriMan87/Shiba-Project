@@ -319,6 +319,7 @@ _data = {
 
 [node name="goblinRogue_enemy" type="CharacterBody2D"]
 script = ExtResource("1_eqhuu")
+enemy_type = "goblin_rogue"
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_51818")

@@ -1387,25 +1387,25 @@ position = Vector2(1256, -2562)
 scale = Vector2(4, 4)
 
 [node name="ghost_enemy" parent="." instance=ExtResource("24_rbd1q")]
-position = Vector2(754, -2519)
+position = Vector2(960, -2455)
 scale = Vector2(3.5, 3.5)
 max_health = 25
 detection_range = 200
 
 [node name="ghost_enemy2" parent="." instance=ExtResource("24_rbd1q")]
-position = Vector2(1587, -2526)
+position = Vector2(1343, -2455)
 scale = Vector2(3.5, 3.5)
 max_health = 25
 detection_range = 200
 
 [node name="ghost_enemy3" parent="." instance=ExtResource("24_rbd1q")]
-position = Vector2(1583, -2236)
+position = Vector2(1361, -2309)
 scale = Vector2(3.5, 3.5)
 max_health = 25
 detection_range = 200
 
 [node name="ghost_enemy4" parent="." instance=ExtResource("24_rbd1q")]
-position = Vector2(746, -2225)
+position = Vector2(940, -2312)
 scale = Vector2(3.5, 3.5)
 max_health = 25
 detection_range = 200
