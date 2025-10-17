@@ -1264,16 +1264,12 @@ tile_map_data = PackedByteArray("AAD//wIAAAAFAAUAAAADAAIAAAAGAAUAAAAEAAIAAAAGAAU
 tile_set = SubResource("TileSet_u2ss0")
 
 [node name="DialogueBox" parent="." groups=["ui"] instance=ExtResource("4_hnc56")]
-visible = false
 
 [node name="QuestUI" parent="." groups=["ui"] instance=ExtResource("5_6grgh")]
-visible = false
 
 [node name="QuestLogUI" parent="." groups=["ui"] instance=ExtResource("6_48iqm")]
-visible = false
 
 [node name="ShopUI" parent="." groups=["ui"] instance=ExtResource("7_oj3ng")]
-visible = false
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." groups=["ui"]]
 

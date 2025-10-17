@@ -1318,3 +1318,23 @@ func get_spawn_position() -> Vector2: return Vector2(0, 0)
 func get_echo_count() -> int: return active_echoes.size()
 func get_dash_energy() -> int: return dash_energy
 func get_max_dash_energy() -> int: return max_dash_energy
+
+func get_directional_input() -> Vector2:
+	var input_vector = Vector2.ZERO
+	var raw_input = Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	
+	if raw_input.length() > 0:
+		var is_controller = Input.get_connected_joypads().size() > 0 and raw_input.length() < 0.99
+		
+		if is_controller:
+			var abs_x = abs(raw_input.x)
+			var abs_y = abs(raw_input.y)
+			
+			if abs_x > abs_y:
+				input_vector = Vector2(sign(raw_input.x), 0)
+			else:
+				input_vector = Vector2(0, sign(raw_input.y))
+		else:
+			input_vector = raw_input.normalized()
+	
+	return input_vector

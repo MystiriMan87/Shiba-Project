@@ -6376,13 +6376,10 @@ position = Vector2(181, -1621)
 scale = Vector2(4.9, 4.9)
 
 [node name="DialogueBox" parent="." instance=ExtResource("23_xgqkh")]
-visible = false
 
 [node name="QuestLogUI" parent="." instance=ExtResource("24_navra")]
-visible = false
 
 [node name="ShopUI" parent="." instance=ExtResource("25_0nbtd")]
-visible = false
 
 [node name="MerchantShop" parent="." instance=ExtResource("26_munwf")]
 visible = false

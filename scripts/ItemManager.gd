@@ -16,6 +16,8 @@ func _ready():
 	load_weapons_database()
 	load_items_database()
 	# Start without an equipped weapon by default
+	
+
 
 func load_weapons_database():
 	weapons_database = {
@@ -338,7 +340,6 @@ func load_items_database():
 		}
 	}
 
-# FIXED: Function to handle weapon switching from inventory
 func equip_weapon_from_inventory(item_id: String) -> bool:
 	"""Equip weapon from inventory and return old weapon to inventory"""
 	print("Attempting to equip weapon from inventory: ", item_id)
@@ -389,7 +390,6 @@ func equip_weapon_from_inventory(item_id: String) -> bool:
 	print("Successfully equipped weapon: ", weapon_data.name)
 	return true
 
-# FIXED: Function to update player's weapon sprite with proper scaling
 func update_player_weapon_sprite(player: CharacterBody2D, weapon_data: Dictionary):
 	"""Update the player's attack sprite to show the new weapon with proper scale"""
 	var attack_sprite = null
@@ -423,7 +423,6 @@ func update_player_weapon_sprite(player: CharacterBody2D, weapon_data: Dictionar
 	else:
 		print("Weapon sprite path not found or doesn't exist: ", sprite_path)
 
-# FIXED: Enhanced texture loading with proper inventory scaling
 func get_item_texture(item_id: String) -> Texture2D:
 	"""Load and return item texture with fallback support"""
 	var item_data = get_item_data(item_id)
@@ -505,7 +504,6 @@ func create_rarity_texture(rarity: String) -> ImageTexture:
 	texture.set_image(image)
 	return texture
 
-# FIXED: Function to create properly scaled sprites for inventory items
 func create_item_sprite(item_id: String, target_size: Vector2 = Vector2(28, 28)) -> Sprite2D:
 	"""Create a properly configured Sprite2D for an item in inventory"""
 	var sprite = Sprite2D.new()
@@ -533,7 +531,6 @@ func create_item_sprite(item_id: String, target_size: Vector2 = Vector2(28, 28))
 	
 	return sprite
 
-# NEW: Function specifically for creating inventory item sprites
 func create_inventory_item_sprite(item_id: String, slot_size: Vector2 = Vector2(32, 32)) -> Sprite2D:
 	"""Create a sprite specifically sized for inventory slots"""
 	var sprite = Sprite2D.new()
@@ -624,7 +621,6 @@ func update_player_weapon_stats(player: CharacterBody2D, weapon_data: Dictionary
 	if "attack_speed" in weapon_data:
 		player.attack_duration = 0.4 / weapon_data.attack_speed
 
-# All other existing functions remain the same...
 func add_item_to_inventory(item_id: String, quantity: int = 1) -> bool:
 	var item_data = get_item_data(item_id)
 	if item_data.is_empty():
@@ -837,3 +833,10 @@ func debug_add_test_items():
 	add_item_to_inventory("steel_sword", 1)
 	add_item_to_inventory("wooden_bow", 1)
 	print("Test items added!")
+
+func swap_inventory_items(from_index: int, to_index: int):
+	if from_index >= 0 and from_index < player_inventory.size() and to_index >= 0 and to_index < player_inventory.size():
+		var temp = player_inventory[from_index]
+		player_inventory[from_index] = player_inventory[to_index]
+		player_inventory[to_index] = temp
+		inventory_updated.emit()
