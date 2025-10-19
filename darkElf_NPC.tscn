@@ -1,0 +1,65 @@
+[gd_scene load_steps=7 format=3 uid="uid://fadffrcj4pg"]
+
+[ext_resource type="Script" uid="uid://chsoa6deu0e0y" path="res://scenes/npc.gd" id="1_f4q0i"]
+[ext_resource type="Texture2D" uid="uid://dmeaadxj04q88" path="res://Assets/Snoblin/Snoblin_Dark_Elves/Assets/Dark Elf Prince/dark_elf_prince2.png" id="2_f4q0i"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_0nbtd"]
+radius = 25.0799
+
+[sub_resource type="Animation" id="Animation_glddq"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_1ibxj"]
+resource_name = "idle"
+length = 0.6
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.366667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [0, 1]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_wise8"]
+_data = {
+&"RESET": SubResource("Animation_glddq"),
+&"idle": SubResource("Animation_1ibxj")
+}
+
+[node name="Elf_NPC" type="CharacterBody2D"]
+script = ExtResource("1_f4q0i")
+interaction_range = 80.0
+npc_name = "Crazed Wizard"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_0nbtd")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(-3.15936, 3)
+texture = ExtResource("2_f4q0i")
+hframes = 4
+vframes = 24
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_wise8")
+}
+autoplay = "idle"

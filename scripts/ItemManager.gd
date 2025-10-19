@@ -279,12 +279,12 @@ func load_items_database():
 			#"magic_bonus": 10,
 			#"weapon_scale": 1.5
 		#},
-		"ancient_artifact": {
-			"id": "ancient_artifact",
-			"name": "Ancient Artifact",
+		"trinket": {
+			"id": "trinket",
+			"name": "Trinket",
 			"type": "artifact",
-			"icon_path": "res://textures/items/artifacts/ancient_artifact.png",
-			"description": "An artifact of unknown origin and immense power.",
+			"icon_path": "res://icon.svg",
+			"description": "An artifact of unknown origins",
 			"rarity": "legendary",
 			"stackable": false,
 			"max_stack": 1,
@@ -840,3 +840,4 @@ func swap_inventory_items(from_index: int, to_index: int):
 		player_inventory[from_index] = player_inventory[to_index]
 		player_inventory[to_index] = temp
 		inventory_updated.emit()
+	

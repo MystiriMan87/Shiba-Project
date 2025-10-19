@@ -4,6 +4,7 @@
 [ext_resource type="FontFile" uid="uid://blkgwe4swrid8" path="res://Assets/100-Sub-Assets-Free/Fonts/m5x7.ttf" id="2_l4r40"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w63dr"]
+bg_color = Color(0.964706, 0.607843, 0, 0.701961)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
@@ -22,9 +23,9 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -400.0
+offset_left = -521.0
 offset_top = -339.0
-offset_right = 400.0
+offset_right = 521.0
 offset_bottom = 316.0
 grow_horizontal = 2
 grow_vertical = 2
@@ -38,10 +39,10 @@ anchor_left = 0.019
 anchor_top = -0.042
 anchor_right = 0.981
 anchor_bottom = 1.042
-offset_left = -0.200001
-offset_top = 0.200003
-offset_right = 0.199951
-offset_bottom = -0.200012
+offset_left = 0.202002
+offset_top = 0.51
+offset_right = -0.202026
+offset_bottom = -0.51001
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/margin_left = 10

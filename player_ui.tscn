@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://cqk6unim2ftgo"]
+[gd_scene load_steps=9 format=3 uid="uid://cqk6unim2ftgo"]
 
 [ext_resource type="Script" uid="uid://bov65j62y0be8" path="res://scripts/PlayerUI.gd" id="1_lwipk"]
 [ext_resource type="Texture2D" uid="uid://d12anw6sa6wxg" path="res://Assets/16x64 Red Simple Healthbar.png" id="2_654h1"]
@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://dysb32n4ws6ys" path="res://Assets/Triangle.png" id="5_a4em4"]
 [ext_resource type="Texture2D" uid="uid://dd0gqips5pn8y" path="res://Assets/L1.png" id="6_gxl1c"]
 [ext_resource type="Script" uid="uid://d2wr72yy2hh5q" path="res://fps_counter.gd" id="7_gxl1c"]
+[ext_resource type="Script" uid="uid://cwpt7fbm7137s" path="res://level_timer.gd" id="8_vg8o0"]
 
 [node name="PlayerUI" type="Control" groups=["ui"]]
 layout_mode = 3
@@ -105,3 +106,11 @@ offset_top = 999.0
 offset_right = 1068.0
 offset_bottom = 1036.0
 script = ExtResource("7_gxl1c")
+
+[node name="LevelTimer" type="Label" parent="."]
+layout_mode = 0
+offset_left = 1706.0
+offset_top = 462.0
+offset_right = 1916.0
+offset_bottom = 526.0
+script = ExtResource("8_vg8o0")

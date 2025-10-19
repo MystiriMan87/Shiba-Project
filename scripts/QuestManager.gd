@@ -75,6 +75,28 @@ func load_quests_database():
 			"auto_accept": false
 		},
 		
+		"slay_goblins": {
+			"id": "slay_goblins",
+			"name": "Goblin Slayer",
+			"description": "The Dark Elf messenger asked you to clear out the dungeon from goblins",
+			"objectives": [
+				{
+					"description": "Defeat 10 goblin enemies",
+					"type": "kill_enemy",
+					"target": "goblin_enemy",
+					"required": 10,
+					"current": 0,
+					"completed": false
+				}
+			],
+			"rewards": {
+				"gold": 20,
+				"items": ["iron_sword"],
+				"experience": 250
+			},
+			"auto_accept": false
+		},
+		
 		#"collect_keys": {
 			#"id": "collect_keys",
 			#"name": "Key Collector",

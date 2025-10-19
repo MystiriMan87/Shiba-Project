@@ -1094,6 +1094,20 @@ func position_attack_hitbox(direction: Vector2):
 	attack_collision.rotation = direction.angle()
 
 func _on_attack_area_body_entered(body):
+	if HitEffectScene:
+		var fx = HitEffectScene.instantiate()
+		fx.global_position = body.global_position
+		var parent = get_tree().current_scene if get_tree() else get_parent()
+		if parent:
+			parent.add_child(fx)
+			fx.rotation = mouse_attack_direction.angle()
+			if fx is GPUParticles2D:
+				fx.emitting = true
+				fx.one_shot = true
+			elif fx is CPUParticles2D:
+				fx.emitting = true
+				fx.one_shot = true
+	
 	if body.has_method("take_damage"):
 		var damage = get_damage_against_enemy(body)
 		body.take_damage(damage)

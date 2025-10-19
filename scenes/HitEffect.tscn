@@ -1,11 +1,11 @@
 [gd_scene load_steps=6 format=3 uid="uid://yagvs8k8kfhd"]
 
 [ext_resource type="Script" uid="uid://baqgixdw2nqqj" path="res://scenes/hit_effect.gd" id="1_dhkt0"]
-[ext_resource type="Texture2D" uid="uid://d1kcjqv7r0swd" path="res://download-white-circle-png-701751694615460wdwmhw56hg-removebg-preview.png" id="2_df7el"]
+[ext_resource type="Texture2D" uid="uid://sxvymbq5oinw" path="res://addons/kenney_particle_pack/dirt_02.png" id="2_df7el"]
 
 [sub_resource type="Gradient" id="Gradient_fl6o4"]
-offsets = PackedFloat32Array(0, 0.509091, 1)
-colors = PackedColorArray(0, 0, 0, 1, 0.45, 0.45, 0.45, 1, 1, 1, 1, 1)
+offsets = PackedFloat32Array(0.00909091, 0.509091, 1)
+colors = PackedColorArray(0.485648, 0.485648, 0.485648, 1, 0.45, 0.45, 0.45, 1, 1, 1, 1, 1)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_dhkt0"]
 gradient = SubResource("Gradient_fl6o4")
@@ -16,10 +16,9 @@ particle_flag_disable_z = true
 emission_shape_offset = Vector3(0, -1, 0)
 initial_velocity_min = 30.0
 initial_velocity_max = 80.0
-gravity = Vector3(0, 98, 0)
 scale_min = 0.01
-scale_max = 0.01
-color = Color(0.997517, 0, 0.130102, 1)
+scale_max = 0.03
+color = Color(0.898039, 0, 0, 1)
 color_ramp = SubResource("GradientTexture1D_dhkt0")
 
 [node name="HitEffect" type="Node2D"]
@@ -27,10 +26,11 @@ script = ExtResource("1_dhkt0")
 
 [node name="GPUParticles2D" type="GPUParticles2D" parent="."]
 emitting = false
-amount = 30
+amount = 10
+amount_ratio = 0.636
 texture = ExtResource("2_df7el")
+lifetime = 0.63
 one_shot = true
 speed_scale = 2.0
 explosiveness = 1.0
-randomness = 1.0
 process_material = SubResource("ParticleProcessMaterial_fl6o4")

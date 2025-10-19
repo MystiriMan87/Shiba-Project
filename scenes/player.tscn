@@ -246,7 +246,9 @@ radius = 27.0185
 
 [node name="Player" type="CharacterBody2D"]
 y_sort_enabled = true
+texture_filter = 1
 script = ExtResource("1_g2els")
+trail_width = 5.0
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture_filter = 1

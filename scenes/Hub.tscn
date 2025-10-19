@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=4 uid="uid://bqugjkay7yqn1"]
+[gd_scene load_steps=36 format=4 uid="uid://bqugjkay7yqn1"]
 
 [ext_resource type="Texture2D" uid="uid://cnv2efmaeat5p" path="res://Assets/Snoblin/Snoblin_Default_Tilemap/Assets/pixel_rpg_tiles.png" id="1_4qglb"]
 [ext_resource type="Script" uid="uid://dedci05mgixib" path="res://scenes/hub.gd" id="1_gqhal"]
@@ -25,6 +25,9 @@
 [ext_resource type="PackedScene" uid="uid://c8vt1j5yksufo" path="res://LobotNPC.tscn" id="21_um0da"]
 [ext_resource type="PackedScene" uid="uid://45sm4n1361sh" path="res://LobotNPC_alter.tscn" id="24_osip4"]
 [ext_resource type="PackedScene" uid="uid://dke0bymely4n" path="res://sign.tscn" id="25_kodur"]
+[ext_resource type="PackedScene" uid="uid://fadffrcj4pg" path="res://darkElf_NPC.tscn" id="26_eakxi"]
+[ext_resource type="Texture2D" uid="uid://tj1xrpvfbv3u" path="res://light.png" id="27_3ggi2"]
+[ext_resource type="PackedScene" uid="uid://bukx3e2x3wdgr" path="res://canvas_modulate.tscn" id="28_8metk"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_16ktt"]
 texture = ExtResource("1_4qglb")
@@ -1325,3 +1328,22 @@ offset_right = 877.0
 offset_bottom = -883.0
 theme_override_font_sizes/font_size = 42
 text = "WIP"
+
+[node name="Elf_NPC" parent="." instance=ExtResource("26_eakxi")]
+position = Vector2(849, -1321)
+scale = Vector2(1.5, 1.5)
+dialogue_id = "elf_messenger"
+npc_name = "Elf Messenger"
+
+[node name="SUN" type="PointLight2D" parent="."]
+texture_filter = 1
+position = Vector2(1612, -821)
+energy = 0.35
+shadow_enabled = true
+shadow_color = Color(0, 0, 0, 1)
+texture = ExtResource("27_3ggi2")
+texture_scale = 10.03
+
+[node name="CanvasModulate" parent="." instance=ExtResource("28_8metk")]
+visible = false
+color = Color(0.845329, 0.845329, 0.845329, 1)

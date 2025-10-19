@@ -8,16 +8,6 @@ extends CharacterBody2D
 @export var detection_range = 150
 @export var attack_range = 100
 
-#@export var drop_chance: float = 0.7
-#@export var rare_drop_chance: float = 0.1
-#@export var min_drop_quantity: int = 1
-#@export var max_drop_quantity: int = 3
-
-#Place holders
-#@export var common_drops: Array[String] = ["health_potion", "mana_potion", "coin"]
-#@export var uncommon_drops: Array[String] = ["steel_sword", "magic_ring"]
-#@export var rare_drops: Array[String] = ["legendary_sword", "ancient_artifact"]
-
 @export var enemy_type: String = "slime" 
 
 @export var jump_force = 300
@@ -30,6 +20,14 @@ extends CharacterBody2D
 @export var walk_acceleration: float = 300.0
 @export var walk_friction: float = 200.0
 @export var walk_animation_speed = 1.0
+
+# Toxic trail exports
+@export var leave_toxic_trail: bool = true
+@export var toxic_damage: int = 1
+@export var toxic_damage_interval: float = 0.5
+@export var trail_spawn_interval: float = 0.2
+@export var trail_lifetime: float = 3.0
+@export var trail_radius: float = 25.0
 
 var current_health
 var is_dead = false
@@ -53,6 +51,8 @@ var is_moving = false
 var landing_timer = 0.0
 var landing_duration = 0.5
 var state_timer = 0.0
+
+var trail_spawn_timer: float = 0.0
 
 enum SlimeState {
 	IDLE,
@@ -87,9 +87,10 @@ func _ready():
 	current_health = max_health
 	collision_layer = 4
 	collision_mask = 1
-	# Ensure all enemies are discoverable via the common group
+	trail_spawn_timer = 0.0
+	
 	add_to_group("enemies")
-	# Safety: ensure exported floats are valid even if scene serialized differently
+	
 	if typeof(walk_friction) == TYPE_NIL:
 		walk_friction = 200.0
 	if typeof(walk_acceleration) == TYPE_NIL:
@@ -114,7 +115,6 @@ func _ready():
 	if animation_player:
 		play_animation("idle")
 
-	# Mark big slime as boss
 	if enemy_type == "big_slime":
 		add_to_group("boss")
 
@@ -185,6 +185,13 @@ func _physics_process(delta):
 			handle_landing_state(delta)
 		SlimeState.COOLDOWN:
 			handle_cooldown_state(delta)
+	
+	# Spawn toxic trail while moving
+	if leave_toxic_trail and is_moving and not is_dead and not is_jumping:
+		trail_spawn_timer -= delta
+		if trail_spawn_timer <= 0:
+			spawn_toxic_puddle()
+			trail_spawn_timer = trail_spawn_interval
 	
 	if not is_jumping:
 		move_and_slide()
@@ -391,13 +398,10 @@ func land_jump():
 				attack_area.monitoring = false
 		)
 
-	# Big slime unique effect: quake and spawn allies on landing
 	if enemy_type == "big_slime":
-		# Camera shake
 		var cam = get_tree().current_scene.get_node_or_null("PlayerCamera") if get_tree() and get_tree().current_scene else null
 		if cam and cam.has_method("shake_camera"):
 			cam.shake_camera(8.0, 0.18)
-		# Spawn 3 slimes erupting from the ground
 		_spawn_floor_slimes(3)
 
 func play_animation_synced(anim_name: String, movement_duration: float, speed_multiplier: float = 2.0):
@@ -483,7 +487,6 @@ func take_damage(amount: int):
 	
 	current_health -= amount
 	if get_tree() and get_tree().current_scene and Engine.has_singleton("ParticleEffects") == false:
-		# no singleton; call static directly
 		if ResourceLoader.exists("res://scripts/Particle_Effects_Manager.gd"):
 			var root = get_tree().current_scene
 			if root and root.has_method("add_child"):
@@ -492,7 +495,6 @@ func take_damage(amount: int):
 	if health_bar:
 		health_bar.value = current_health
 
-	# Notify UI for boss health updates
 	if enemy_type == "big_slime":
 		boss_health_changed.emit(current_health, max_health)
 	
@@ -526,12 +528,10 @@ func die():
 	is_moving = false
 	current_state = SlimeState.IDLE
 	
-	# Register for respawn BEFORE doing death effects
 	var respawn_manager = get_tree().get_first_node_in_group("respawn_manager")
 	if respawn_manager:
 		respawn_manager.register_enemy_death(self)
 	
-	# Handle drops (including keys)
 	DropSystem.handle_enemy_death(enemy_type, global_position, get_tree())
 	drop_keys()
 
@@ -551,27 +551,21 @@ func die():
 	tween.parallel().tween_property(sprite, "modulate:a", 0.0, 0.5)
 	tween.parallel().tween_property(sprite, "scale", Vector2(1.5, 0.5), 0.5)
 	tween.tween_callback(queue_free)
-	
-	
-	
-	
+
 func drop_keys():
-	"""Drop keys when enemy dies"""
-	var key_drop_chance = 0.3  # 30% chance to drop a key
+	var key_drop_chance = 0.3
 	
 	if randf() < key_drop_chance:
-		var key_type = "wooden"  # Default key type
+		var key_type = "wooden"
 		
-		# Different enemies drop different keys
 		match enemy_type:
 			"skeleton":
-				key_type = "iron"  # Skeletons drop iron keys
+				key_type = "iron"
 			"slime":
-				key_type = "wooden"  # Slimes drop wooden keys
+				key_type = "wooden"
 			_:
-				key_type = "wooden"  # Default to wooden
+				key_type = "wooden"
 		
-		# Spawn the key
 		var key_id = key_type + "_key"
 		var pickup_scene = load("res://scenes/PickupItem.tscn")
 		
@@ -580,7 +574,6 @@ func drop_keys():
 			get_tree().current_scene.add_child(pickup)
 			pickup.global_position = global_position + Vector2(randf_range(-20, 20), -20)
 			pickup.set_item(key_id, 1)
-			print("Enemy dropped ", key_type, " key!")
 
 func _spawn_floor_slimes(count: int):
 	var scene_path = "res://scenes/slime_enemy.tscn"
@@ -595,81 +588,73 @@ func _spawn_floor_slimes(count: int):
 		if not s:
 			continue
 		parent.add_child(s)
-		# Position in a small circle around the big slime
 		var angle = (i * TAU) / float(max(1, count))
 		var radius = 36 + i * 4
 		var spawn_pos = global_position + Vector2(cos(angle), sin(angle)) * radius
 		s.global_position = spawn_pos + Vector2(0, 12)
-		# Little emerge animation (rise and fade in), keep original scale
 		if "modulate" in s:
 			s.modulate.a = 0.0
 		var tw = create_tween()
 		tw.tween_property(s, "global_position", spawn_pos, 0.25)
 		tw.tween_property(s, "modulate:a", 1.0, 0.25)
+
+func spawn_toxic_puddle():
+	var puddle = Area2D.new()
+	puddle.name = "ToxicPuddle"
+	puddle.collision_layer = 0
+	puddle.collision_mask = 1
+	
+	var visual = ColorRect.new()
+	visual.color = Color(0.2, 0.8, 0.2, 0.4)
+	visual.size = Vector2(trail_radius * 2, trail_radius * 2)
+	visual.position = Vector2(-trail_radius, -trail_radius)
+	puddle.add_child(visual)
+	
+	var shape = CollisionShape2D.new()
+	var circle = CircleShape2D.new()
+	circle.radius = trail_radius
+	shape.shape = circle
+	puddle.add_child(shape)
+	
+	var parent = get_tree().current_scene if get_tree() else get_parent()
+	if parent:
+		parent.add_child(puddle)
+		puddle.global_position = global_position
 		
-#func _spawn_floor_enemies(count: int):
-	#var scene_path = "res://scenes/vampire_enemy.tscn"
-	#var vampire_scene = load(scene_path)
-	#if not vampire_scene:
-		#return
-	#var parent = get_tree().current_scene if get_tree() and get_tree().current_scene else get_parent()
-	#if not parent:
-		#return
-	#for i in range(count):
-		#var s = vampire_scene.instantiate()
-		#if not s:
-			#continue
-		#parent.add_child(s)
-		#var angle = (i * TAU) / float(max(1, count))
-		#var radius = 36 + i * 4
-		#var spawn_pos = global_position + Vector2(cos(angle), sin(angle)) * radius
-		#s.global_position = spawn_pos + Vector2(0, 12)
-		#if "modulate" in s:
-			#s.modulate.a = 0.0
-		#var tw = create_tween()
-		#tw.tween_property(s, "global_position", spawn_pos, 0.25)
-		#tw.tween_property(s, "modulate:a", 1.0, 0.25)
-#func drop_items():
-	#"""Handle item dropping when enemy dies"""
-	#print("Rolling for item drops...")
-#
-	#if randf() > drop_chance:
-		#print("No items dropped")
-		#return
-	#
-	#var dropped_items: Array[Dictionary] = []
-	#var drop_pool: Array[String] = []
-	#var rarity_roll = randf()
-	#
-	#if rarity_roll < rare_drop_chance:
-		## Rare drop (10% chance)
-		#drop_pool = rare_drops
-		#print("Rolling for rare drop!")
-	#elif rarity_roll < rare_drop_chance + 0.2:  # 20% chance for uncommon
-		## Uncommon drop
-		#drop_pool = uncommon_drops
-		#print("Rolling for uncommon drop!")
-	#else:
-		## Common drop
-		#drop_pool = common_drops
-		#print("Rolling for common drop!")
-	#if drop_pool.size() > 0:
-		#var random_item = drop_pool[randi() % drop_pool.size()]
-		#var quantity = randi_range(min_drop_quantity, max_drop_quantity)
-	#
-	#var drop_data = {
-			#"item_id": random_item,
-			#"quantity": quantity,
-			#"position": global_position
-		#}
-		#dropped_items.append(drop_data)
-		#
-		#print("Dropping: ", random_item, " x", quantity)
-		#
-		## Spawn the pickup item in the world
-		#spawn_pickup_item(drop_data)
-
-
+		var damage_timer = Timer.new()
+		damage_timer.wait_time = toxic_damage_interval
+		damage_timer.autostart = true
+		puddle.add_child(damage_timer)
+		
+		var players_in_puddle = []
+		
+		puddle.body_entered.connect(func(body):
+			if body.is_in_group("player"):
+				players_in_puddle.append(body)
+		)
+		
+		puddle.body_exited.connect(func(body):
+			if body.is_in_group("player"):
+				players_in_puddle.erase(body)
+		)
+		
+		damage_timer.timeout.connect(func():
+			for p in players_in_puddle:
+				if is_instance_valid(p) and p.has_method("take_damage"):
+					p.take_damage(toxic_damage)
+		)
+		
+		var tween = create_tween()
+		tween.tween_property(visual, "modulate:a", 0.0, trail_lifetime)
+		tween.tween_callback(func():
+			if is_instance_valid(puddle):
+				puddle.queue_free()
+		)
+		
+		var pulse_tween = create_tween()
+		pulse_tween.set_loops()
+		pulse_tween.tween_property(visual, "modulate:a", 0.6, 0.5)
+		pulse_tween.tween_property(visual, "modulate:a", 0.3, 0.5)
 
 func _on_detection_area_entered(body):
 	if body.is_in_group("player"):

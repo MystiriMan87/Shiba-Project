@@ -1,5 +1,4 @@
 extends Node
-
 # Dialogue data structure
 var dialogues = {
 	"npc_greeting": [
@@ -7,6 +6,12 @@ var dialogues = {
 		{"speaker": "Crazed Wizard", "text": "I don't have any new quests fo now, come back later!"},
 		{"speaker": "Crazed Wizard", "text": "Before you go"},
 		{"speaker": "Crazed Wizard", "text": "If you meet a merchant on your travels through the dungeons make sure to give him your coins in exhange for valuable.. valuable.. items! (mumbling)"},
+	],
+	"elf_messenger": [
+		{"speaker": "Elf Messenger", "text": "I come with peace. I know you have been ruthlessly fighting our warriors down in the depths of the dungeons."},
+		{"speaker": "Elf Messenger", "text": "I have a proposition to make."},
+		{"speaker": "Elf Messenger", "text": "If you instead defeat 10 goblins for me I would not only forget our previous conflict but would reward you handsomely."},
+		{"speaker": "Elf Messenger", "text": "It should be marked in your quest logd. Do not return until you accomplished the task."},
 	],
 	"sign-default": [
 		{"speaker": "Amazing Sign", "text": "Deep Dark Caverns"},
@@ -20,20 +25,20 @@ var dialogues = {
 		{"speaker": "Explorer Dave", "text": "Before you go, if you are having trouble defeating the ghosts, the goblins have a chance to drop a magic ring to help you! Good luck"},
 	],
 	"skeleton_quest_start": [
-		 "Greetings traveler, are you by chance going to decending into those caverns?",
-		 "Could you help me by defeating 3 skeletons while you are down there?",
-		 "I'll reward you handsomely for your trouble."
+		{"speaker": "Crazed Wizard", "text": "Greetings traveler, are you by chance going to decending into those caverns?"},
+		{"speaker": "Crazed Wizard", "text": "Could you help me by defeating 3 skeletons while you are down there?"},
+		{"speaker": "Crazed Wizard", "text": "I'll reward you handsomely for your trouble."}
 	],
 	"skeleton_quest_active": [
-		"Have you dealt with those skeletons yet?",
-		"Be careful out there, they can be dangerous!",
-  		"Come back when you've defeated 3 of them."
+		{"speaker": "Crazed Wizard", "text": "Have you dealt with those skeletons yet?"},
+		{"speaker": "Crazed Wizard", "text": "Be careful out there, they can be dangerous!"},
+		{"speaker": "Crazed Wizard", "text": "Come back when you've defeated 3 of them."}
 	],
 		
 	"skeleton_quest_complete": [
-		"You did it! The dungeon feels safer already.",
-		"Thank you so much for your help!",
-		"You should've recieved your reward so check your inventory!"
+		{"speaker": "Crazed Wizard", "text": "You did it! The dungeon feels safer already."},
+		{"speaker": "Crazed Wizard", "text": "Thank you so much for your help!"},
+		{"speaker": "Crazed Wizard", "text": "You should've recieved your reward so check your inventory!"}
 	],
 	"merchant_intro": [
 		{"speaker": "Merchant", "text": "Looking to buy some potions?"},
