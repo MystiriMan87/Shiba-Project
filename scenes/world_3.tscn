@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=4 uid="uid://cqdokec8g1tqu"]
+[gd_scene load_steps=27 format=4 uid="uid://cqdokec8g1tqu"]
 
 [ext_resource type="Script" uid="uid://c8dew88u6ily3" path="res://world_3.gd" id="1_m3jh3"]
 [ext_resource type="PackedScene" uid="uid://ny2bd86mtevm" path="res://player_camera.tscn" id="2_lkfvj"]
@@ -20,6 +20,7 @@
 [ext_resource type="Script" uid="uid://cwr05foje27n4" path="res://mysterious_npc.gd" id="18_7dsii"]
 [ext_resource type="PackedScene" uid="uid://be8kk06nbgra5" path="res://skeleton_NPC.tscn" id="19_qja4o"]
 [ext_resource type="PackedScene" uid="uid://bq7bbdmxxgdbv" path="res://level_change_pedestal.tscn" id="20_retbw"]
+[ext_resource type="PackedScene" uid="uid://dlsog5o45sqr6" path="res://scenes/PauseMenu.tscn" id="21_uxbfi"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1ojam"]
 texture = ExtResource("8_retbw")
@@ -1431,7 +1432,6 @@ script = ExtResource("1_m3jh3")
 [node name="PlayerCamera" parent="." instance=ExtResource("2_lkfvj")]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
-visible = false
 
 [node name="PlayerUI" parent="CanvasLayer" instance=ExtResource("3_b3666")]
 
@@ -1439,12 +1439,10 @@ visible = false
 visible = false
 
 [node name="QuestUI" parent="." instance=ExtResource("5_oyiwx")]
-visible = false
 
 [node name="PickupItem" parent="." instance=ExtResource("6_7dsii")]
 
 [node name="QuestLogUI" parent="." instance=ExtResource("7_qja4o")]
-visible = false
 
 [node name="TileMap" type="TileMap" parent="."]
 scale = Vector2(0.9, 0.9)
@@ -1472,7 +1470,6 @@ tile_map_data = PackedByteArray("AAD///7/AAAEAAgAAAD/////AAAEAAkAAAAAAP7/AAAEAAg
 tile_set = SubResource("TileSet_w512l")
 
 [node name="DialogueBox" parent="." instance=ExtResource("10_k0ben")]
-visible = false
 
 [node name="Area2D" parent="." instance=ExtResource("16_obkij")]
 position = Vector2(35, 394)
@@ -1597,3 +1594,5 @@ scale = Vector2(1.5, 1.5)
 position = Vector2(0, 2654)
 scale = Vector2(5, 5)
 target_scene = "res://scenes/world_4.tscn"
+
+[node name="PauseMenu" parent="." instance=ExtResource("21_uxbfi")]

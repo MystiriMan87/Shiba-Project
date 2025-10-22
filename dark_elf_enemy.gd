@@ -26,6 +26,10 @@ extends CharacterBody2D
 @export var wander_wait_time_min: float = 2.0
 @export var wander_wait_time_max: float = 5.0
 
+var is_stuck: bool = false
+var stuck_timer: float = 0.0
+var last_velocity: Vector2 = Vector2.ZERO
+
 var current_health
 var is_dead = false
 var is_attacking = false
@@ -40,6 +44,7 @@ var target_velocity = Vector2.ZERO
 var is_moving = false
 var last_speed_ratio: float = 0.0
 var facing_direction = "down"
+var is_taking_damage 
 
 var wander_target: Vector2 = Vector2.ZERO
 var wander_timer: float = 0.0
@@ -120,6 +125,15 @@ func find_player():
 		player = players[0]
 
 func _physics_process(delta):
+	if velocity.length() < 1 and not is_dead and current_state != GoblinState.IDLE:
+		stuck_timer += delta
+		if stuck_timer > 1.0:  # Stuck for more than 1 second
+			print("Enemy appears stuck, forcing state reset")
+			force_state_reset()
+			stuck_timer = 0.0
+	else:
+		stuck_timer = 0.0
+	
 	if is_dead:
 		return
 	
@@ -412,3 +426,26 @@ func _on_detection_area_entered(body):
 func _on_detection_area_exited(body):
 	if body.is_in_group("player"):
 		player_in_detection_range = false
+		
+func force_state_reset():
+	"""Emergency state reset when enemy gets stuck"""
+	is_taking_damage = false
+	damage_timer = 0.0
+	is_attacking = false
+	attack_timer = 0.0
+	
+	# Reset sprite
+	if sprite:
+		sprite.modulate = Color.WHITE
+	
+	# Reset animation
+	if animation_player:
+		animation_player.speed_scale = 1.0
+		if current_state == GoblinState.WALKING:
+			animation_player.play("idle")
+	
+	# Reset collision
+	if collision_shape:
+		collision_shape.disabled = false
+	
+	print("State force-reset completed")

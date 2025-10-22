@@ -78,12 +78,13 @@ toxic_puddle_texture = ExtResource("2_fq0mw")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture_filter = 1
-scale = Vector2(2.2, 2.2)
+position = Vector2(1, -16)
+scale = Vector2(2, 2)
 texture = ExtResource("2_md0e3")
 hframes = 11
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(1, 33)
+position = Vector2(1, 0)
 shape = SubResource("RectangleShape2D_5uy6h")
 
 [node name="HealthBar" type="ProgressBar" parent="."]
@@ -99,14 +100,12 @@ show_percentage = false
 collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea"]
-position = Vector2(0, -1)
 shape = SubResource("CircleShape2D_md0e3")
 
 [node name="AttackArea" type="Area2D" parent="."]
 collision_layer = 8
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
-position = Vector2(2, 33)
 shape = SubResource("RectangleShape2D_md0e3")
 debug_color = Color(0.854902, 0, 0, 0.647059)
 

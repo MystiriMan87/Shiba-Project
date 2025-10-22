@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=4 uid="uid://7l5npwiefw66"]
+[gd_scene load_steps=36 format=4 uid="uid://7l5npwiefw66"]
 
 [ext_resource type="PackedScene" uid="uid://bmrnrfe6psbj2" path="res://quest_ui.tscn" id="1_hgrhv"]
 [ext_resource type="PackedScene" uid="uid://bkcsm36nf4kyd" path="res://dialogue_box.tscn" id="2_dr8ba"]
@@ -26,6 +26,7 @@
 [ext_resource type="PackedScene" uid="uid://dpctdss2lq6w3" path="res://ghost_enemy.tscn" id="24_rbd1q"]
 [ext_resource type="PackedScene" uid="uid://co1aha623au6i" path="res://mimic_enemy.tscn" id="25_3xk2h"]
 [ext_resource type="PackedScene" uid="uid://bq7bbdmxxgdbv" path="res://level_change_pedestal.tscn" id="26_gph3w"]
+[ext_resource type="PackedScene" uid="uid://dlsog5o45sqr6" path="res://scenes/PauseMenu.tscn" id="27_0airf"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_emu1g"]
 texture = ExtResource("8_ysdsq")
@@ -1464,4 +1465,6 @@ scale = Vector2(4, 4)
 [node name="Level_Change_Pedestal" parent="." instance=ExtResource("26_gph3w")]
 position = Vector2(1152, -3250)
 scale = Vector2(4, 4)
-target_scene = "res://world_3.tscn"
+target_scene = "res://scenes/world_3.tscn"
+
+[node name="PauseMenu" parent="." instance=ExtResource("27_0airf")]
