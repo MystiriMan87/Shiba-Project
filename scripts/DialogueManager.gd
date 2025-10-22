@@ -32,7 +32,7 @@ var dialogues = {
 	"coward_skeleton": [
 		{"speaker": "Cowardly Skeleton", "text": "No! Please! Don't hurt me!"},
 		{"speaker": "Cowardly Skeleton", "text": "Please, I don't want to fight! I was sent away by my friends because I was too cowardly.. Now I sit here all day long."},
-		{"speaker": "Cowardly Skeleton", "text": ". . . . . . . ."},
+		{"speaker": "Cowardly Skeleton", "text": ". . . . . . . . . . ."},
 	],
 	"skeleton_quest_start": [
 		{"speaker": "Crazed Wizard", "text": "Greetings traveler, are you by chance going to decending into those caverns?"},
