@@ -47,3 +47,7 @@ text = "Main Menu"
 layout_mode = 2
 text = "Quit
 "
+
+[connection signal="pressed" from="PausePanel/VBoxContainer/ResumeButton" to="." method="_on_resume_pressed"]
+[connection signal="pressed" from="PausePanel/VBoxContainer/MainMenuButton" to="." method="_on_main_menu_pressed"]
+[connection signal="pressed" from="PausePanel/VBoxContainer/QuitButton" to="." method="_on_quit_pressed"]

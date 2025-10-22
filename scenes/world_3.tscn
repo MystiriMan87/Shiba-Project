@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=4 uid="uid://cqdokec8g1tqu"]
+[gd_scene load_steps=29 format=4 uid="uid://cqdokec8g1tqu"]
 
 [ext_resource type="Script" uid="uid://c8dew88u6ily3" path="res://world_3.gd" id="1_m3jh3"]
 [ext_resource type="PackedScene" uid="uid://ny2bd86mtevm" path="res://player_camera.tscn" id="2_lkfvj"]
@@ -21,6 +21,8 @@
 [ext_resource type="PackedScene" uid="uid://be8kk06nbgra5" path="res://skeleton_NPC.tscn" id="19_qja4o"]
 [ext_resource type="PackedScene" uid="uid://bq7bbdmxxgdbv" path="res://level_change_pedestal.tscn" id="20_retbw"]
 [ext_resource type="PackedScene" uid="uid://dlsog5o45sqr6" path="res://scenes/PauseMenu.tscn" id="21_uxbfi"]
+[ext_resource type="PackedScene" uid="uid://c42ybnvh2sa5t" path="res://merchat_npc.tscn" id="22_8tc4w"]
+[ext_resource type="PackedScene" uid="uid://bgg32r6jrhvd4" path="res://Trader_NPC.tscn" id="23_gpm48"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1ojam"]
 texture = ExtResource("8_retbw")
@@ -1436,7 +1438,6 @@ script = ExtResource("1_m3jh3")
 [node name="PlayerUI" parent="CanvasLayer" instance=ExtResource("3_b3666")]
 
 [node name="ShopUI" parent="." instance=ExtResource("4_obkij")]
-visible = false
 
 [node name="QuestUI" parent="." instance=ExtResource("5_oyiwx")]
 
@@ -1596,3 +1597,11 @@ scale = Vector2(5, 5)
 target_scene = "res://scenes/world_4.tscn"
 
 [node name="PauseMenu" parent="." instance=ExtResource("21_uxbfi")]
+
+[node name="MerchatNPC" parent="." instance=ExtResource("22_8tc4w")]
+position = Vector2(-115, 1298)
+scale = Vector2(1.5, 1.5)
+
+[node name="CharacterBody2D2" parent="." instance=ExtResource("23_gpm48")]
+position = Vector2(-229, 1303)
+scale = Vector2(1.5, 1.5)

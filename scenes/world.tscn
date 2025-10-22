@@ -6435,3 +6435,11 @@ scale = Vector2(3, 3)
 [node name="mimic_enemy" parent="." instance=ExtResource("35_f17e3")]
 position = Vector2(-309, 1221)
 scale = Vector2(4, 4)
+
+[node name="Label" type="Label" parent="."]
+offset_left = 879.0
+offset_top = 663.0
+offset_right = 1217.0
+offset_bottom = 712.0
+text = "Feel free to make any gameplay suggestion!
+This is still very early in development"
