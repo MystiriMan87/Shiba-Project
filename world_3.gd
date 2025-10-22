@@ -1,8 +1,7 @@
 extends Node2D
 
 @export var debug_spawn_startup_items: bool = false
-
-@export var background_music_path: String = "res://audio/background_music.ogg"
+@export var background_music_path: String = "res://audio/a_dungeon_ambience_loop-79423.mp3"
 @export var background_music_volume: float = 0.0
 @export var music_autoplay: bool = true
 @onready var music_player: AudioStreamPlayer = null
