@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Shiba project game"
-run/main_scene="uid://cqdokec8g1tqu"
+run/main_scene="uid://byg0qtj4d0dqv"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -28,8 +28,9 @@ QuestManager="*res://scripts/QuestManager.gd"
 
 [display]
 
-window/size/viewport_width=1980
+window/size/viewport_width=1920
 window/size/viewport_height=1080
+window/size/mode=2
 window/stretch/mode="viewport"
 
 [editor_plugins]

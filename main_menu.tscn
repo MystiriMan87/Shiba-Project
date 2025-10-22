@@ -40,13 +40,14 @@ corner_radius_bottom_left = 15
 shadow_size = 15
 
 [node name="MainMenu" type="Control"]
-layout_direction = 1
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 script = ExtResource("1_7vrkn")
 
 [node name="Button" type="Button" parent="."]
@@ -170,3 +171,4 @@ texture = ExtResource("5_nlkkf")
 expand_mode = 5
 
 [connection signal="pressed" from="Button" to="." method="_on_play_pressed"]
+[connection signal="pressed" from="Button3" to="." method="_on_button_quit_pressed"]
