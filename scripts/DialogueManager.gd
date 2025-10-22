@@ -24,6 +24,16 @@ var dialogues = {
 		{"speaker": "Explorer Dave", "text": "If you're crazy enough to go there, one holds plenty of swift goblins the other contains hulking brutes."},
 		{"speaker": "Explorer Dave", "text": "Before you go, if you are having trouble defeating the ghosts, the goblins have a chance to drop a magic ring to help you! Good luck"},
 	],
+	"mysterious_npc": [
+		{"speaker": "???", "text": "I'm surpsied you lasted this long"},
+		{"speaker": "???", "text": "We'll see soon enough"},
+		{"speaker": "???", "text": ". . . . . . . ."},
+	],
+	"coward_skeleton": [
+		{"speaker": "Cowardly Skeleton", "text": "No! Please! Don't hurt me!"},
+		{"speaker": "Cowardly Skeleton", "text": "Please, I don't want to fight! I was sent away by my friends because I was too cowardly.. Now I sit here all day long."},
+		{"speaker": "Cowardly Skeleton", "text": ". . . . . . . ."},
+	],
 	"skeleton_quest_start": [
 		{"speaker": "Crazed Wizard", "text": "Greetings traveler, are you by chance going to decending into those caverns?"},
 		{"speaker": "Crazed Wizard", "text": "Could you help me by defeating 3 skeletons while you are down there?"},

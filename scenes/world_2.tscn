@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=4 uid="uid://7l5npwiefw66"]
+[gd_scene load_steps=35 format=4 uid="uid://7l5npwiefw66"]
 
 [ext_resource type="PackedScene" uid="uid://bmrnrfe6psbj2" path="res://quest_ui.tscn" id="1_hgrhv"]
 [ext_resource type="PackedScene" uid="uid://bkcsm36nf4kyd" path="res://dialogue_box.tscn" id="2_dr8ba"]
@@ -15,7 +15,7 @@
 [ext_resource type="Texture2D" uid="uid://cr8jwkih06a2t" path="res://Assets/Snoblin/Snoblin_Dungeon_Tiles/Assets/Extra/vfx_treasure_glitter.png" id="11_pvi7j"]
 [ext_resource type="PackedScene" uid="uid://fmjm73g3uhw7" path="res://goblin_enemy.tscn" id="12_co50f"]
 [ext_resource type="PackedScene" uid="uid://bukx3e2x3wdgr" path="res://canvas_modulate.tscn" id="13_a2svu"]
-[ext_resource type="Script" uid="uid://53segd3eoigm" path="res://scenes/camera_follow_trigger.gd" id="15_hvdyd"]
+[ext_resource type="PackedScene" uid="uid://dmli680qro3yx" path="res://camera_follow_trigger.tscn" id="16_gph3w"]
 [ext_resource type="PackedScene" uid="uid://con8irkei050h" path="res://dark_elf_enemy.tscn" id="17_rg7ok"]
 [ext_resource type="PackedScene" uid="uid://bfjoojsctscj1" path="res://Miner_NPC.tscn" id="18_5wjeq"]
 [ext_resource type="PackedScene" uid="uid://dnxtl0v8o707b" path="res://brazier.tscn" id="19_f53ia"]
@@ -472,8 +472,6 @@ physics_layer_0/collision_mask = 31
 sources/0 = SubResource("TileSetAtlasSource_f53ia")
 sources/1 = SubResource("TileSetAtlasSource_7uo55")
 sources/2 = SubResource("TileSetAtlasSource_s8ivg")
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_co50f"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_co50f"]
 bg_color = Color(0.6, 0.6, 0.6, 0)
@@ -1214,13 +1212,8 @@ scale = Vector2(3, 3)
 [node name="CanvasModulate" parent="." instance=ExtResource("13_a2svu")]
 color = Color(0.270222, 0.270222, 0.270222, 1)
 
-[node name="Area2D" type="Area2D" parent="."]
+[node name="Area2D" parent="." instance=ExtResource("16_gph3w")]
 position = Vector2(672, -32)
-script = ExtResource("15_hvdyd")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-scale = Vector2(3, 3)
-shape = SubResource("RectangleShape2D_co50f")
 
 [node name="darkElf_enemy" parent="." instance=ExtResource("17_rg7ok")]
 position = Vector2(1122, -35)
@@ -1471,3 +1464,4 @@ scale = Vector2(4, 4)
 [node name="Level_Change_Pedestal" parent="." instance=ExtResource("26_gph3w")]
 position = Vector2(1152, -3250)
 scale = Vector2(4, 4)
+target_scene = "res://world_3.tscn"

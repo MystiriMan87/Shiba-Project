@@ -1,9 +1,9 @@
 # NPC.gd
 extends CharacterBody2D
 
-@export var dialogue_id: String = "npc_greeting"
+@export var dialogue_id: String = "mysterious_npc"
 @export var interaction_range: float = 60.0
-@export var npc_name: String = "Villager"
+@export var npc_name: String = "???"
 @export var npc_id: String = "villager"
 @export var dialogue_audio_path: String = ""
 @export var audio_volume: float = -5.0

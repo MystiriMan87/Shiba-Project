@@ -16,7 +16,9 @@ var character_portraits: Dictionary = {
 	"Merchant": "res://portaits/portrait_human_3.png",
 	"Elf Messenger": "res://portaits/portrait_dark_elf_4.png",
 	"Crazed Wizard": "res://portaits/portrait_human_20.png",
-	"Explorer Dave": "res://portaits/portrait_human_20.png"
+	"Explorer Dave": "res://portaits/portrait_human_20.png",
+	"???": "res://portaits/portrait_human_12.png",
+	"Cowardly Skeleton": "res://portaits/portrait_skeleton.png"
 }
 
 @onready var panel: Panel = $Panel

@@ -28,6 +28,7 @@ extends CharacterBody2D
 @export var trail_spawn_interval: float = 0.2
 @export var trail_lifetime: float = 3.0
 @export var trail_radius: float = 25.0
+@export var toxic_puddle_texture: Texture2D = null 
 
 var current_health
 var is_dead = false
@@ -604,10 +605,30 @@ func spawn_toxic_puddle():
 	puddle.collision_layer = 0
 	puddle.collision_mask = 1
 	
-	var visual = ColorRect.new()
-	visual.color = Color(0.2, 0.8, 0.2, 0.4)
-	visual.size = Vector2(trail_radius * 2, trail_radius * 2)
-	visual.position = Vector2(-trail_radius, -trail_radius)
+	# Create visual using Sprite2D or fallback to ColorRect
+	var visual
+	if toxic_puddle_texture != null:
+		# Use custom texture
+		var sprite = Sprite2D.new()
+		sprite.texture = toxic_puddle_texture
+		
+		# Calculate scale based on desired radius
+		var tex_size = toxic_puddle_texture.get_size()
+		var scale_x = (trail_radius * 2) / tex_size.x
+		var scale_y = (trail_radius * 2) / tex_size.y
+		sprite.scale = Vector2(scale_x, scale_y)
+		
+		# Tint it green and make it semi-transparent
+		sprite.modulate = Color(0.2, 1.0, 0.2, 0.6)  # Green tint with transparency
+		visual = sprite
+	else:
+		# Fallback to green box if no texture
+		var rect = ColorRect.new()
+		rect.color = Color(0.2, 0.8, 0.2, 0.4)
+		rect.size = Vector2(trail_radius * 2, trail_radius * 2)
+		rect.position = Vector2(-trail_radius, -trail_radius)
+		visual = rect
+	
 	puddle.add_child(visual)
 	
 	var shape = CollisionShape2D.new()

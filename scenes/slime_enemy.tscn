@@ -1,6 +1,7 @@
-[gd_scene load_steps=10 format=3 uid="uid://drik1twhweam8"]
+[gd_scene load_steps=11 format=3 uid="uid://drik1twhweam8"]
 
 [ext_resource type="Script" uid="uid://ba4klw55e614j" path="res://scripts/enemy.gd" id="1_md0e3"]
+[ext_resource type="Texture2D" uid="uid://cgl806wq3ydkm" path="res://addons/kenney_particle_pack/dirt_03.png" id="2_fq0mw"]
 [ext_resource type="Texture2D" uid="uid://pc5fy4ks2pd" path="res://Assets/green-slime-spritesheet.png" id="2_md0e3"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5uy6h"]
@@ -73,6 +74,7 @@ collision_layer = 4
 script = ExtResource("1_md0e3")
 max_health = 4
 jump_arc_height = 100
+toxic_puddle_texture = ExtResource("2_fq0mw")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture_filter = 1

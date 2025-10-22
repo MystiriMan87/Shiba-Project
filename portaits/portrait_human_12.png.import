@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b6xd0opxmwmcc"
-path="res://.godot/imported/portrait_skeleton.png-443d8a0fa3377934e94bae7efc49cdfa.ctex"
+uid="uid://dxhj7phjq58wg"
+path="res://.godot/imported/portrait_human_12.png-f84d353d1edb6c322d61ad542829684b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Assets/Snoblin/Snoblin_Skeleton_Warriors/Assets/Extra/portrait_skeleton.png"
-dest_files=["res://.godot/imported/portrait_skeleton.png-443d8a0fa3377934e94bae7efc49cdfa.ctex"]
+source_file="res://portaits/portrait_human_12.png"
+dest_files=["res://.godot/imported/portrait_human_12.png-f84d353d1edb6c322d61ad542829684b.ctex"]
 
 [params]
 
