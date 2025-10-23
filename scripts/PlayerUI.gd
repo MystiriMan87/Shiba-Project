@@ -149,7 +149,7 @@ func create_boss_bar():
 	var container = Panel.new()
 	container.name = "BossBarContainer"
 	container.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	container.offset_top = 8
+	container.offset_top = 80
 	container.offset_left = 0
 	container.offset_right = 0
 	container.visible = false

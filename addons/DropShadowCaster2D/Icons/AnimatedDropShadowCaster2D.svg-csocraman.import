@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://hxs2cquf2niw"
-path="res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex"
+uid="uid://cnn5x123k6cvp"
+path="res://.godot/imported/AnimatedDropShadowCaster2D.svg-cab4d73bc662ba79df744fab1ca8f80f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://icon.svg"
-dest_files=["res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex"]
+source_file="res://addons/2D-projected-ground-shadow/addons/DropShadowCaster2D/Icons/AnimatedDropShadowCaster2D.svg"
+dest_files=["res://.godot/imported/AnimatedDropShadowCaster2D.svg-cab4d73bc662ba79df744fab1ca8f80f.ctex"]
 
 [params]
 

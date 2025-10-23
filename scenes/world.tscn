@@ -1,4 +1,4 @@
-[gd_scene load_steps=59 format=4 uid="uid://dpcl1dclvepl8"]
+[gd_scene load_steps=60 format=4 uid="uid://dpcl1dclvepl8"]
 
 [ext_resource type="Script" uid="uid://c4k4k8r5ebb5c" path="res://scenes/world.gd" id="1_4mrxx"]
 [ext_resource type="PackedScene" uid="uid://hqa6411o6hsf" path="res://scenes/player.tscn" id="1_nnsk1"]
@@ -18,6 +18,7 @@
 [ext_resource type="Texture2D" uid="uid://dmy2jt50kh0vy" path="res://Assets/Snoblin/Snoblin_Dungeon_Tiles/Assets/dungeon_objects.png" id="9_rup4s"]
 [ext_resource type="PackedScene" uid="uid://cv5q5jo7523bl" path="res://scenes/skeleton_enemy_v2.tscn" id="10_w7kh3"]
 [ext_resource type="Texture2D" uid="uid://tj1xrpvfbv3u" path="res://light.png" id="12_q5onr"]
+[ext_resource type="Script" uid="uid://bghaddibpt6f1" path="res://CRT/addons/crt/crt.gd" id="13_817gm"]
 [ext_resource type="PackedScene" uid="uid://cme4secwfuob2" path="res://torch.tscn" id="13_jhx03"]
 [ext_resource type="PackedScene" uid="uid://bfy8qij5td24" path="res://scenes/Gate_door.tscn" id="15_xo05s"]
 [ext_resource type="PackedScene" uid="uid://bu81gbln0icr0" path="res://scenes/SpikeTrap.tscn" id="16_dss4m"]
@@ -6186,6 +6187,11 @@ tile_set = SubResource("TileSet_jhx03")
 [node name="PlayerUI" parent="CanvasLayer" instance=ExtResource("5_71j4m")]
 metadata/_edit_use_anchors_ = true
 
+[node name="CRT" type="CanvasLayer" parent="CanvasLayer"]
+visible = false
+script = ExtResource("13_817gm")
+metadata/_custom_type_script = "uid://bghaddibpt6f1"
+
 [node name="LineOfSightUILayer" type="CanvasLayer" parent="."]
 
 [node name="LightingMaskBlocker" type="ColorRect" parent="LineOfSightUILayer"]
@@ -6326,21 +6332,27 @@ position = Vector2(1082, 2196)
 
 [node name="Goblin_enemy" parent="Enemies" instance=ExtResource("4_rup4s")]
 position = Vector2(108, 2271)
+wander_radius = 100.0
 
 [node name="Goblin_enemy2" parent="Enemies" instance=ExtResource("4_rup4s")]
 position = Vector2(168, 2475)
+wander_radius = 100.0
 
 [node name="Goblin_enemy3" parent="Enemies" instance=ExtResource("4_rup4s")]
 position = Vector2(420, 2621)
+wander_radius = 100.0
 
 [node name="Goblin_enemy4" parent="Enemies" instance=ExtResource("4_rup4s")]
 position = Vector2(919, 2445)
+wander_radius = 100.0
 
 [node name="Goblin_enemy5" parent="Enemies" instance=ExtResource("4_rup4s")]
 position = Vector2(977, 2271)
+wander_radius = 100.0
 
 [node name="Goblin_enemy6" parent="Enemies" instance=ExtResource("4_rup4s")]
 position = Vector2(906, 2672)
+wander_radius = 100.0
 
 [node name="GateDoor" parent="." instance=ExtResource("15_xo05s")]
 visible = false

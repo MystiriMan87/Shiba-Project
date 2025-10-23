@@ -530,41 +530,33 @@ tile_set = SubResource("TileSet_ab5jv")
 
 [node name="Goblin_enemy" parent="." instance=ExtResource("12_co50f")]
 position = Vector2(960, -161)
-max_health = 15
+wander_radius = 100.0
 
 [node name="Goblin_enemy7" parent="." instance=ExtResource("12_co50f")]
 position = Vector2(-248, -1254)
-max_health = 15
+wander_radius = 100.0
 
 [node name="Goblin_enemy2" parent="." instance=ExtResource("12_co50f")]
 position = Vector2(1262, -172)
-max_health = 15
+wander_radius = 100.0
 
 [node name="Goblin_enemy5" parent="." instance=ExtResource("12_co50f")]
 position = Vector2(201, -958)
 scale = Vector2(5, 5)
-max_health = 25
-damage = 4
-attack_range = 100
-chase_duration = 10.0
-attack_cooldown = 3.0
+wander_radius = 100.0
 
 [node name="Goblin_enemy6" parent="." instance=ExtResource("12_co50f")]
 position = Vector2(204, -809)
 scale = Vector2(5, 5)
-max_health = 25
-damage = 4
-attack_range = 100
-chase_duration = 10.0
-attack_cooldown = 3.0
+wander_radius = 100.0
 
 [node name="Goblin_enemy3" parent="." instance=ExtResource("12_co50f")]
 position = Vector2(1274, 84)
-max_health = 15
+wander_radius = 100.0
 
 [node name="Goblin_enemy4" parent="." instance=ExtResource("12_co50f")]
 position = Vector2(987, 74)
-max_health = 15
+wander_radius = 100.0
 
 [node name="SpikeTraps" type="Node" parent="."]
 

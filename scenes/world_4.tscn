@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=4 uid="uid://cg55iyfat0xtl"]
+[gd_scene load_steps=35 format=4 uid="uid://cg55iyfat0xtl"]
 
 [ext_resource type="Script" uid="uid://c8dew88u6ily3" path="res://world_3.gd" id="1_25pf3"]
 [ext_resource type="PackedScene" uid="uid://ny2bd86mtevm" path="res://player_camera.tscn" id="2_ca0go"]
@@ -27,6 +27,7 @@
 [ext_resource type="PackedScene" uid="uid://fmjm73g3uhw7" path="res://goblin_enemy.tscn" id="25_mmbe8"]
 [ext_resource type="PackedScene" uid="uid://con8irkei050h" path="res://dark_elf_enemy.tscn" id="26_isq8n"]
 [ext_resource type="FontFile" uid="uid://vkfuxgs5bk41" path="res://Assets/100-Sub-Assets-Free/Fonts/PixeloidSans-nR3g1.ttf" id="27_bgf5n"]
+[ext_resource type="PackedScene" uid="uid://dq5abinvfao8t" path="res://dark_elf.tscn" id="28_mmbe8"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1ojam"]
 texture = ExtResource("8_bgf5n")
@@ -1611,7 +1612,7 @@ scale = Vector2(1.5, 1.5)
 
 [node name="Level_Change_Pedestal" parent="." instance=ExtResource("20_3ub13")]
 visible = false
-position = Vector2(0, 2654)
+position = Vector2(405, 2601)
 scale = Vector2(5, 5)
 
 [node name="PauseMenu" parent="." instance=ExtResource("20_25pf3")]
@@ -1725,26 +1726,22 @@ max_health = 6
 [node name="Goblin_enemy" parent="Enemies" instance=ExtResource("25_mmbe8")]
 position = Vector2(-488, 2375)
 scale = Vector2(4, 4)
-max_health = 12
-wander_radius = 10.0
+wander_radius = 100.0
 
 [node name="Goblin_enemy2" parent="Enemies" instance=ExtResource("25_mmbe8")]
 position = Vector2(-332, 2342)
 scale = Vector2(4, 4)
-max_health = 12
-wander_radius = 10.0
+wander_radius = 100.0
 
 [node name="Goblin_enemy3" parent="Enemies" instance=ExtResource("25_mmbe8")]
 position = Vector2(-200, 2405)
 scale = Vector2(4, 4)
-max_health = 12
-wander_radius = 10.0
+wander_radius = 100.0
 
 [node name="Goblin_enemy4" parent="Enemies" instance=ExtResource("25_mmbe8")]
 position = Vector2(-98, 2339)
 scale = Vector2(4, 4)
-max_health = 12
-wander_radius = 10.0
+wander_radius = 100.0
 
 [node name="goblinRogue_enemy" parent="Enemies" instance=ExtResource("26_isq8n")]
 position = Vector2(-803, 3239)
@@ -1771,6 +1768,7 @@ max_health = 7
 wander_radius = 10.0
 
 [node name="Label" type="Label" parent="."]
+visible = false
 offset_left = 6.0
 offset_top = 4552.0
 offset_right = 905.0
@@ -1784,3 +1782,11 @@ text = "WIP
 Congrats you got to 
 the end!"
 horizontal_alignment = 1
+
+[node name="Boss" parent="." instance=ExtResource("28_mmbe8")]
+position = Vector2(433, 4752)
+scale = Vector2(7, 7)
+max_health = 50
+damage = 3
+attack_range = 150
+is_boss = true
