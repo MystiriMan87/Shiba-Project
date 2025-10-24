@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Shiba project game"
-run/main_scene="uid://byg0qtj4d0dqv"
+run/main_scene="uid://cqdokec8g1tqu"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -35,7 +35,7 @@ window/stretch/mode="viewport"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/AsepriteWizard/plugin.cfg", "res://addons/crt/plugin.cfg", "res://addons/godot_super-wakatime/plugin.cfg", "res://addons/nklbdev.aseprite_importers/plugin.cfg")
+enabled=PackedStringArray("res://addons/AsepriteWizard/plugin.cfg", "res://addons/crt/plugin.cfg", "res://addons/godot_super-wakatime/plugin.cfg")
 
 [global_group]
 
