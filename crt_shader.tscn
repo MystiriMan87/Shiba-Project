@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=3 uid="uid://c3gma4ft77p17"]
+
+[ext_resource type="Script" uid="uid://bghaddibpt6f1" path="res://addons/crt/crt.gd" id="1_7vxyi"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="CRT" type="CanvasLayer" parent="CanvasLayer"]
+script = ExtResource("1_7vxyi")
+resolution = Vector2(320, 240)
+warp_amount = 1.0
+metadata/_custom_type_script = "uid://bghaddibpt6f1"
