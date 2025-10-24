@@ -78,16 +78,16 @@ vec3 fetch_pixel(vec2 uv, vec2 off) {
  * Calculates distance from current pixel to nearest texel center
  * Used for sub-pixel filtering and anti-aliasing
  */
-vec2 Dist(vec2 pos) {
+vec2 Dist(vec2 pos) { 
     pos = pos * resolution;
     return -((pos - floor(pos)) - vec2(0.5));
 }
-
+    
 /**
  * 1D Gaussian function for smooth filtering
  */
-float Gaus(float pos, float scale) {
-    return exp2(scale * pos * pos);
+float Gaus(float pos, float scale) { 
+    return exp2(scale * pos * pos); 
 }
 
 /**
@@ -99,13 +99,13 @@ vec3 Horz3(vec2 pos, float off) {
     vec3 b = fetch_pixel(pos, vec2(-1.0, off));
     vec3 c = fetch_pixel(pos, vec2( 0.0, off));
     vec3 d = fetch_pixel(pos, vec2( 1.0, off));
-
+    
     // Calculate weights based on distance from pixel center
     float dst = Dist(pos).x;
     float wb = Gaus(dst - 1.0, pixel_strength);
     float wc = Gaus(dst + 0.0, pixel_strength);
     float wd = Gaus(dst + 1.0, pixel_strength);
-
+    
     // Return weighted average of samples
     return (b * wb + c * wc + d * wd) / (wb + wc + wd);
 }
@@ -125,7 +125,7 @@ float Scan(vec2 pos, float off) {
  */
 vec3 Tri(vec2 pos) {
     vec3 clr = fetch_pixel(pos, vec2(0.0));
-
+    
     if (scan_line_amount > 0.0) {
         // Sample three vertically adjacent scanlines
         vec3 a = Horz3(pos, -1.0);
@@ -141,7 +141,7 @@ vec3 Tri(vec2 pos) {
         vec3 scanlines = a * wa + b * wb + c * wc;
         clr = mix(clr, scanlines, scan_line_amount);
     }
-
+    
     return clr;
 }
 
@@ -157,7 +157,7 @@ vec2 warp(vec2 uv) {
     float delta2 = dot(delta.xy, delta.xy);
     float delta4 = delta2 * delta2;
     float delta_offset = delta4 * warp_amount;
-
+    
     // Apply warping and normalize back to 0-1 range
     vec2 warped = uv + delta * delta_offset;
     return (warped - 0.5) / mix(1.0, 1.2, warp_amount/5.0) + 0.5;
@@ -171,7 +171,7 @@ float vignette(vec2 uv) {
     // Create circular falloff from center
     uv *= 1.0 - uv.xy;
     float vignette = uv.x * uv.y * 15.0;
-
+    
     // Apply intensity controls
     return pow(vignette, vignette_intensity * vignette_amount);
 }
@@ -183,12 +183,12 @@ float vignette(vec2 uv) {
 vec3 grille(vec2 uv) {
     float unit = PI / 3.0;
     float scale = 2.0 * unit / grille_size;
-
+    
     // Create offset color patterns for RGB channels
     float r = smoothstep(0.5, 0.8, cos(uv.x * scale - unit));
     float g = smoothstep(0.5, 0.8, cos(uv.x * scale + unit));
     float b = smoothstep(0.5, 0.8, cos(uv.x * scale + 3.0 * unit));
-
+    
     // Blend between original color and grille pattern
     return mix(vec3(1.0), vec3(r, g, b), grille_amount);
 }
@@ -201,7 +201,7 @@ float roll_line(vec2 uv) {
     // Create complex wave pattern that moves with time
     float x = uv.y * 3.0 - TIME * roll_speed;
     float f = cos(x) * cos(x * 2.35 + 1.1) * cos(x * 4.45 + 2.3);
-
+    
     // Threshold and smooth the wave to create distinct lines
     float roll_line = smoothstep(0.5, 0.9, f);
     return roll_line * roll_line_amount;
@@ -213,7 +213,7 @@ void fragment() {
     // Get screen coordinates and apply screen warping
     vec2 pix = FRAGCOORD.xy;
     vec2 pos = warp(SCREEN_UV);
-
+    
     // Generate rolling interference lines if enabled
     float line = 0.0;
     if (roll_line_amount > 0.0) {
@@ -229,33 +229,33 @@ void fragment() {
 
     // Get base color with scanline processing
     vec3 clr = Tri(pos);
-
+    
     // Apply chromatic aberration (color separation)
     if (aberation_amount > 0.0) {
         float chromatic = aberation_amount + line * 2.0;  // Enhanced by rolling lines
         vec2 chromatic_x = vec2(chromatic, 0.0) / resolution.x;
         vec2 chromatic_y = vec2(0.0, chromatic/2.0) / resolution.y;
-
+        
         // Sample RGB channels with slight offsets
         float r = Tri(pos - chromatic_x).r;  // Red shifted left
         float g = Tri(pos + chromatic_y).g;  // Green shifted down
         float b = Tri(pos + chromatic_x).b;  // Blue shifted right
         clr = vec3(r, g, b);
     }
-
+    
     // Apply shadow mask/grille effect
     if (grille_amount > 0.0) {
         clr *= grille(pix);
     }
-
+    
     // Adjust overall brightness based on effects
     clr *= 1.0 + scan_line_amount * 0.6 + line * 3.0 + grille_amount * 2.0;
-
+    
     // Apply vignette (darken edges)
     if (vignette_amount > 0.0) {
         clr *= vignette(pos);
     }
-
+    
     // Output final color
     COLOR.rgb = clr;
     COLOR.a = 1.0;

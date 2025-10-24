@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=4 uid="uid://cqdokec8g1tqu"]
+[gd_scene load_steps=31 format=4 uid="uid://cqdokec8g1tqu"]
 
 [ext_resource type="Script" uid="uid://c8dew88u6ily3" path="res://world_3.gd" id="1_m3jh3"]
 [ext_resource type="PackedScene" uid="uid://ny2bd86mtevm" path="res://player_camera.tscn" id="2_lkfvj"]
@@ -19,7 +19,9 @@
 [ext_resource type="PackedScene" uid="uid://0soyg5pq7u3d" path="res://mysterious_NPC.tscn" id="17_oyiwx"]
 [ext_resource type="Script" uid="uid://cwr05foje27n4" path="res://mysterious_npc.gd" id="18_7dsii"]
 [ext_resource type="PackedScene" uid="uid://be8kk06nbgra5" path="res://skeleton_NPC.tscn" id="19_qja4o"]
+[ext_resource type="PackedScene" uid="uid://cv5q5jo7523bl" path="res://scenes/skeleton_enemy_v2.tscn" id="20_3tiay"]
 [ext_resource type="PackedScene" uid="uid://bq7bbdmxxgdbv" path="res://level_change_pedestal.tscn" id="20_retbw"]
+[ext_resource type="PackedScene" uid="uid://dpctdss2lq6w3" path="res://ghost_enemy.tscn" id="21_kvd0n"]
 [ext_resource type="PackedScene" uid="uid://dlsog5o45sqr6" path="res://scenes/PauseMenu.tscn" id="21_uxbfi"]
 [ext_resource type="PackedScene" uid="uid://c42ybnvh2sa5t" path="res://merchat_npc.tscn" id="22_8tc4w"]
 [ext_resource type="PackedScene" uid="uid://bgg32r6jrhvd4" path="res://Trader_NPC.tscn" id="23_gpm48"]
@@ -1591,6 +1593,46 @@ position = Vector2(2841, 2544)
 scale = Vector2(1.5, 1.5)
 
 [node name="Enemies" type="Node" parent="."]
+
+[node name="SkeletonEnemyV2" parent="Enemies" instance=ExtResource("20_3tiay")]
+position = Vector2(-168, 3124)
+scale = Vector2(5, 5)
+
+[node name="SkeletonEnemyV3" parent="Enemies" instance=ExtResource("20_3tiay")]
+position = Vector2(125, 3114)
+scale = Vector2(5, 5)
+
+[node name="SkeletonEnemyV4" parent="Enemies" instance=ExtResource("20_3tiay")]
+position = Vector2(-31, 3276)
+scale = Vector2(5, 5)
+
+[node name="SkeletonEnemyV5" parent="Enemies" instance=ExtResource("20_3tiay")]
+position = Vector2(148, 2901)
+scale = Vector2(5, 5)
+
+[node name="SkeletonEnemyV6" parent="Enemies" instance=ExtResource("20_3tiay")]
+position = Vector2(-167, 2900)
+scale = Vector2(5, 5)
+
+[node name="ghost_enemy" parent="Enemies" instance=ExtResource("21_kvd0n")]
+position = Vector2(-17, 2997)
+scale = Vector2(5, 5)
+
+[node name="ghost_enemy2" parent="Enemies" instance=ExtResource("21_kvd0n")]
+position = Vector2(-315, 3295)
+scale = Vector2(5, 5)
+
+[node name="ghost_enemy3" parent="Enemies" instance=ExtResource("21_kvd0n")]
+position = Vector2(-333, 3044)
+scale = Vector2(5, 5)
+
+[node name="ghost_enemy4" parent="Enemies" instance=ExtResource("21_kvd0n")]
+position = Vector2(278, 3032)
+scale = Vector2(5, 5)
+
+[node name="ghost_enemy5" parent="Enemies" instance=ExtResource("21_kvd0n")]
+position = Vector2(285, 3264)
+scale = Vector2(5, 5)
 
 [node name="Level_Change_Pedestal" parent="." instance=ExtResource("20_retbw")]
 position = Vector2(0, 2654)

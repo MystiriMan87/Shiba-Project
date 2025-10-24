@@ -291,6 +291,7 @@ _data = {
 }
 
 [node name="ghost_enemy" type="CharacterBody2D"]
+texture_filter = 1
 script = ExtResource("1_2fkgl")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

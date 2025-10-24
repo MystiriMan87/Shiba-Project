@@ -12,20 +12,39 @@
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hiloj"]
 bg_color = Color(0.674531, 0.412541, 0.239348, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0.0562916, 0.0562916, 0.0562915, 1)
 corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cbg41"]
-bg_color = Color(0.6, 0.6, 0.6, 0)
+bg_color = Color(0.815686, 0.52549, 0.231373, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_babf8"]
 bg_color = Color(0.815568, 0.524905, 0.231462, 1)
-corner_radius_top_left = 15
-corner_radius_top_right = 15
-corner_radius_bottom_right = 15
-corner_radius_bottom_left = 15
+border_width_left = 2
+border_width_top = 2
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.149475, 0.149475, 0.149474, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
 [node name="PlayerUI" type="Control" groups=["ui"]]
 layout_mode = 3
@@ -147,22 +166,23 @@ layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -276.0
-offset_top = 31.0
-offset_right = 277.0
+offset_left = -128.0
+offset_top = 32.0
+offset_right = 120.0
 offset_bottom = 90.0
 grow_horizontal = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_cbg41")
 
 [node name="TitleLabel" type="Label" parent="InventoryPanel/Header"]
 layout_mode = 0
-offset_right = 545.0
+offset_right = 245.0
 offset_bottom = 51.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("9_hiloj")
 theme_override_font_sizes/font_size = 35
 text = "Inventory"
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="ContentPanel" type="Panel" parent="InventoryPanel"]
 layout_mode = 0
@@ -181,4 +201,4 @@ offset_bottom = 383.0
 
 [node name="InventoryGrid" type="GridContainer" parent="InventoryPanel/ContentPanel/ScrollContainer"]
 layout_mode = 2
-columns = 11
+columns = 5
