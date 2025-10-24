@@ -49,6 +49,7 @@ func _ready():
 	if not player:
 		print("Warning: Player not found")
 	
+	# Only create the things that still need code (optional UI elements)
 	if not echo_container:
 		create_echo_pips()
 	if not boss_bar_container:
@@ -201,7 +202,8 @@ func create_enhanced_inventory_slot(index: int) -> Control:
 	
 	return slot
 
-
+# Keep all your existing functions below this point
+# (create_echo_pips, create_boss_bar, create_dash_bar, setup_death_screen, etc.)
 
 func create_echo_pips():
 	var container = HBoxContainer.new()
