@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://cqk6unim2ftgo"]
+[gd_scene load_steps=10 format=3 uid="uid://cqk6unim2ftgo"]
 
 [ext_resource type="Script" uid="uid://bov65j62y0be8" path="res://scripts/PlayerUI.gd" id="1_lwipk"]
 [ext_resource type="Texture2D" uid="uid://d12anw6sa6wxg" path="res://Assets/16x64 Red Simple Healthbar.png" id="2_654h1"]
@@ -8,24 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://dd0gqips5pn8y" path="res://Assets/L1.png" id="6_gxl1c"]
 [ext_resource type="Script" uid="uid://d2wr72yy2hh5q" path="res://fps_counter.gd" id="7_gxl1c"]
 [ext_resource type="Script" uid="uid://cwpt7fbm7137s" path="res://level_timer.gd" id="8_vg8o0"]
-[ext_resource type="FontFile" uid="uid://cuifcrxdin7jw" path="res://Assets/100-Sub-Assets-Free/Fonts/PixeloidMono-1G8ae.ttf" id="9_hiloj"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hiloj"]
-bg_color = Color(0.674531, 0.412541, 0.239348, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cbg41"]
-bg_color = Color(0.6, 0.6, 0.6, 0)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_babf8"]
-bg_color = Color(0.815568, 0.524905, 0.231462, 1)
-corner_radius_top_left = 15
-corner_radius_top_right = 15
-corner_radius_bottom_right = 15
-corner_radius_bottom_left = 15
+[ext_resource type="Texture2D" uid="uid://csen0ptmcym2v" path="res://Assets/GUI Spritesheets/GUI_Spritesheet.png" id="9_hiloj"]
 
 [node name="PlayerUI" type="Control" groups=["ui"]]
 layout_mode = 3
@@ -134,51 +117,65 @@ offset_right = 1916.0
 offset_bottom = 526.0
 script = ExtResource("8_vg8o0")
 
-[node name="InventoryPanel" type="Panel" parent="."]
+[node name="InventoryPanel" type="NinePatchRect" parent="."]
 layout_mode = 0
 offset_left = 519.0
 offset_top = 283.0
 offset_right = 1449.0
 offset_bottom = 792.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_hiloj")
+texture = ExtResource("9_hiloj")
+patch_margin_left = 10
+patch_margin_top = 10
+patch_margin_right = 10
+patch_margin_bottom = 10
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
 
-[node name="Header" type="Panel" parent="InventoryPanel"]
+[node name="TopTabsContainer" type="HBoxContainer" parent="InventoryPanel"]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -276.0
-offset_top = 31.0
-offset_right = 277.0
-offset_bottom = 90.0
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 40.0
 grow_horizontal = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_cbg41")
 
-[node name="TitleLabel" type="Label" parent="InventoryPanel/Header"]
-layout_mode = 0
-offset_right = 545.0
-offset_bottom = 51.0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_fonts/font = ExtResource("9_hiloj")
-theme_override_font_sizes/font_size = 35
-text = "Inventory"
-horizontal_alignment = 1
+[node name="InvTab" type="TextureButton" parent="InventoryPanel/TopTabsContainer"]
+layout_mode = 2
+
+[node name="MapTab" type="TextureButton" parent="InventoryPanel/TopTabsContainer"]
+layout_mode = 2
+
+[node name="SkillsTab" type="TextureButton" parent="InventoryPanel/TopTabsContainer"]
+layout_mode = 2
 
 [node name="ContentPanel" type="Panel" parent="InventoryPanel"]
 layout_mode = 0
-offset_left = 28.0
-offset_top = 128.0
-offset_right = 905.0
-offset_bottom = 485.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_babf8")
+offset_left = 30.0
+offset_top = 57.0
+offset_right = 908.0
+offset_bottom = 492.0
 
-[node name="ScrollContainer" type="ScrollContainer" parent="InventoryPanel/ContentPanel"]
-layout_mode = 1
-offset_left = 24.0
-offset_top = 27.0
-offset_right = 900.0
-offset_bottom = 383.0
+[node name="InventoryGrid" type="GridContainer" parent="InventoryPanel/ContentPanel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 7
 
-[node name="InventoryGrid" type="GridContainer" parent="InventoryPanel/ContentPanel/ScrollContainer"]
-layout_mode = 2
-columns = 11
+[node name="BottomDecorations" type="Control" parent="InventoryPanel"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="CornerLeft" type="TextureRect" parent="InventoryPanel/BottomDecorations"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="CornerRight" type="TextureRect" parent="InventoryPanel/BottomDecorations"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
