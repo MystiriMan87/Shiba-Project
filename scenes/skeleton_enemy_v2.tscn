@@ -1,7 +1,8 @@
-[gd_scene load_steps=25 format=3 uid="uid://cv5q5jo7523bl"]
+[gd_scene load_steps=26 format=3 uid="uid://cv5q5jo7523bl"]
 
 [ext_resource type="Script" uid="uid://dddopf30dcvlk" path="res://scripts/skeleton_enemy_v2.gd" id="1_skeleton"]
 [ext_resource type="Texture2D" uid="uid://c3be27dfqm6iw" path="res://Assets/Snoblin/Snoblin_Skeleton_Warriors/Assets/Skeleton Warrior/skeleton_warrior.png" id="2_exbgd"]
+[ext_resource type="PackedScene" uid="uid://bk4x7prqxo3wg" path="res://shadow.tscn" id="3_v410c"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 8.35996
@@ -386,6 +387,7 @@ lunge_duration = 0.1
 wander_radius = 70.0
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+z_index = 2
 texture = ExtResource("2_exbgd")
 hframes = 4
 vframes = 18
@@ -434,3 +436,7 @@ visible = false
 position = Vector2(-2.66667, 6)
 shape = SubResource("CircleShape2D_1")
 debug_color = Color(1, 0.00392157, 0, 0.419608)
+
+[node name="Shadow" parent="." instance=ExtResource("3_v410c")]
+position = Vector2(-2.98023e-08, 7.66667)
+scale = Vector2(0.3, 0.095)

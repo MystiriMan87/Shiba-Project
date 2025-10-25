@@ -1783,7 +1783,7 @@ Congrats you got to
 the end!"
 horizontal_alignment = 1
 
-[node name="Boss" parent="." instance=ExtResource("28_mmbe8")]
+[node name="Boss" parent="." groups=["boss"] instance=ExtResource("28_mmbe8")]
 position = Vector2(433, 4752)
 scale = Vector2(7, 7)
 max_health = 50

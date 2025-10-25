@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://bk4x7prqxo3wg"]
+
+[sub_resource type="Gradient" id="Gradient_dqkch"]
+offsets = PackedFloat32Array(0.503788, 1)
+colors = PackedColorArray(0, 0, 0, 1, 0.250213, 0.250213, 0.250213, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_qlg0r"]
+gradient = SubResource("Gradient_dqkch")
+fill = 1
+fill_from = Vector2(0.487179, 0.482906)
+fill_to = Vector2(0.485043, 0.106838)
+
+[node name="Shadow" type="Sprite2D"]
+z_index = 1
+z_as_relative = false
+scale = Vector2(1, 0.3125)
+texture = SubResource("GradientTexture2D_qlg0r")

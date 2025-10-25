@@ -4,6 +4,7 @@ extends Control
 @export var max_inventory_slots: int = 20
 @export var weapon_scale_factor: float = 0.6
 @export var slot_padding: int = 8
+@export var boss_detection_distance: float = 500.0
 
 var inventory_slots: Array = []
 var selected_slot_index: int = -1
@@ -14,8 +15,8 @@ var active_notifications: Array = []
 var notification_spacing: float = 30.0
 var game_start_time: float = 0.0
 var enemies_killed: int = 0
+var connected_bosses: Array = []
 
-# Reference manually created nodes
 @onready var inventory_panel: Panel = $InventoryPanel
 @onready var inventory_grid: GridContainer = $InventoryPanel/ContentPanel/ScrollContainer/InventoryGrid
 @onready var dash_bar: ProgressBar = $DashContainer/DashBar if has_node("DashContainer/DashBar") else null
@@ -44,12 +45,6 @@ func _ready():
 		controller_evt.button_index = JOY_BUTTON_Y
 		InputMap.action_add_event("inventory_toggle", controller_evt)
 	
-	if not item_manager:
-		print("Warning: ItemManager not found")
-	if not player:
-		print("Warning: Player not found")
-	
-	# Only create the things that still need code (optional UI elements)
 	if not echo_container:
 		create_echo_pips()
 	if not boss_bar_container:
@@ -96,17 +91,12 @@ func connect_signals():
 		if player.has_signal("echo_spawned"):
 			if not player.echo_spawned.is_connected(_on_echo_spawned):
 				player.echo_spawned.connect(_on_echo_spawned)
-	
-	var bosses = get_tree().get_nodes_in_group("boss")
-	for b in bosses:
-		_connect_boss_signals(b)
 
 func setup_inventory_ui():
 	create_inventory_slots()
 	refresh_inventory_display()
 
 func create_inventory_slots():
-	# Clear existing slots
 	for slot in inventory_slots:
 		if is_instance_valid(slot):
 			slot.queue_free()
@@ -116,7 +106,6 @@ func create_inventory_slots():
 		for child in inventory_grid.get_children():
 			child.queue_free()
 	
-	# Create slots
 	for i in range(max_inventory_slots):
 		var slot = create_enhanced_inventory_slot(i)
 		inventory_slots.append(slot)
@@ -202,9 +191,6 @@ func create_enhanced_inventory_slot(index: int) -> Control:
 	
 	return slot
 
-# Keep all your existing functions below this point
-# (create_echo_pips, create_boss_bar, create_dash_bar, setup_death_screen, etc.)
-
 func create_echo_pips():
 	var container = HBoxContainer.new()
 	container.name = "EchoPips"
@@ -217,32 +203,74 @@ func create_echo_pips():
 func create_boss_bar():
 	var container = Panel.new()
 	container.name = "BossBarContainer"
-	container.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	container.offset_top = 80
+	container.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	container.offset_top = -70
+	container.offset_bottom = 0
 	container.visible = false
+	
+	var bg_style = StyleBoxFlat.new()
+	bg_style.bg_color = Color(0, 0, 0, 0.6)
+	bg_style.border_width_top = 2
+	bg_style.border_width_bottom = 2
+	bg_style.border_color = Color(0.5, 0, 0, 0.8)
+	container.add_theme_stylebox_override("panel", bg_style)
 	add_child(container)
 	
 	var inner = CenterContainer.new()
+	inner.name = "BossInner"
 	inner.set_anchors_preset(Control.PRESET_FULL_RECT)
 	container.add_child(inner)
 	
 	var vbox = VBoxContainer.new()
+	vbox.name = "BossVBox"
 	vbox.add_theme_constant_override("separation", 6)
 	inner.add_child(vbox)
 	
 	boss_label = Label.new()
+	boss_label.name = "BossName"
 	boss_label.text = "Boss"
 	boss_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	boss_label.add_theme_font_size_override("font_size", 20)
-	boss_label.add_theme_color_override("font_color", Color(1, 0.85, 0.2))
+	boss_label.add_theme_color_override("font_color", Color(1, 0.2, 0.2))
+	boss_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+	boss_label.add_theme_constant_override("shadow_offset_x", 2)
+	boss_label.add_theme_constant_override("shadow_offset_y", 2)
 	vbox.add_child(boss_label)
 	
 	boss_bar = ProgressBar.new()
+	boss_bar.name = "BossBar"
 	boss_bar.min_value = 0
 	boss_bar.max_value = 100
 	boss_bar.value = 100
-	boss_bar.custom_minimum_size = Vector2(620, 24)
+	boss_bar.custom_minimum_size = Vector2(620, 28)
 	boss_bar.show_percentage = false
+	
+	var bar_style = StyleBoxFlat.new()
+	bar_style.bg_color = Color(0.8, 0, 0, 1)
+	bar_style.border_width_top = 2
+	bar_style.border_width_bottom = 2
+	bar_style.border_width_left = 2
+	bar_style.border_width_right = 2
+	bar_style.border_color = Color(0.3, 0, 0, 1)
+	bar_style.corner_radius_top_left = 4
+	bar_style.corner_radius_top_right = 4
+	bar_style.corner_radius_bottom_left = 4
+	bar_style.corner_radius_bottom_right = 4
+	boss_bar.add_theme_stylebox_override("fill", bar_style)
+	
+	var bg_bar_style = StyleBoxFlat.new()
+	bg_bar_style.bg_color = Color(0.2, 0, 0, 0.8)
+	bg_bar_style.border_width_top = 2
+	bg_bar_style.border_width_bottom = 2
+	bg_bar_style.border_width_left = 2
+	bg_bar_style.border_width_right = 2
+	bg_bar_style.border_color = Color(0.3, 0, 0, 1)
+	bg_bar_style.corner_radius_top_left = 4
+	bg_bar_style.corner_radius_top_right = 4
+	bg_bar_style.corner_radius_bottom_left = 4
+	bg_bar_style.corner_radius_bottom_right = 4
+	boss_bar.add_theme_stylebox_override("background", bg_bar_style)
+	
 	vbox.add_child(boss_bar)
 	
 	boss_bar_container = container
@@ -255,10 +283,12 @@ func create_dash_bar():
 	add_child(dash_container)
 	
 	dash_label = Label.new()
+	dash_label.name = "DashLabel"
 	dash_label.visible = false
 	dash_container.add_child(dash_label)
 	
 	dash_bar = ProgressBar.new()
+	dash_bar.name = "DashBar"
 	dash_bar.min_value = 0
 	dash_bar.max_value = 100
 	dash_bar.value = 100
@@ -284,19 +314,6 @@ func setup_death_screen():
 	death_panel.size = Vector2(400, 300)
 	death_panel.position = Vector2(-200, -150)
 	death_screen.add_child(death_panel)
-	
-	# Add rest of death screen setup...
-
-# Keep ALL your other existing functions from the original script:
-# - update_health_display()
-# - refresh_inventory_display()
-# - display_item_in_slot()
-# - handle_item_interaction()
-# - toggle_inventory()
-# - navigate_inventory()
-# - _input()
-# - All signal handlers
-# - etc.
 
 func toggle_inventory():
 	if inventory_panel:
@@ -402,6 +419,36 @@ func _input(event):
 		if event.is_action_pressed("inventory_toggle"):
 			toggle_inventory()
 
+func _process(_delta):
+	if not player:
+		return
+	
+	var bosses = get_tree().get_nodes_in_group("boss")
+	var closest_boss = null
+	var closest_distance = boss_detection_distance
+	
+	for boss in bosses:
+		if boss and is_instance_valid(boss):
+			var distance = player.global_position.distance_to(boss.global_position)
+			if distance < closest_distance:
+				closest_boss = boss
+				closest_distance = distance
+			
+			if not connected_bosses.has(boss):
+				_connect_boss_signals(boss)
+				connected_bosses.append(boss)
+	
+	if closest_boss and boss_bar_container:
+		if not boss_bar_container.visible:
+			boss_bar_container.visible = true
+			boss_bar_container.modulate.a = 0.0
+			var tween = create_tween()
+			tween.tween_property(boss_bar_container, "modulate:a", 1.0, 0.3)
+	elif boss_bar_container and boss_bar_container.visible:
+		var tween = create_tween()
+		tween.tween_property(boss_bar_container, "modulate:a", 0.0, 0.3)
+		tween.tween_callback(func(): boss_bar_container.visible = false)
+
 func _on_inventory_updated():
 	refresh_inventory_display()
 
@@ -412,16 +459,57 @@ func _on_player_health_changed(new_health: int):
 	update_health_display()
 
 func _on_player_dash_changed(new_energy: int):
-	pass
+	if dash_bar:
+		dash_bar.value = new_energy
 
 func _on_player_died():
-	pass
+	if death_screen:
+		death_screen.visible = true
+		var tween = create_tween()
+		tween.tween_property(death_screen, "modulate:a", 1.0, 0.5)
 
 func _on_enemy_killed():
 	enemies_killed += 1
 
 func _connect_boss_signals(boss: Node):
-	pass
+	if not boss:
+		return
+	
+	if boss.has_signal("health_changed"):
+		if not boss.health_changed.is_connected(_on_boss_health_changed):
+			boss.health_changed.connect(_on_boss_health_changed.bind(boss))
+	
+	if boss.has_signal("died"):
+		if not boss.died.is_connected(_on_boss_died):
+			boss.died.connect(_on_boss_died.bind(boss))
+	
+	if boss_label and boss.has_method("get_boss_name"):
+		boss_label.text = boss.get_boss_name()
+	elif boss_label:
+		boss_label.text = boss.name
+	
+	if boss_bar and boss.has_method("get_max_health") and boss.has_method("get_health"):
+		boss_bar.max_value = boss.get_max_health()
+		boss_bar.value = boss.get_health()
+	elif boss_bar and "max_health" in boss and "health" in boss:
+		boss_bar.max_value = boss.max_health
+		boss_bar.value = boss.health
+
+func _on_boss_health_changed(new_health: int, boss: Node = null):
+	if not boss_bar:
+		return
+	
+	var tween = create_tween()
+	tween.tween_property(boss_bar, "value", new_health, 0.3)
+
+func _on_boss_died(boss: Node = null):
+	if boss and connected_bosses.has(boss):
+		connected_bosses.erase(boss)
+	
+	if boss_bar_container and boss_bar_container.visible:
+		var tween = create_tween()
+		tween.tween_property(boss_bar_container, "modulate:a", 0.0, 0.5)
+		tween.tween_callback(func(): boss_bar_container.visible = false)
 
 func update_health_display():
 	pass
@@ -443,7 +531,6 @@ func _on_echoes_changed(count: int):
 func _on_echo_spawned(duration: float):
 	if not echo_container:
 		return
-	# Brief glow on newest pip
 	var idx = min(2, max(0, (player.get_echo_count() - 1))) if player and player.has_method("get_echo_count") else 0
 	if idx < echo_container.get_child_count():
 		var pip = echo_container.get_child(idx)
@@ -453,4 +540,4 @@ func _on_echo_spawned(duration: float):
 			t.tween_property(pip, "modulate", Color(0.2, 0.6, 1.0, 0.9), 0.18)
 			
 func show_notification(message: String, color: Color = Color.WHITE, duration: float = 2.0):
-	pass
+	pass 

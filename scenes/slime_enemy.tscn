@@ -1,8 +1,9 @@
-[gd_scene load_steps=11 format=3 uid="uid://drik1twhweam8"]
+[gd_scene load_steps=12 format=3 uid="uid://drik1twhweam8"]
 
 [ext_resource type="Script" uid="uid://ba4klw55e614j" path="res://scripts/enemy.gd" id="1_md0e3"]
 [ext_resource type="Texture2D" uid="uid://cgl806wq3ydkm" path="res://addons/kenney_particle_pack/dirt_03.png" id="2_fq0mw"]
 [ext_resource type="Texture2D" uid="uid://pc5fy4ks2pd" path="res://Assets/green-slime-spritesheet.png" id="2_md0e3"]
+[ext_resource type="PackedScene" uid="uid://bk4x7prqxo3wg" path="res://shadow.tscn" id="4_2blxa"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_5uy6h"]
 size = Vector2(52, 38)
@@ -77,6 +78,7 @@ jump_arc_height = 100
 toxic_puddle_texture = ExtResource("2_fq0mw")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+z_index = 2
 texture_filter = 1
 position = Vector2(1, -16)
 scale = Vector2(2, 2)
@@ -84,6 +86,7 @@ texture = ExtResource("2_md0e3")
 hframes = 11
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
 position = Vector2(1, 0)
 shape = SubResource("RectangleShape2D_5uy6h")
 
@@ -97,12 +100,14 @@ offset_bottom = -78.0
 show_percentage = false
 
 [node name="DetectionArea" type="Area2D" parent="."]
+visible = false
 collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea"]
 shape = SubResource("CircleShape2D_md0e3")
 
 [node name="AttackArea" type="Area2D" parent="."]
+visible = false
 collision_layer = 8
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackArea"]
@@ -120,3 +125,6 @@ offset_bottom = -38.0
 libraries = {
 &"": SubResource("AnimationLibrary_xwavj")
 }
+
+[node name="Shadow" parent="." instance=ExtResource("4_2blxa")]
+position = Vector2(2, 17)

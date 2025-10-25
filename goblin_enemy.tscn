@@ -1,7 +1,8 @@
-[gd_scene load_steps=23 format=3 uid="uid://fmjm73g3uhw7"]
+[gd_scene load_steps=24 format=3 uid="uid://fmjm73g3uhw7"]
 
 [ext_resource type="Texture2D" uid="uid://cyrakkebvjxkl" path="res://Assets/Snoblin/Snoblin_Goblin_Clan/Assets/Goblin Barbarian/goblin_barbarian.png" id="1_51818"]
 [ext_resource type="Script" uid="uid://bsq8b33pthepd" path="res://goblin_enemy.gd" id="1_eqhuu"]
+[ext_resource type="PackedScene" uid="uid://bk4x7prqxo3wg" path="res://shadow.tscn" id="3_wjlpu"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_fl3bm"]
 
@@ -309,6 +310,7 @@ script = ExtResource("1_eqhuu")
 wander_radius = 70.0
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+z_index = 2
 texture = ExtResource("1_51818")
 hframes = 4
 vframes = 27
@@ -334,3 +336,7 @@ visible = false
 [node name="AttackCollison" type="CollisionShape2D" parent="AttackArea"]
 shape = SubResource("CircleShape2D_vcxjn")
 debug_color = Color(0.980392, 0, 0, 0.419608)
+
+[node name="Shadow" parent="." instance=ExtResource("3_wjlpu")]
+position = Vector2(0, 7)
+scale = Vector2(0.3, 0.094)
