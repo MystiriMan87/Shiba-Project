@@ -16,6 +16,8 @@ var notification_spacing: float = 30.0
 var game_start_time: float = 0.0
 var enemies_killed: int = 0
 var connected_bosses: Array = []
+var current_boss: Node = null
+
 
 @onready var inventory_panel: Panel = $InventoryPanel
 @onready var inventory_grid: GridContainer = $InventoryPanel/ContentPanel/ScrollContainer/InventoryGrid
@@ -26,6 +28,10 @@ var connected_bosses: Array = []
 @onready var boss_bar: ProgressBar = $BossBarContainer/BossInner/BossVBox/BossBar if has_node("BossBarContainer/BossInner/BossVBox/BossBar") else null
 @onready var boss_label: Label = $BossBarContainer/BossInner/BossVBox/BossName if has_node("BossBarContainer/BossInner/BossVBox/BossName") else null
 @onready var death_screen: Control = $DeathScreen if has_node("DeathScreen") else null
+
+@onready var victory_popup: Control = $VictoryPopup if has_node("VictoryPopup") else null
+@onready var victory_text: Label = $VictoryPopup/Banner/MainText if has_node("VictoryPopup/Banner/MainText") else null
+@onready var victory_banner: Panel = $VictoryPopup/Banner if has_node("VictoryPopup/Banner") else null
 
 func _ready():
 	if get_parent() is CanvasLayer:
@@ -91,6 +97,14 @@ func connect_signals():
 		if player.has_signal("echo_spawned"):
 			if not player.echo_spawned.is_connected(_on_echo_spawned):
 				player.echo_spawned.connect(_on_echo_spawned)
+
+	call_deferred("_connect_to_existing_bosses")
+	
+func _connect_to_existing_bosses():
+	var bosses = get_tree().get_nodes_in_group("boss")
+	for boss in bosses:
+		if boss and is_instance_valid(boss):
+			_connect_boss_signals(boss)
 
 func setup_inventory_ui():
 	create_inventory_slots()
@@ -204,8 +218,8 @@ func create_boss_bar():
 	var container = Panel.new()
 	container.name = "BossBarContainer"
 	container.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	container.offset_top = -70
-	container.offset_bottom = 0
+	container.offset_top = -120
+	container.offset_bottom = -50
 	container.visible = false
 	
 	var bg_style = StyleBoxFlat.new()
@@ -423,31 +437,31 @@ func _process(_delta):
 	if not player:
 		return
 	
+	# Find closest boss
 	var bosses = get_tree().get_nodes_in_group("boss")
 	var closest_boss = null
 	var closest_distance = boss_detection_distance
 	
 	for boss in bosses:
-		if boss and is_instance_valid(boss):
+		if boss and is_instance_valid(boss) and not boss.is_dead:
 			var distance = player.global_position.distance_to(boss.global_position)
 			if distance < closest_distance:
 				closest_boss = boss
 				closest_distance = distance
-			
-			if not connected_bosses.has(boss):
-				_connect_boss_signals(boss)
-				connected_bosses.append(boss)
 	
-	if closest_boss and boss_bar_container:
-		if not boss_bar_container.visible:
-			boss_bar_container.visible = true
-			boss_bar_container.modulate.a = 0.0
-			var tween = create_tween()
-			tween.tween_property(boss_bar_container, "modulate:a", 1.0, 0.3)
+	# Update current boss
+	if closest_boss != current_boss:
+		if current_boss:
+			_disconnect_boss(current_boss)
+		current_boss = closest_boss
+		if current_boss:
+			_connect_to_boss(current_boss)
+	
+	# Update boss bar visibility and value
+	if current_boss and is_instance_valid(current_boss):
+		_update_boss_bar_display()
 	elif boss_bar_container and boss_bar_container.visible:
-		var tween = create_tween()
-		tween.tween_property(boss_bar_container, "modulate:a", 0.0, 0.3)
-		tween.tween_callback(func(): boss_bar_container.visible = false)
+		_hide_boss_bar()
 
 func _on_inventory_updated():
 	refresh_inventory_display()
@@ -472,35 +486,184 @@ func _on_enemy_killed():
 	enemies_killed += 1
 
 func _connect_boss_signals(boss: Node):
-	if not boss:
+	if not boss or not is_instance_valid(boss):
 		return
 	
+	print("Connecting to boss: ", boss.name)  # Debug print
+	
+	# Connect to boss_engaged signal
+	if boss.has_signal("boss_engaged"):
+		if not boss.boss_engaged.is_connected(_on_boss_engaged):
+			boss.boss_engaged.connect(_on_boss_engaged)
+			print("Connected to boss_engaged signal")
+	
+	# Connect to health_changed signal
 	if boss.has_signal("health_changed"):
 		if not boss.health_changed.is_connected(_on_boss_health_changed):
 			boss.health_changed.connect(_on_boss_health_changed.bind(boss))
+			print("Connected to health_changed signal")
+	elif boss.has_signal("boss_health_changed"):
+		if not boss.boss_health_changed.is_connected(_on_boss_health_changed):
+			boss.boss_health_changed.connect(_on_boss_health_changed.bind(boss))
+			print("Connected to boss_health_changed signal")
 	
-	if boss.has_signal("died"):
-		if not boss.died.is_connected(_on_boss_died):
-			boss.died.connect(_on_boss_died.bind(boss))
+	# Connect to boss_disengaged signal
+	if boss.has_signal("boss_disengaged"):
+		if not boss.boss_disengaged.is_connected(_on_boss_disengaged):
+			boss.boss_disengaged.connect(_on_boss_disengaged)
 	
-	if boss_label and boss.has_method("get_boss_name"):
-		boss_label.text = boss.get_boss_name()
-	elif boss_label:
-		boss_label.text = boss.name
+	# Set initial boss bar values
+	if boss_label:
+		var boss_type = "Boss"
+		if "enemy_type" in boss:
+			boss_type = boss.enemy_type.capitalize()
+		boss_label.text = boss_type
 	
-	if boss_bar and boss.has_method("get_max_health") and boss.has_method("get_health"):
-		boss_bar.max_value = boss.get_max_health()
-		boss_bar.value = boss.get_health()
-	elif boss_bar and "max_health" in boss and "health" in boss:
-		boss_bar.max_value = boss.max_health
-		boss_bar.value = boss.health
+	if boss_bar:
+		var max_hp = 100
+		if "max_health" in boss:
+			max_hp = boss.max_health
+		
+		var curr_hp = max_hp
+		if "current_health" in boss:
+			curr_hp = boss.current_health
+		
+		boss_bar.max_value = max_hp
+		boss_bar.value = curr_hp
+		print("Set boss bar - Max: ", max_hp, " Current: ", curr_hp)
+	
+	if not connected_bosses.has(boss):
+		connected_bosses.append(boss)
 
-func _on_boss_health_changed(new_health: int, boss: Node = null):
-	if not boss_bar:
+func _connect_to_boss(boss: Node):
+	if not boss or not is_instance_valid(boss):
+		return
+	
+	print("=== Connecting to boss: ", boss.name, " ===")
+	
+	# Connect signals
+	if boss.has_signal("boss_engaged"):
+		if not boss.boss_engaged.is_connected(_on_boss_engaged):
+			boss.boss_engaged.connect(_on_boss_engaged)
+			print("✓ Connected boss_engaged")
+	
+	if boss.has_signal("health_changed"):
+		if not boss.health_changed.is_connected(_on_boss_health_changed):
+			boss.health_changed.connect(_on_boss_health_changed)
+			print("✓ Connected health_changed")
+	
+	if boss.has_signal("boss_disengaged"):
+		if not boss.boss_disengaged.is_connected(_on_boss_disengaged):
+			boss.boss_disengaged.connect(_on_boss_disengaged)
+			print("✓ Connected boss_disengaged")
+	
+	# Initialize boss bar
+	_show_boss_bar(boss)
+	
+	
+func _show_boss_bar(boss: Node):
+	if not boss_bar or not boss_bar_container:
+		return
+	
+	# Get boss name
+	var boss_name = "Boss"
+	if "enemy_type" in boss:
+		boss_name = boss.enemy_type.capitalize() + " Champion"
+	
+	# Get health values
+	var max_hp = 100
+	var curr_hp = 100
+	
+	if "max_health" in boss:
+		max_hp = boss.max_health
+	if "current_health" in boss:
+		curr_hp = boss.current_health
+	
+	print("Showing boss bar - Name: ", boss_name, " HP: ", curr_hp, "/", max_hp)
+	
+	# Set values
+	if boss_label:
+		boss_label.text = boss_name
+	
+	boss_bar.max_value = max_hp
+	boss_bar.value = curr_hp
+	
+	# Show with fade in
+	if not boss_bar_container.visible:
+		boss_bar_container.visible = true
+		boss_bar_container.modulate.a = 0.0
+		var tween = create_tween()
+		tween.tween_property(boss_bar_container, "modulate:a", 1.0, 0.3)
+		
+func _update_boss_bar_display():
+	if not current_boss or not boss_bar:
+		return
+	
+	if "current_health" in current_boss:
+		# Direct update without tween for immediate feedback
+		boss_bar.value = current_boss.current_health
+
+# Hide boss bar
+func _hide_boss_bar():
+	if not boss_bar_container:
 		return
 	
 	var tween = create_tween()
-	tween.tween_property(boss_bar, "value", new_health, 0.3)
+	tween.tween_property(boss_bar_container, "modulate:a", 0.0, 0.3)
+	tween.tween_callback(func(): 
+		boss_bar_container.visible = false
+		current_boss = null
+	)
+	
+func _on_boss_engaged(boss_name: String, max_hp: int, current_hp: int):
+	print(">>> Boss Engaged Signal Received! <<<")
+	print("Name: ", boss_name, " Max HP: ", max_hp, " Current HP: ", current_hp)
+	
+	if boss_label:
+		boss_label.text = boss_name
+	
+	if boss_bar:
+		boss_bar.max_value = max_hp
+		boss_bar.value = current_hp
+
+func _on_boss_health_changed(current_hp: int, max_hp: int):
+	print(">>> Boss Health Changed! HP: ", current_hp, "/", max_hp, " <<<")
+	
+	if boss_bar:
+		boss_bar.max_value = max_hp
+		var tween = create_tween()
+		tween.tween_property(boss_bar, "value", current_hp, 0.2)
+		
+func _on_boss_disengaged():
+	print(">>> Boss Disengaged! <<<")
+	_hide_boss_bar()
+	
+	await get_tree().create_timer(0.5).timeout
+	show_victory_popup("DARK ELF CHAMPION")
+
+	
+func _disconnect_boss(boss: Node):
+	if not boss or not is_instance_valid(boss):
+		return
+	
+	if boss.has_signal("boss_engaged") and boss.boss_engaged.is_connected(_on_boss_engaged):
+		boss.boss_engaged.disconnect(_on_boss_engaged)
+	
+	if boss.has_signal("health_changed") and boss.health_changed.is_connected(_on_boss_health_changed):
+		boss.health_changed.disconnect(_on_boss_health_changed)
+	
+	if boss.has_signal("boss_disengaged") and boss.boss_disengaged.is_connected(_on_boss_disengaged):
+		boss.boss_disengaged.disconnect(_on_boss_disengaged)
+
+#func _on_boss_health_changed(new_health: int, boss: Node = null):
+	#print("Boss health changed to: ", new_health)  # Debug print
+	#
+	#if not boss_bar:
+		#print("No boss bar found!")
+		#return
+	#
+	#var tween = create_tween()
+	#tween.tween_property(boss_bar, "value", new_health, 0.3)
 
 func _on_boss_died(boss: Node = null):
 	if boss and connected_bosses.has(boss):
@@ -510,6 +673,29 @@ func _on_boss_died(boss: Node = null):
 		var tween = create_tween()
 		tween.tween_property(boss_bar_container, "modulate:a", 0.0, 0.5)
 		tween.tween_callback(func(): boss_bar_container.visible = false)
+		
+#func _on_boss_engaged(boss_name: String, max_hp: int, current_hp: int):
+	#print("Boss engaged callback! Name: ", boss_name, " Max HP: ", max_hp, " Current HP: ", current_hp)
+	#
+	#if boss_label:
+		#boss_label.text = boss_name
+	#
+	#if boss_bar:
+		#boss_bar.max_value = max_hp
+		#boss_bar.value = current_hp
+	#
+	#if boss_bar_container:
+		#boss_bar_container.visible = true
+		#boss_bar_container.modulate.a = 0.0
+		#var tween = create_tween()
+		#tween.tween_property(boss_bar_container, "modulate:a", 1.0, 0.3)
+
+#func _on_boss_disengaged():
+	#print("Boss disengaged!")
+	#if boss_bar_container and boss_bar_container.visible:
+		#var tween = create_tween()
+		#tween.tween_property(boss_bar_container, "modulate:a", 0.0, 0.3)
+		#tween.tween_callback(func(): boss_bar_container.visible = false)
 
 func update_health_display():
 	pass
@@ -540,4 +726,36 @@ func _on_echo_spawned(duration: float):
 			t.tween_property(pip, "modulate", Color(0.2, 0.6, 1.0, 0.9), 0.18)
 			
 func show_notification(message: String, color: Color = Color.WHITE, duration: float = 2.0):
-	pass 
+	pass
+	
+func show_victory_popup(boss_name: String = "ENEMY"):
+	if not victory_popup:
+		return
+	
+	if victory_text:
+		victory_text.text = "ENEMY FELLED"
+	
+	victory_popup.visible = true
+	victory_popup.modulate.a = 0.0
+	if victory_banner:
+		victory_banner.scale = Vector2(1.2, 1.2)
+	
+	var tween = create_tween()
+	tween.set_parallel(true)
+	
+	tween.tween_property(victory_popup, "modulate:a", 1.0, 0.4)
+	
+	if victory_banner:
+		tween.tween_property(victory_banner, "scale", Vector2(1.0, 1.0), 0.5).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+		tween.tween_property(victory_banner, "modulate:a", 1.0, 0.5)
+	
+	await get_tree().create_timer(3.0).timeout
+	hide_victory_popup()
+
+func hide_victory_popup():
+	if not victory_popup:
+		return
+	
+	var tween = create_tween()
+	tween.tween_property(victory_popup, "modulate:a", 0.0, 0.8)
+	tween.tween_callback(func(): victory_popup.visible = false)

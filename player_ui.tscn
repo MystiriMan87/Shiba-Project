@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://cqk6unim2ftgo"]
+[gd_scene load_steps=15 format=3 uid="uid://cqk6unim2ftgo"]
 
 [ext_resource type="Script" uid="uid://bov65j62y0be8" path="res://scripts/PlayerUI.gd" id="1_lwipk"]
 [ext_resource type="Texture2D" uid="uid://d12anw6sa6wxg" path="res://Assets/16x64 Red Simple Healthbar.png" id="2_654h1"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://d2wr72yy2hh5q" path="res://fps_counter.gd" id="7_gxl1c"]
 [ext_resource type="Script" uid="uid://cwpt7fbm7137s" path="res://level_timer.gd" id="8_vg8o0"]
 [ext_resource type="FontFile" uid="uid://cuifcrxdin7jw" path="res://Assets/100-Sub-Assets-Free/Fonts/PixeloidMono-1G8ae.ttf" id="9_hiloj"]
+[ext_resource type="Texture2D" uid="uid://7jsd5egoaoi5" path="res://Assets/pngwing.com.png" id="10_cbg41"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hiloj"]
 bg_color = Color(0.674531, 0.412541, 0.239348, 1)
@@ -45,6 +46,14 @@ corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qadsr"]
+bg_color = Color(0.262932, 0.262932, 0.262932, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.843137, 0, 1)
 
 [node name="PlayerUI" type="Control" groups=["ui"]]
 layout_mode = 3
@@ -154,6 +163,7 @@ offset_bottom = 526.0
 script = ExtResource("8_vg8o0")
 
 [node name="InventoryPanel" type="Panel" parent="."]
+visible = false
 layout_mode = 0
 offset_left = 519.0
 offset_top = 283.0
@@ -202,3 +212,97 @@ offset_bottom = 383.0
 [node name="InventoryGrid" type="GridContainer" parent="InventoryPanel/ContentPanel/ScrollContainer"]
 layout_mode = 2
 columns = 5
+
+[node name="VictoryPopup" type="Control" parent="."]
+visible = false
+z_index = 100
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="VictoryPopup"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.396078)
+
+[node name="Banner" type="Panel" parent="VictoryPopup"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -413.0
+offset_top = -78.0
+offset_right = 387.0
+offset_bottom = 42.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_qadsr")
+
+[node name="MainText" type="Label" parent="VictoryPopup/Banner"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -57.5
+offset_top = -11.5
+offset_right = 57.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.992157, 0.815686, 0.0901961, 0.968627)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 56
+text = "ENEMY FELLED"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LightRays" type="TextureRect" parent="VictoryPopup"]
+modulate = Color(0.992157, 0.815686, 0.0980392, 0.619608)
+z_index = -1
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -958.0
+offset_top = 551.0
+offset_right = -308.0
+offset_bottom = 1378.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation = -1.57143
+texture = ExtResource("10_cbg41")
+stretch_mode = 5
+
+[node name="LightRays2" type="TextureRect" parent="VictoryPopup"]
+modulate = Color(0.992157, 0.815686, 0.0980392, 0.619608)
+z_index = -1
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 140.0
+offset_top = 556.0
+offset_right = 790.0
+offset_bottom = 1383.0
+grow_horizontal = 2
+grow_vertical = 2
+rotation = -1.57143
+texture = ExtResource("10_cbg41")
+stretch_mode = 5
+flip_v = true

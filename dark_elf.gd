@@ -38,7 +38,9 @@ extends CharacterBody2D
 
 signal boss_engaged(boss_name: String, max_hp: int, current_hp: int)
 signal boss_disengaged()
-signal boss_health_changed(current_hp: int, max_hp: int)
+#signal boss_health_changed(current_hp: int, max_hp: int)
+signal health_changed(current_hp: int, max_hp: int)
+
 
 var is_stuck: bool = false
 var stuck_timer: float = 0.0
@@ -478,16 +480,26 @@ func take_damage(amount: int):
 	current_health -= amount
 	damage_timer = damage_cooldown
 	
+	# Emit health changed signal for bosses
 	if is_boss:
-		boss_health_changed.emit(current_health, max_health)
+		print("Boss took damage! Current HP: ", current_health, " / ", max_health)
+		health_changed.emit(current_health, max_health)
+	
+	if current_state == GoblinState.CHARGING:
+		end_charge()
+		return
 	
 	if animation_player:
 		hurt_locked = true
 		var hit_anim = "hurt_" + facing_direction
 		
 		if animation_player.has_animation(hit_anim):
-			animation_player.speed_scale = 0.8
+			animation_player.speed_scale = 1.2
 			animation_player.play(hit_anim)
+			
+			var anim_length = animation_player.get_animation(hit_anim).length / animation_player.speed_scale
+			await get_tree().create_timer(anim_length * 0.8).timeout
+			hurt_locked = false
 		else:
 			hurt_locked = false
 	else:
@@ -495,7 +507,10 @@ func take_damage(amount: int):
 	
 	if current_health <= 0:
 		die()
-
+	else:
+		if current_state != GoblinState.ATTACKING:
+			change_state(GoblinState.WALKING)
+			
 func die():
 	if is_dead:
 		return
