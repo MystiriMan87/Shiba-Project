@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://owjcku7p77uw"
+path="res://.godot/imported/enemy felled SFX.mp3-6417609a42edd8ff02882245d0a69bb6.mp3str"
+
+[deps]
+
+source_file="res://audio/enemy felled SFX.mp3"
+dest_files=["res://.godot/imported/enemy felled SFX.mp3-6417609a42edd8ff02882245d0a69bb6.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

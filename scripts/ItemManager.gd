@@ -136,7 +136,7 @@ func load_weapons_database():
 			"icon_path": "res://textures/items/weapons/legendary_mace.png",
 			"sprite_path": "res://textures/items/weapons/legendary_mace.png",
 			"description": "A blade of legend, humming with ancient power.",
-			"rarity": "common",
+			"rarity": "legendary",
 			"stackable": false,
 			"max_stack": 1,
 			"weapon_scale": 2.5  # Large legendary weapon
@@ -206,7 +206,7 @@ func load_items_database():
 			"type": "equipment",
 			"icon_path": "res://Assets/Ring Sprites.png",
 			"description": "A mysterious glowing ring, said to be used against ghosts",
-			"rarity": "rare",
+			"rarity": "legendary",
 			"stackable": false,
 			"max_stack": 1,
 			"weapon_scale": 1.0
@@ -330,7 +330,7 @@ func load_items_database():
 			"id": "golden_key",
 			"name": "Golden Key",
 			"type": "key",
-			"icon_path": "res://Assets/2D Pixel Dungeon Asset Pack/items/keys/key_golden.png",
+			"icon_path": "res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/keys/keys_1_1.png",
 			"description": "A precious golden key that unlocks rare treasures.",
 			"rarity": "rare",
 			"stackable": false,

@@ -18,6 +18,11 @@ var enemies_killed: int = 0
 var connected_bosses: Array = []
 var current_boss: Node = null
 
+var hovered_slot_index: int = -1
+var hover_timer: Timer = null
+var is_hovering: bool = false
+
+@onready var victory_sound: AudioStreamPlayer = $VictoryPopup/VictorySound if has_node("VictoryPopup/VictorySound") else null
 
 @onready var inventory_panel: Panel = $InventoryPanel
 @onready var inventory_grid: GridContainer = $InventoryPanel/ContentPanel/ScrollContainer/InventoryGrid
@@ -28,6 +33,19 @@ var current_boss: Node = null
 @onready var boss_bar: ProgressBar = $BossBarContainer/BossInner/BossVBox/BossBar if has_node("BossBarContainer/BossInner/BossVBox/BossBar") else null
 @onready var boss_label: Label = $BossBarContainer/BossInner/BossVBox/BossName if has_node("BossBarContainer/BossInner/BossVBox/BossName") else null
 @onready var death_screen: Control = $DeathScreen if has_node("DeathScreen") else null
+
+@onready var equipped_weapon_panel: Panel = $InventoryPanel/EquippedWeaponPanel if has_node("InventoryPanel/EquippedWeaponPanel") else null
+@onready var equipped_weapon_icon: TextureRect = $InventoryPanel/EquippedWeaponPanel/EquippedVBox/WeaponIconContainer/WeaponIcon if has_node("InventoryPanel/EquippedWeaponPanel/EquippedVBox/WeaponIconContainer/WeaponIcon") else null
+@onready var equipped_weapon_name: Label = $InventoryPanel/EquippedWeaponPanel/EquippedVBox/WeaponNameLabel if has_node("InventoryPanel/EquippedWeaponPanel/EquippedVBox/WeaponNameLabel") else null
+@onready var equipped_weapon_damage: Label = $InventoryPanel/EquippedWeaponPanel/EquippedVBox/WeaponDamageLabel if has_node("InventoryPanel/EquippedWeaponPanel/EquippedVBox/WeaponDamageLabel") else null
+@onready var equipped_weapon_range: Label = $InventoryPanel/EquippedWeaponPanel/EquippedVBox/WeaponRangeLabel if has_node("InventoryPanel/EquippedWeaponPanel/EquippedVBox/WeaponRangeLabel") else null
+@onready var equipped_weapon_speed: Label = $InventoryPanel/EquippedWeaponPanel/EquippedVBox/WeaponSpeedLabel if has_node("InventoryPanel/EquippedWeaponPanel/EquippedVBox/WeaponSpeedLabel") else null
+
+@onready var item_description_panel: Panel = $InventoryPanel/ItemDescriptionPanel if has_node("InventoryPanel/ItemDescriptionPanel") else null
+@onready var item_name_label: Label = $InventoryPanel/ItemDescriptionPanel/DescriptionMargin/DescriptionVBox/ItemNameLabel if has_node("InventoryPanel/ItemDescriptionPanel/DescriptionMargin/DescriptionVBox/ItemNameLabel") else null
+@onready var item_type_label: Label = $InventoryPanel/ItemDescriptionPanel/DescriptionMargin/DescriptionVBox/ItemTypeLabel if has_node("InventoryPanel/ItemDescriptionPanel/DescriptionMargin/DescriptionVBox/ItemTypeLabel") else null
+@onready var item_description_label: Label = $InventoryPanel/ItemDescriptionPanel/DescriptionMargin/DescriptionVBox/ItemDescriptionLabel if has_node("InventoryPanel/ItemDescriptionPanel/DescriptionMargin/DescriptionVBox/ItemDescriptionLabel") else null
+@onready var item_stats_label: Label = $InventoryPanel/ItemDescriptionPanel/DescriptionMargin/DescriptionVBox/ItemStatsLabel if has_node("InventoryPanel/ItemDescriptionPanel/DescriptionMargin/DescriptionVBox/ItemStatsLabel") else null	
 
 @onready var victory_popup: Control = $VictoryPopup if has_node("VictoryPopup") else null
 @onready var victory_text: Label = $VictoryPopup/Banner/MainText if has_node("VictoryPopup/Banner/MainText") else null
@@ -59,6 +77,12 @@ func _ready():
 		create_dash_bar()
 	if not death_screen:
 		setup_death_screen()
+		
+	hover_timer = Timer.new()
+	hover_timer.wait_time = 0.15  # 150ms delay before hiding
+	hover_timer.one_shot = true
+	hover_timer.timeout.connect(_on_hover_timer_timeout)
+	add_child(hover_timer)
 	
 	game_start_time = Time.get_unix_time_from_system()
 	
@@ -77,6 +101,8 @@ func connect_signals():
 			item_manager.inventory_updated.connect(_on_inventory_updated)
 		if not item_manager.item_picked_up.is_connected(_on_item_picked_up):
 			item_manager.item_picked_up.connect(_on_item_picked_up)
+		if not item_manager.weapon_equipped.is_connected(_on_weapon_equipped):
+			item_manager.weapon_equipped.connect(_on_weapon_equipped)
 	
 	if player:
 		if player.has_signal("health_changed"):
@@ -134,6 +160,7 @@ func create_enhanced_inventory_slot(index: int) -> Control:
 	var background = Panel.new()
 	background.name = "Background"
 	background.set_anchors_preset(Control.PRESET_FULL_RECT)
+	background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
 	var style_box = StyleBoxFlat.new()
 	style_box.bg_color = Color(0.15, 0.12, 0.08, 0.95)
@@ -154,6 +181,7 @@ func create_enhanced_inventory_slot(index: int) -> Control:
 	selection_overlay.name = "SelectionOverlay"
 	selection_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
 	selection_overlay.visible = false
+	selection_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
 	var selection_style = StyleBoxFlat.new()
 	selection_style.bg_color = Color(0.2, 0.6, 1.0, 0.3)
@@ -179,6 +207,7 @@ func create_enhanced_inventory_slot(index: int) -> Control:
 	item_icon.offset_bottom = -slot_padding
 	item_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	slot.add_child(item_icon)
+	item_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
 	var count_label = Label.new()
 	count_label.name = "CountLabel"
@@ -194,13 +223,19 @@ func create_enhanced_inventory_slot(index: int) -> Control:
 	count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	count_label.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 	count_label.text = ""
+	count_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	slot.add_child(count_label)
 	
 	var button = Button.new()
 	button.name = "ClickDetector"
 	button.set_anchors_preset(Control.PRESET_FULL_RECT)
 	button.flat = true
+	button.mouse_filter = Control.MOUSE_FILTER_STOP 
 	button.pressed.connect(_on_slot_clicked.bind(index))
+	slot.add_child(button)
+	
+	button.mouse_entered.connect(_on_slot_hover_entered.bind(index))
+	button.mouse_exited.connect(_on_slot_hover_exited.bind(index))
 	slot.add_child(button)
 	
 	return slot
@@ -334,10 +369,12 @@ func toggle_inventory():
 		inventory_panel.visible = !inventory_panel.visible
 		if inventory_panel.visible:
 			refresh_inventory_display()
+			update_equipped_weapon_display()
 			selected_slot_index = 0
 			update_inventory_selection()
 		else:
 			selected_slot_index = -1
+			hide_item_description()
 
 func refresh_inventory_display():
 	if not item_manager:
@@ -352,6 +389,9 @@ func refresh_inventory_display():
 		var item = inventory_items[i]
 		var slot = inventory_slots[i]
 		display_item_in_slot(slot, item, i)
+		
+	update_equipped_weapon_display()
+
 
 func display_item_in_slot(slot: Control, item: Dictionary, slot_index: int):
 	if not slot.has_node("ItemIcon") or not slot.has_node("CountLabel"):
@@ -732,6 +772,10 @@ func show_victory_popup(boss_name: String = "ENEMY"):
 	if not victory_popup:
 		return
 	
+	# Play victory sound
+	if victory_sound:
+		victory_sound.play()
+	
 	if victory_text:
 		victory_text.text = "ENEMY FELLED"
 	
@@ -759,3 +803,164 @@ func hide_victory_popup():
 	var tween = create_tween()
 	tween.tween_property(victory_popup, "modulate:a", 0.0, 0.8)
 	tween.tween_callback(func(): victory_popup.visible = false)
+	
+func _on_weapon_equipped(weapon_data: Dictionary):
+	update_equipped_weapon_display()
+
+func update_equipped_weapon_display():
+	if not item_manager:
+		return
+	
+	var equipped = item_manager.get_equipped_weapon()
+	
+	if equipped.is_empty():
+		# No weapon equipped
+		if equipped_weapon_name:
+			equipped_weapon_name.text = "None"
+		if equipped_weapon_damage:
+			equipped_weapon_damage.text = "Damage: --"
+		if equipped_weapon_range:
+			equipped_weapon_range.text = "Range: --"
+		if equipped_weapon_speed:
+			equipped_weapon_speed.text = "Speed: --"
+		if equipped_weapon_icon:
+			equipped_weapon_icon.texture = null
+	else:
+		# Weapon is equipped
+		if equipped_weapon_name:
+			equipped_weapon_name.text = equipped.get("name", "Unknown")
+		
+		if equipped_weapon_damage:
+			equipped_weapon_damage.text = "Damage: " + str(equipped.get("damage", 0))
+		
+		if equipped_weapon_range:
+			equipped_weapon_range.text = "Range: " + str(equipped.get("attack_range", 0))
+		
+		if equipped_weapon_speed:
+			var speed = equipped.get("attack_speed", 1.0)
+			equipped_weapon_speed.text = "Speed: " + str(snapped(speed, 0.1))
+		
+		# Load weapon icon
+		if equipped_weapon_icon:
+			var icon_path = equipped.get("icon_path", "")
+			if icon_path != "" and ResourceLoader.exists(icon_path):
+				var texture = load(icon_path)
+				equipped_weapon_icon.texture = texture
+			else:
+				equipped_weapon_icon.texture = null
+
+func _on_slot_hover_entered(slot_index: int):
+	# Stop any pending hide timer
+	if hover_timer:
+		hover_timer.stop()
+	
+	is_hovering = true
+	hovered_slot_index = slot_index
+	
+	if not item_manager:
+		return
+	
+	var inventory_items = item_manager.get_inventory_items()
+	if slot_index >= inventory_items.size():
+		# Empty slot - hide description
+		hide_item_description()
+		return
+	
+	var item = inventory_items[slot_index]
+	show_item_description(item)
+
+func _on_slot_hover_exited(slot_index: int):
+	# Only start hide timer if we're leaving the currently hovered slot
+	if slot_index == hovered_slot_index:
+		is_hovering = false
+		if hover_timer:
+			hover_timer.start()
+
+func _on_hover_timer_timeout():
+	# Only hide if we're still not hovering over anything
+	if not is_hovering:
+		hide_item_description()
+		hovered_slot_index = -1
+
+func show_item_description(item: Dictionary):
+	if not item_description_panel:
+		return
+	
+	var item_data = item.get("data", {})
+	if item_data.is_empty():
+		return
+	
+	# Get item properties
+	var item_name = item_data.get("name", "Unknown Item")
+	var item_type = item_data.get("type", "unknown").capitalize()
+	var item_rarity = item_data.get("rarity", "common")
+	var description = item_data.get("description", "No description available.")
+	
+	# Set item name with rarity color
+	if item_name_label:
+		item_name_label.text = item_name
+		var rarity_color = get_rarity_color(item_rarity)
+		item_name_label.add_theme_color_override("font_color", rarity_color)
+	
+	# Set item type
+	if item_type_label:
+		item_type_label.text = "Type: " + item_type + " | " + item_rarity.capitalize()
+	
+	# Set description
+	if item_description_label:
+		item_description_label.text = description
+	
+	# Set stats (if weapon or has special properties)
+	if item_stats_label:
+		var stats_text = ""
+		
+		if item_type.to_lower() == "weapon":
+			var damage = item_data.get("damage", 0)
+			var attack_speed = item_data.get("attack_speed", 1.0)
+			var attack_range = item_data.get("attack_range", 0)
+			
+			stats_text += "Damage: " + str(damage) + "\n"
+			stats_text += "Speed: " + str(snapped(attack_speed, 0.1)) + "\n"
+			stats_text += "Range: " + str(attack_range)
+		
+		elif item_type.to_lower() == "consumable":
+			var effect = item_data.get("effect", "").replace("_", " ").capitalize()
+			var effect_value = item_data.get("effect_value", 0)
+			stats_text += "Effect: " + effect + " +" + str(effect_value)
+		
+		elif "value" in item_data:
+			stats_text += "Value: " + str(item_data.value) + " gold"
+		
+		item_stats_label.text = stats_text
+	
+	# Show the panel immediately if hidden, or just update if already visible
+	if not item_description_panel.visible:
+		item_description_panel.visible = true
+		item_description_panel.modulate.a = 0.0
+		
+		var tween = create_tween()
+		tween.tween_property(item_description_panel, "modulate:a", 1.0, 0.2)
+	else:
+		# Already visible, just update the content (no animation needed)
+		item_description_panel.modulate.a = 1.0
+
+func hide_item_description():
+	if not item_description_panel or not item_description_panel.visible:
+		return
+	
+	var tween = create_tween()
+	tween.tween_property(item_description_panel, "modulate:a", 0.0, 0.15)
+	tween.tween_callback(func(): 
+		if item_description_panel:
+			item_description_panel.visible = false
+	)
+
+func get_rarity_color(rarity: String) -> Color:
+	var rarity_colors = {
+		"common": Color(0.8, 0.8, 0.8),      # Light gray
+		"uncommon": Color(0.2, 1.0, 0.2),    # Green
+		"rare": Color(0.3, 0.5, 1.0),        # Blue
+		"epic": Color(0.8, 0.3, 1.0),        # Purple
+		"legendary": Color(1.0, 0.6, 0.2)    # Orange/Gold
+	}
+	return rarity_colors.get(rarity, Color.WHITE)
