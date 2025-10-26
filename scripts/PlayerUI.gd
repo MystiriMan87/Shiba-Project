@@ -26,8 +26,8 @@ var is_hovering: bool = false
 
 @onready var inventory_panel: Panel = $InventoryPanel
 @onready var inventory_grid: GridContainer = $InventoryPanel/ContentPanel/ScrollContainer/InventoryGrid
-@onready var dash_bar: ProgressBar = $DashContainer/DashBar if has_node("DashContainer/DashBar") else null
-@onready var dash_label: Label = $DashContainer/DashLabel if has_node("DashContainer/DashLabel") else null
+#@onready var dash_bar: ProgressBar = $DashContainer/DashBar if has_node("DashContainer/DashBar") else null
+#@onready var dash_label: Label = $DashContainer/DashLabel if has_node("DashContainer/DashLabel") else null
 @onready var echo_container: HBoxContainer = $EchoPips if has_node("EchoPips") else null
 @onready var boss_bar_container: Control = $BossBarContainer if has_node("BossBarContainer") else null
 @onready var boss_bar: ProgressBar = $BossBarContainer/BossInner/BossVBox/BossBar if has_node("BossBarContainer/BossInner/BossVBox/BossBar") else null
@@ -73,8 +73,8 @@ func _ready():
 		create_echo_pips()
 	if not boss_bar_container:
 		create_boss_bar()
-	if not dash_bar:
-		create_dash_bar()
+	#if not dash_bar:
+		#create_dash_bar()
 	if not death_screen:
 		setup_death_screen()
 		
@@ -108,9 +108,9 @@ func connect_signals():
 		if player.has_signal("health_changed"):
 			if not player.health_changed.is_connected(_on_player_health_changed):
 				player.health_changed.connect(_on_player_health_changed)
-		if player.has_signal("dash_energy_changed"):
-			if not player.dash_energy_changed.is_connected(_on_player_dash_changed):
-				player.dash_energy_changed.connect(_on_player_dash_changed)
+		#if player.has_signal("dash_energy_changed"):
+			#if not player.dash_energy_changed.is_connected(_on_player_dash_changed):
+				#player.dash_energy_changed.connect(_on_player_dash_changed)
 		if player.has_signal("player_died"):
 			if not player.player_died.is_connected(_on_player_died):
 				player.player_died.connect(_on_player_died)
@@ -324,26 +324,26 @@ func create_boss_bar():
 	
 	boss_bar_container = container
 
-func create_dash_bar():
-	var dash_container = VBoxContainer.new()
-	dash_container.name = "DashContainer"
-	dash_container.position = Vector2(135, 210)
-	dash_container.size = Vector2(460, 48)
-	add_child(dash_container)
-	
-	dash_label = Label.new()
-	dash_label.name = "DashLabel"
-	dash_label.visible = false
-	dash_container.add_child(dash_label)
-	
-	dash_bar = ProgressBar.new()
-	dash_bar.name = "DashBar"
-	dash_bar.min_value = 0
-	dash_bar.max_value = 100
-	dash_bar.value = 100
-	dash_bar.custom_minimum_size = Vector2(420, 12)
-	dash_bar.show_percentage = false
-	dash_container.add_child(dash_bar)
+#func create_dash_bar():
+	#var dash_container = VBoxContainer.new()
+	#dash_container.name = "DashContainer"
+	#dash_container.position = Vector2(135, 210)
+	#dash_container.size = Vector2(460, 48)
+	#add_child(dash_container)
+	#
+	#dash_label = Label.new()
+	#dash_label.name = "DashLabel"
+	#dash_label.visible = false
+	#dash_container.add_child(dash_label)
+	#
+	#dash_bar = ProgressBar.new()
+	#dash_bar.name = "DashBar"
+	#dash_bar.min_value = 0
+	#dash_bar.max_value = 100
+	#dash_bar.value = 100
+	#dash_bar.custom_minimum_size = Vector2(420, 12)
+	#dash_bar.show_percentage = false
+	#dash_container.add_child(dash_bar)
 
 func setup_death_screen():
 	death_screen = Control.new()
@@ -511,10 +511,10 @@ func _on_item_picked_up(item_data: Dictionary):
 
 func _on_player_health_changed(new_health: int):
 	update_health_display()
-
-func _on_player_dash_changed(new_energy: int):
-	if dash_bar:
-		dash_bar.value = new_energy
+#
+#func _on_player_dash_changed(new_energy: int):
+	#if dash_bar:
+		#dash_bar.value = new_energy
 
 func _on_player_died():
 	if death_screen:

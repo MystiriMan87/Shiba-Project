@@ -250,6 +250,7 @@ z_index = 2
 y_sort_enabled = true
 texture_filter = 1
 script = ExtResource("1_g2els")
+max_health = 4
 trail_width = 5.0
 
 [node name="Shadow" parent="." instance=ExtResource("2_qlg0r")]

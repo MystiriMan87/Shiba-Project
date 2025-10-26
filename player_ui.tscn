@@ -1,7 +1,9 @@
-[gd_scene load_steps=20 format=3 uid="uid://cqk6unim2ftgo"]
+[gd_scene load_steps=22 format=3 uid="uid://cqk6unim2ftgo"]
 
 [ext_resource type="Script" uid="uid://bov65j62y0be8" path="res://scripts/PlayerUI.gd" id="1_lwipk"]
 [ext_resource type="Texture2D" uid="uid://d12anw6sa6wxg" path="res://Assets/16x64 Red Simple Healthbar.png" id="2_654h1"]
+[ext_resource type="Texture2D" uid="uid://ols3gv51eowm" path="res://Assets/GUI Spritesheets/Bars_02.png" id="2_wotjm"]
+[ext_resource type="Script" uid="uid://d20qdd40jbixg" path="res://Dashbar.gd" id="3_nma07"]
 [ext_resource type="Script" uid="uid://etw1xkbn5jmn" path="res://healthbar.gd" id="3_pc08v"]
 [ext_resource type="Texture2D" uid="uid://14jjco5gh3hy" path="res://Assets/Square.png" id="4_pc08v"]
 [ext_resource type="Texture2D" uid="uid://dysb32n4ws6ys" path="res://Assets/Triangle.png" id="5_a4em4"]
@@ -85,6 +87,22 @@ grow_vertical = 2
 mouse_filter = 1
 script = ExtResource("1_lwipk")
 
+[node name="DashContainer" type="HBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 253.0
+offset_top = 251.0
+offset_right = 293.0
+offset_bottom = 291.0
+
+[node name="Sprite2D" type="Sprite2D" parent="DashContainer"]
+position = Vector2(39, -74)
+scale = Vector2(7, 7)
+texture = ExtResource("2_wotjm")
+vframes = 4
+region_enabled = true
+region_rect = Rect2(0, 60, 30, 40)
+script = ExtResource("3_nma07")
+
 [node name="HealthContainer" type="HBoxContainer" parent="."]
 texture_filter = 1
 layout_mode = 1
@@ -96,11 +114,14 @@ scale = Vector2(6, 6)
 
 [node name="Sprite2D" type="Sprite2D" parent="HealthContainer"]
 texture_filter = 1
-position = Vector2(48.5, 7)
-scale = Vector2(1.6224, 1.75)
+position = Vector2(31.5, 5.16667)
+scale = Vector2(1, 1.076)
 texture = ExtResource("2_654h1")
 vframes = 5
+region_rect = Rect2(0, 10, 30, 40)
 script = ExtResource("3_pc08v")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="HealthContainer/Sprite2D"]
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 0

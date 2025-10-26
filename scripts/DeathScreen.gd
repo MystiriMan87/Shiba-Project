@@ -2,7 +2,7 @@ extends Control
 
 @export var fade_in_duration: float = 0.5
 @export var fade_out_duration: float = 0.3
-@export var respawn_delay: float = 1.0
+@export var respawn_delay: float = 5.0
 
 var player: CharacterBody2D = null
 var main_ui: Control = null
