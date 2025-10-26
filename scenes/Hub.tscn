@@ -1,4 +1,4 @@
-[gd_scene load_steps=41 format=4 uid="uid://bqugjkay7yqn1"]
+[gd_scene load_steps=42 format=4 uid="uid://bqugjkay7yqn1"]
 
 [ext_resource type="Texture2D" uid="uid://cnv2efmaeat5p" path="res://Assets/Snoblin/Snoblin_Default_Tilemap/Assets/pixel_rpg_tiles.png" id="1_4qglb"]
 [ext_resource type="Script" uid="uid://dedci05mgixib" path="res://scenes/hub.gd" id="1_gqhal"]
@@ -29,6 +29,7 @@
 [ext_resource type="PackedScene" uid="uid://fadffrcj4pg" path="res://darkElf_NPC.tscn" id="26_eakxi"]
 [ext_resource type="Texture2D" uid="uid://tj1xrpvfbv3u" path="res://light.png" id="27_3ggi2"]
 [ext_resource type="PackedScene" uid="uid://bukx3e2x3wdgr" path="res://canvas_modulate.tscn" id="28_8metk"]
+[ext_resource type="PackedScene" uid="uid://dlsog5o45sqr6" path="res://scenes/PauseMenu.tscn" id="29_8metk"]
 [ext_resource type="PackedScene" uid="uid://cme4secwfuob2" path="res://torch.tscn" id="30_yt83c"]
 [ext_resource type="PackedScene" uid="uid://d14w75lwsi7ls" path="res://scenes/chest.tscn" id="31_6y564"]
 
@@ -1316,10 +1317,10 @@ z_index = 2
 position = Vector2(365, -193)
 scale = Vector2(1.5, 1.5)
 is_quest_giver = true
-quest_to_give = "slay_skeletons"
-quest_dialogue_id = "skeleton_quest_start"
-quest_complete_dialogue_id = "skeleton_quest_active"
-quest_active_dialogue_id = "skeleton_quest_start"
+quest_to_give = "retrieve_firegem"
+quest_dialogue_id = "firegem_quest_start"
+quest_complete_dialogue_id = "firegem_quest_complete"
+quest_active_dialogue_id = "firegem_quest_active"
 
 [node name="Shadow" parent="Crazed Wizard" instance=ExtResource("23_8metk")]
 position = Vector2(-3.33333, 37.3333)
@@ -1438,3 +1439,5 @@ position = Vector2(382, -468)
 key_type = "golden"
 loot_items = Array[String](["health_potion", "coin", "legendary_mace", "fire_gem"])
 loot_spawn_radius_base = 70.0
+
+[node name="PauseMenu" parent="." instance=ExtResource("29_8metk")]

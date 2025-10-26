@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=4 uid="uid://cg55iyfat0xtl"]
+[gd_scene load_steps=36 format=4 uid="uid://cg55iyfat0xtl"]
 
 [ext_resource type="Script" uid="uid://c8dew88u6ily3" path="res://world_3.gd" id="1_25pf3"]
 [ext_resource type="PackedScene" uid="uid://ny2bd86mtevm" path="res://player_camera.tscn" id="2_ca0go"]
@@ -28,6 +28,7 @@
 [ext_resource type="PackedScene" uid="uid://con8irkei050h" path="res://dark_elf_enemy.tscn" id="26_isq8n"]
 [ext_resource type="FontFile" uid="uid://vkfuxgs5bk41" path="res://Assets/100-Sub-Assets-Free/Fonts/PixeloidSans-nR3g1.ttf" id="27_bgf5n"]
 [ext_resource type="PackedScene" uid="uid://dq5abinvfao8t" path="res://dark_elf.tscn" id="28_mmbe8"]
+[ext_resource type="AudioStream" uid="uid://dbp8f1kx3bysn" path="res://audio/10. Ornstein & Smough.mp3" id="29_isq8n"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1ojam"]
 texture = ExtResource("8_bgf5n")
@@ -1791,3 +1792,7 @@ damage = 10
 attack_range = 150
 enemy_type = "dark_elf_boss"
 is_boss = true
+boss_music_path = NodePath("../BossMusic")
+
+[node name="BossMusic" type="AudioStreamPlayer" parent="." groups=["boss_music"]]
+stream = ExtResource("29_isq8n")

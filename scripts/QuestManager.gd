@@ -53,23 +53,23 @@ func load_quests_database():
 			"auto_accept": false
 		},
 		
-		"slay_skeletons": {
-			"id": "slay_skeletons",
-			"name": "Skeleton Slayer",
-			"description": "The dungeon is overrun with skeletons. Defeat them to make it safer.",
+		"retrieve_firegem": {
+			"id": "retrieve_firegem",
+			"name": "Sacred Fire Gem",
+			"description": "The dungeon contains a sacred relic called the firegem. The old wizard asks you to retrieve it. He hasn't mentioned its use...",
 			"objectives": [
 				{
-					"description": "Defeat 3 skeleton enemies",
-					"type": "kill_enemy",
-					"target": "skeleton_enemy",
-					"required": 3,
+					"description": "Collect the Fire Gem",
+					"type": "collect_item",
+					"target": "fire_gem",
+					"required": 1,
 					"current": 0,
 					"completed": false
 				}
 			],
 			"rewards": {
-				"gold": 20,
-				"items": ["iron_sword"],
+				"gold": 30,
+				"items": ["steel_hammer"],
 				"experience": 250
 			},
 			"auto_accept": false

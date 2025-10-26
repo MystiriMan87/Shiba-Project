@@ -1,0 +1,151 @@
+[gd_scene load_steps=2 format=3 uid="uid://cuuwjcs8nvtqa"]
+
+[ext_resource type="Script" uid="uid://8k2pw38m2a25" path="res://scenes/settings_menu.gd" id="1_yelko"]
+
+[node name="SettingsMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_yelko")
+
+[node name="Panel" type="Panel" parent="."]
+custom_minimum_size = Vector2(800, 600)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+offset_left = 61.0
+offset_top = 157.0
+offset_right = 529.0
+offset_bottom = 661.0
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "Settings
+"
+
+[node name="AudioSelection" type="VBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="AudioLabel" type="Label" parent="Panel/VBoxContainer/AudioSelection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Audio"
+
+[node name="MasterVolume" type="HBoxContainer" parent="Panel/VBoxContainer/AudioSelection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/VBoxContainer/AudioSelection/MasterVolume"]
+layout_mode = 2
+text = "Master Volume
+"
+
+[node name="HSlider" type="HSlider" parent="Panel/VBoxContainer/AudioSelection/MasterVolume"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+
+[node name="Value" type="Label" parent="Panel/VBoxContainer/AudioSelection/MasterVolume"]
+layout_mode = 2
+text = "100%"
+
+[node name="MusicVolume" type="HBoxContainer" parent="Panel/VBoxContainer/AudioSelection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/VBoxContainer/AudioSelection/MusicVolume"]
+layout_mode = 2
+text = "Music Volume
+"
+
+[node name="HSlider" type="HSlider" parent="Panel/VBoxContainer/AudioSelection/MusicVolume"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+
+[node name="Value" type="Label" parent="Panel/VBoxContainer/AudioSelection/MusicVolume"]
+layout_mode = 2
+text = "80%"
+
+[node name="SFXVolume" type="HBoxContainer" parent="Panel/VBoxContainer/AudioSelection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/VBoxContainer/AudioSelection/SFXVolume"]
+layout_mode = 2
+text = "SFX Volume
+"
+
+[node name="HSlider" type="HSlider" parent="Panel/VBoxContainer/AudioSelection/SFXVolume"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+
+[node name="Value" type="Label" parent="Panel/VBoxContainer/AudioSelection/SFXVolume"]
+layout_mode = 2
+text = "100%"
+
+[node name="VideoSection" type="VBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="VideoLabel" type="Label" parent="Panel/VBoxContainer/VideoSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Video
+"
+
+[node name="Fullscreen" type="HBoxContainer" parent="Panel/VBoxContainer/VideoSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/VBoxContainer/VideoSection/Fullscreen"]
+layout_mode = 2
+text = "Fullscreen
+"
+
+[node name="CheckBox" type="CheckBox" parent="Panel/VBoxContainer/VideoSection/Fullscreen"]
+layout_mode = 2
+
+[node name="VSync" type="HBoxContainer" parent="Panel/VBoxContainer/VideoSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/VBoxContainer/VideoSection/VSync"]
+layout_mode = 2
+text = "VSync
+"
+
+[node name="CheckBox" type="CheckBox" parent="Panel/VBoxContainer/VideoSection/VSync"]
+layout_mode = 2
+
+[node name="Resolution" type="HBoxContainer" parent="Panel/VBoxContainer/VideoSection"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/VBoxContainer/VideoSection/Resolution"]
+layout_mode = 2
+text = "Resolution"
+
+[node name="OptionButton" type="OptionButton" parent="Panel/VBoxContainer/VideoSection/Resolution"]
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="Panel/VBoxContainer"]
+layout_mode = 2
+text = "Back
+"
+
+[connection signal="changed" from="Panel/VBoxContainer/AudioSelection/MasterVolume/HSlider" to="." method="_on_master_volume_changed"]
+[connection signal="changed" from="Panel/VBoxContainer/AudioSelection/MusicVolume/HSlider" to="." method="_on_music_volume_changed"]
+[connection signal="changed" from="Panel/VBoxContainer/AudioSelection/SFXVolume/HSlider" to="." method="_on_sfx_volume_changed"]
+[connection signal="toggled" from="Panel/VBoxContainer/VideoSection/Fullscreen/CheckBox" to="." method="_on_fullscreen_toggled"]
+[connection signal="toggled" from="Panel/VBoxContainer/VideoSection/VSync/CheckBox" to="." method="_on_vsync_toggled"]
+[connection signal="item_selected" from="Panel/VBoxContainer/VideoSection/Resolution/OptionButton" to="." method="_on_resolution_selected"]
+[connection signal="pressed" from="Panel/VBoxContainer/BackButton" to="." method="_on_back_pressed"]

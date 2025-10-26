@@ -40,7 +40,7 @@ func load_weapons_database():
 			"id": "iron_axe",
 			"name": "Iron Axe",
 			"type": "weapon",
-			"damage": 2,
+			"damage": 3,
 			"attack_speed": 0.8,
 			"attack_range": 50,
 			"icon_path": "res://Assets/oubliette_weapons - free/spr_wep_iron_axe_2.png",
@@ -318,7 +318,7 @@ func load_items_database():
 			"id": "iron_key",
 			"name": "Iron Key",
 			"type": "key",
-			"icon_path": "res://Assets/2D Pixel Dungeon Asset Pack/items/keys/key_iron.png",
+			"icon_path": "res://Assets/2D Pixel Dungeon Asset Pack/items and trap_animation/keys/keys_2_1.png",
 			"description": "A sturdy iron key for more secure locks.",
 			"rarity": "uncommon",
 			"stackable": false,
@@ -629,6 +629,8 @@ func add_item_to_inventory(item_id: String, quantity: int = 1) -> bool:
 	
 	print("Adding item to inventory: ", item_id, " x", quantity)
 	
+	var original_quantity = quantity  # Track how much we're trying to add
+	
 	# Handle stackable items
 	if item_data.get("stackable", false):
 		for inventory_item in player_inventory:
@@ -645,9 +647,17 @@ func add_item_to_inventory(item_id: String, quantity: int = 1) -> bool:
 					if quantity <= 0:
 						inventory_updated.emit()
 						item_picked_up.emit(item_data)
+						
+						# Notify quest manager
+						var quest_manager = get_node_or_null("/root/QuestManager")
+						if quest_manager:
+							quest_manager.on_item_collected(item_id, can_add)
+							print("✓ Notified QuestManager about stacked items: ", item_id, " x", can_add)
+						
 						return true
 	
 	# Create new inventory slots for remaining items
+	var total_added = 0  # Track how many we actually added
 	while quantity > 0 and player_inventory.size() < max_inventory_size:
 		var stack_size = 1
 		if item_data.get("stackable", false):
@@ -662,23 +672,25 @@ func add_item_to_inventory(item_id: String, quantity: int = 1) -> bool:
 		
 		player_inventory.append(inventory_item)
 		quantity -= stack_size
+		total_added += stack_size
 		print("Created new stack with ", stack_size, " items. Remaining: ", quantity)
+	
+	# Emit signals
+	inventory_updated.emit()
+	item_picked_up.emit(item_data)
+	
+	# Notify quest manager about items added
+	if total_added > 0:
+		var quest_manager = get_node_or_null("/root/QuestManager")
+		if quest_manager:
+			quest_manager.on_item_collected(item_id, total_added)
+			print("✓ Notified QuestManager about new items: ", item_id, " x", total_added)
 	
 	if quantity > 0:
 		print("Could not add all items - inventory full! Remaining: ", quantity)
-		inventory_updated.emit()
-		item_picked_up.emit(item_data)
 		return false
 	
-	inventory_updated.emit()
-	item_picked_up.emit(item_data)
 	print("Successfully added all items to inventory")
-	return true
-	
-	var quest_manager = get_node_or_null("/root/QuestManager")
-	if quest_manager:
-		quest_manager.on_item_collected(item_id, quantity)
-	
 	return true
 
 func remove_item_from_inventory(item_id: String, quantity: int = 1) -> bool:

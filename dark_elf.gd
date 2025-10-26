@@ -36,6 +36,9 @@ extends CharacterBody2D
 @export var wander_wait_time_min: float = 2.0
 @export var wander_wait_time_max: float = 5.0
 
+@export var boss_music_path: NodePath = ""
+@onready var boss_music_node: AudioStreamPlayer = get_node_or_null(boss_music_path) if boss_music_path != NodePath("") else null
+
 signal boss_engaged(boss_name: String, max_hp: int, current_hp: int)
 signal boss_disengaged()
 #signal boss_health_changed(current_hp: int, max_hp: int)
@@ -519,6 +522,27 @@ func die():
 	
 	if is_boss:
 		boss_disengaged.emit()
+		print("Boss died - emitting boss_disengaged")
+		
+		# Stop boss music on death
+		var boss_music = get_tree().get_first_node_in_group("boss_music")
+		if boss_music and boss_music is AudioStreamPlayer and boss_music.playing:
+			print("Boss died - fading out boss music")
+			var music_tween = create_tween()
+			music_tween.tween_property(boss_music, "volume_db", -80, 2.0)
+			music_tween.tween_callback(func(): 
+				boss_music.stop()
+				
+				# Restart ambient music after boss music fades out
+				var bg_music = get_tree().get_first_node_in_group("background_music")
+				if bg_music and bg_music is AudioStreamPlayer:
+					print("Restarting background music after boss death")
+					if not bg_music.playing:
+						bg_music.volume_db = -80
+						bg_music.play()
+						var fade_tween = create_tween()
+						fade_tween.tween_property(bg_music, "volume_db", -15.0, 2.0)
+			)
 	
 	var quest_manager = get_node_or_null("/root/QuestManager")
 	if quest_manager:
@@ -551,16 +575,46 @@ func _on_detection_area_entered(body):
 		if is_boss and not boss_engaged_emitted:
 			boss_engaged_emitted = true
 			boss_engaged.emit("Dark Elf Champion", max_health, current_health)
-			print("Boss engaged! Showing health bar")
+			print("Boss engaged!")
+			
+			# Use direct reference instead of group
+			if boss_music_node and boss_music_node.stream:
+				print("Playing boss music via direct reference")
+				boss_music_node.volume_db = -5.0
+				boss_music_node.play()
+				print("Boss music playing: ", boss_music_node.playing)
+			else:
+				print("Boss music node not assigned or has no stream!")
+
 
 func _on_detection_area_exited(body):
 	if body.is_in_group("player"):
 		player_in_detection_range = false
 		
-		# Uncomment if bar to disappear when player leaves
-		# if is_boss and boss_engaged_emitted:
-		# 	boss_disengaged.emit()
-		# 	boss_engaged_emitted = false
+		# Only trigger disengaged if boss was actually engaged
+		if is_boss and boss_engaged_emitted:
+			print("Player left boss area - stopping boss music")
+			
+			# Fade out and stop boss music
+			var boss_music = get_tree().get_first_node_in_group("boss_music")
+			if boss_music and boss_music is AudioStreamPlayer:
+				print("Fading out boss music")
+				var tween = create_tween()
+				tween.tween_property(boss_music, "volume_db", -80, 1.0)
+				tween.tween_callback(func(): 
+					boss_music.stop()
+					print("Boss music stopped")
+					
+					# Restart background music after boss music stops
+					var bg_music = get_tree().get_first_node_in_group("background_music")
+					if bg_music and bg_music is AudioStreamPlayer:
+						print("Restarting background music")
+						if not bg_music.playing:
+							bg_music.volume_db = -80
+							bg_music.play()
+							var fade_tween = create_tween()
+							fade_tween.tween_property(bg_music, "volume_db", -15.0, 1.5)
+				)
 
 func force_state_reset():
 	"""Emergency state reset when enemy gets stuck"""

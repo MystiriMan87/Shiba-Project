@@ -23,13 +23,13 @@ func load_shop_items():
 			"price": 15,
 			"type": "consumable"
 		},
-		#"max_health_upgrade": {
-			#"id": "max_health_upgrade",
-			#"name": "Heart Container",
-			#"description": "Permanently increases max HP by 1",
-			#"price": 20,
-			#"type": "upgrade"
-		#},
+		"max_health_upgrade": {
+			"id": "max_health_upgrade",
+			"name": "Heart Container",
+			"description": "Permanently increases max HP by 1",
+			"price": 100,
+			"type": "upgrade"
+		},
 		#"iron_sword": {
 			#"id": "iron_sword",
 			#"name": "Iron Sword",
@@ -37,13 +37,13 @@ func load_shop_items():
 			#"price": 100,
 			#"type": "weapon"
 		#},
-		#"iron_axe": {
-			#"id": "iron_axe",
-			#"name": "Iron Axe",
-			#"description": "A heavy iron axe",
-			#"price": 30,
-			#"type": "weapon"
-		#},
+		"iron_axe": {
+			"id": "iron_axe",
+			"name": "Iron Axe",
+			"description": "A heavy iron axe",
+			"price": 30,
+			"type": "weapon"
+		},
 		"steel_hammer": {
 			"id": "steel_hammer",
 			"name": "Steel Hammer",
@@ -58,20 +58,20 @@ func load_shop_items():
 			"price": 75,
 			"type": "weapon"
 		},
-		#"wooden_key": {
-			#"id": "wooden_key",
-			#"name": "Wooden Key",
-			#"description": "Opens wooden chests",
-			#"price": 25,
-			#"type": "key"
-		#},
-		#"iron_key": {
-			#"id": "iron_key",
-			#"name": "Iron Key",
-			#"description": "Opens iron chests",
-			#"price": 50,
-			#"type": "key"
-		#}
+		"golden_key": {
+			"id": "golden_key",
+			"name": "Golden Key",
+			"description": "Exceptionally pricey",
+			"price": 999,
+			"type": "key"
+		},
+		"iron_key": {
+			"id": "iron_key",
+			"name": "Iron Key",
+			"description": "Opens iron chests",
+			"price": 50,
+			"type": "key"
+		}
 	}
 
 func get_shop_items() -> Dictionary:

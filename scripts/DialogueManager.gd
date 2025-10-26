@@ -2,10 +2,10 @@ extends Node
 # Dialogue data structure
 var dialogues = {
 	"npc_greeting": [
-		{"speaker": "Crazed Wizard", "text": "Hello traveler! Thank you for defeating those skeletons for me!"},
-		{"speaker": "Crazed Wizard", "text": "I don't have any new quests fo now, come back later!"},
+		{"speaker": "Crazed Wizard", "text": "Hello traveler! Thank you for bringing me that fire gem!"},
+		{"speaker": "Crazed Wizard", "text": "I don't have any new quests for now, come back later!"},
 		{"speaker": "Crazed Wizard", "text": "Before you go"},
-		{"speaker": "Crazed Wizard", "text": "If you meet a merchant on your travels through the dungeons make sure to give him your coins in exhange for valuable.. valuable.. items! (mumbling)"},
+		{"speaker": "Crazed Wizard", "text": "If you meet a merchant on your travels make sure to give him your coins in exhange for valuable.. valuable.. items! (mumbling)"},
 	],
 	"elf_messenger": [
 		{"speaker": "Elf Messenger", "text": "I come with peace. I know you have been ruthlessly fighting our warriors down in the depths of the dungeons."},
@@ -34,20 +34,20 @@ var dialogues = {
 		{"speaker": "Cowardly Skeleton", "text": "Please, I don't want to fight! I was sent away by my friends because I was too cowardly.. Now I sit here all day long."},
 		{"speaker": "Cowardly Skeleton", "text": ". . . . . . . . . . ."},
 	],
-	"skeleton_quest_start": [
+	"firegem_quest_start": [
 		{"speaker": "Crazed Wizard", "text": "Greetings traveler, are you by chance going to decending into those caverns?"},
-		{"speaker": "Crazed Wizard", "text": "Could you help me by defeating 3 skeletons while you are down there?"},
+		{"speaker": "Crazed Wizard", "text": "They say an ancient relic has been spotted down in the depths. I challenge you to retrieve it from the 4th level of the dungeon"},
 		{"speaker": "Crazed Wizard", "text": "I'll reward you handsomely for your trouble."}
 	],
-	"skeleton_quest_active": [
-		{"speaker": "Crazed Wizard", "text": "Have you dealt with those skeletons yet?"},
-		{"speaker": "Crazed Wizard", "text": "Be careful out there, they can be dangerous!"},
-		{"speaker": "Crazed Wizard", "text": "Come back when you've defeated 3 of them."}
+	"firegem_quest_active": [
+		{"speaker": "Crazed Wizard", "text": "Have you gotten the Fire Gem yet?"},
+		{"speaker": "Crazed Wizard", "text": "Be careful out there, it is guarden by a Dark Elf Champion"},
+		{"speaker": "Crazed Wizard", "text": "Come back when you've collected it."}
 	],
 		
-	"skeleton_quest_complete": [
+	"firegem_quest_complete": [
 		{"speaker": "Crazed Wizard", "text": "You did it! The dungeon feels safer already."},
-		{"speaker": "Crazed Wizard", "text": "Thank you so much for your help!"},
+		{"speaker": "Crazed Wizard", "text": "Come back later and I will show you how it works"},
 		{"speaker": "Crazed Wizard", "text": "You should've recieved your reward so check your inventory!"}
 	],
 	"merchant_intro": [

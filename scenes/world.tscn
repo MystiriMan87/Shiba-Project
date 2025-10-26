@@ -1,4 +1,4 @@
-[gd_scene load_steps=59 format=4 uid="uid://dpcl1dclvepl8"]
+[gd_scene load_steps=60 format=4 uid="uid://dpcl1dclvepl8"]
 
 [ext_resource type="Script" uid="uid://c4k4k8r5ebb5c" path="res://scenes/world.gd" id="1_4mrxx"]
 [ext_resource type="PackedScene" uid="uid://hqa6411o6hsf" path="res://scenes/player.tscn" id="1_nnsk1"]
@@ -36,6 +36,7 @@
 [ext_resource type="PackedScene" uid="uid://deu077hu7c72v" path="res://viewport_culler.tscn" id="33_rup4s"]
 [ext_resource type="PackedScene" uid="uid://con8irkei050h" path="res://dark_elf_enemy.tscn" id="34_4kbfs"]
 [ext_resource type="PackedScene" uid="uid://co1aha623au6i" path="res://mimic_enemy.tscn" id="35_f17e3"]
+[ext_resource type="PackedScene" uid="uid://dlsog5o45sqr6" path="res://scenes/PauseMenu.tscn" id="37_817gm"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_71j4m"]
 texture = ExtResource("4_k0juu")
@@ -6450,3 +6451,5 @@ offset_right = 1217.0
 offset_bottom = 712.0
 text = "Feel free to make any gameplay suggestion!
 This is still very early in development"
+
+[node name="PauseMenu" parent="." instance=ExtResource("37_817gm")]
