@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://do6we3l5k3p6t"
-path="res://.godot/imported/PixelRPG.ttf-77e68b5128ddaca1efde8cb658c18d9b.fontdata"
+uid="uid://cxmygrl8lpf7k"
+path="res://.godot/imported/PixeloidSansBold-RpeJo.ttf-400b9224a0d15326ab26163eb67fa7cb.fontdata"
 
 [deps]
 
-source_file="res://Assets/100-Sub-Assets-Free/Fonts/PixelRPG.ttf"
-dest_files=["res://.godot/imported/PixelRPG.ttf-77e68b5128ddaca1efde8cb658c18d9b.fontdata"]
+source_file="res://Fonts/PixeloidSansBold-RpeJo.ttf"
+dest_files=["res://.godot/imported/PixeloidSansBold-RpeJo.ttf-400b9224a0d15326ab26163eb67fa7cb.fontdata"]
 
 [params]
 

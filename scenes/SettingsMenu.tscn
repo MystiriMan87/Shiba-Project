@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://cuuwjcs8nvtqa"]
+[gd_scene load_steps=3 format=3 uid="uid://cuuwjcs8nvtqa"]
 
 [ext_resource type="Script" uid="uid://8k2pw38m2a25" path="res://scenes/settings_menu.gd" id="1_yelko"]
+[ext_resource type="FontFile" uid="uid://vkfuxgs5bk41" path="res://Fonts/PixeloidSans-nR3g1.ttf" id="2_1yw23"]
 
 [node name="SettingsMenu" type="Control"]
 layout_mode = 3
@@ -30,6 +31,7 @@ theme_override_constants/separation = 20
 
 [node name="TitleLabel" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1yw23")
 theme_override_font_sizes/font_size = 50
 text = "Settings
 "
@@ -39,6 +41,7 @@ layout_mode = 2
 
 [node name="AudioLabel" type="Label" parent="Panel/VBoxContainer/AudioSelection"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1yw23")
 theme_override_font_sizes/font_size = 25
 text = "Audio"
 
@@ -47,6 +50,8 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/AudioSelection/MasterVolume"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1yw23")
+theme_override_font_sizes/font_size = 19
 text = "Master Volume
 "
 
@@ -58,6 +63,7 @@ step = 0.01
 
 [node name="Value" type="Label" parent="Panel/VBoxContainer/AudioSelection/MasterVolume"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1yw23")
 text = "100%"
 
 [node name="MusicVolume" type="HBoxContainer" parent="Panel/VBoxContainer/AudioSelection"]
@@ -65,6 +71,8 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/AudioSelection/MusicVolume"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1yw23")
+theme_override_font_sizes/font_size = 19
 text = "Music Volume
 "
 
@@ -76,6 +84,7 @@ step = 0.01
 
 [node name="Value" type="Label" parent="Panel/VBoxContainer/AudioSelection/MusicVolume"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1yw23")
 text = "80%"
 
 [node name="SFXVolume" type="HBoxContainer" parent="Panel/VBoxContainer/AudioSelection"]
@@ -83,6 +92,8 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/AudioSelection/SFXVolume"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1yw23")
+theme_override_font_sizes/font_size = 19
 text = "SFX Volume
 "
 
@@ -94,6 +105,7 @@ step = 0.01
 
 [node name="Value" type="Label" parent="Panel/VBoxContainer/AudioSelection/SFXVolume"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1yw23")
 text = "100%"
 
 [node name="VideoSection" type="VBoxContainer" parent="Panel/VBoxContainer"]
@@ -101,6 +113,7 @@ layout_mode = 2
 
 [node name="VideoLabel" type="Label" parent="Panel/VBoxContainer/VideoSection"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1yw23")
 theme_override_font_sizes/font_size = 25
 text = "Video
 "
@@ -110,6 +123,8 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/VideoSection/Fullscreen"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1yw23")
+theme_override_font_sizes/font_size = 19
 text = "Fullscreen
 "
 
@@ -121,10 +136,12 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/VideoSection/VSync"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1yw23")
+theme_override_font_sizes/font_size = 19
 text = "VSync
 "
 
-[node name="CheckBox" type="CheckBox" parent="Panel/VBoxContainer/VideoSection/VSync"]
+[node name="OptionButton" type="OptionButton" parent="Panel/VBoxContainer/VideoSection/VSync"]
 layout_mode = 2
 
 [node name="Resolution" type="HBoxContainer" parent="Panel/VBoxContainer/VideoSection"]
@@ -132,6 +149,8 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/VideoSection/Resolution"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1yw23")
+theme_override_font_sizes/font_size = 19
 text = "Resolution"
 
 [node name="OptionButton" type="OptionButton" parent="Panel/VBoxContainer/VideoSection/Resolution"]
@@ -139,13 +158,32 @@ layout_mode = 2
 
 [node name="BackButton" type="Button" parent="Panel/VBoxContainer"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_1yw23")
 text = "Back
 "
+
+[node name="ControlsLabel" type="Label" parent="Panel"]
+layout_mode = 0
+offset_left = 793.0
+offset_top = 277.0
+offset_right = 1115.0
+offset_bottom = 787.0
+theme_override_fonts/font = ExtResource("2_1yw23")
+theme_override_font_sizes/font_size = 39
+text = "E - Interact
+
+Tab - INVENTORY
+
+Shift - Dash
+
+J - Quest Log
+
+Escape - Settings"
 
 [connection signal="changed" from="Panel/VBoxContainer/AudioSelection/MasterVolume/HSlider" to="." method="_on_master_volume_changed"]
 [connection signal="changed" from="Panel/VBoxContainer/AudioSelection/MusicVolume/HSlider" to="." method="_on_music_volume_changed"]
 [connection signal="changed" from="Panel/VBoxContainer/AudioSelection/SFXVolume/HSlider" to="." method="_on_sfx_volume_changed"]
 [connection signal="toggled" from="Panel/VBoxContainer/VideoSection/Fullscreen/CheckBox" to="." method="_on_fullscreen_toggled"]
-[connection signal="toggled" from="Panel/VBoxContainer/VideoSection/VSync/CheckBox" to="." method="_on_vsync_toggled"]
+[connection signal="item_selected" from="Panel/VBoxContainer/VideoSection/VSync/OptionButton" to="." method="_on_vsync_toggled"]
 [connection signal="item_selected" from="Panel/VBoxContainer/VideoSection/Resolution/OptionButton" to="." method="_on_resolution_selected"]
 [connection signal="pressed" from="Panel/VBoxContainer/BackButton" to="." method="_on_back_pressed"]

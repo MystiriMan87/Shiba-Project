@@ -1,7 +1,15 @@
-[gd_scene load_steps=3 format=3 uid="uid://dlsog5o45sqr6"]
+[gd_scene load_steps=5 format=3 uid="uid://dlsog5o45sqr6"]
 
 [ext_resource type="Script" uid="uid://btf6gfcmhg73j" path="res://scenes/pause_menu.gd" id="1_g4jo0"]
-[ext_resource type="FontFile" uid="uid://cuifcrxdin7jw" path="res://Assets/100-Sub-Assets-Free/Fonts/PixeloidMono-1G8ae.ttf" id="1_jvnd5"]
+[ext_resource type="FontFile" uid="uid://cuifcrxdin7jw" path="res://Fonts/PixeloidMono-1G8ae.ttf" id="1_jvnd5"]
+[ext_resource type="FontFile" uid="uid://vkfuxgs5bk41" path="res://Fonts/PixeloidSans-nR3g1.ttf" id="3_komsw"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5w6ei"]
+bg_color = Color(0, 0, 0, 0.34902)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
 [node name="PauseMenu" type="CanvasLayer"]
 script = ExtResource("1_g4jo0")
@@ -18,16 +26,14 @@ offset_right = 201.0
 offset_bottom = 161.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_5w6ei")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PausePanel"]
-layout_mode = 0
+[node name="Label" type="Label" parent="PausePanel"]
+layout_mode = 2
 offset_left = 126.0
 offset_top = 46.0
 offset_right = 273.0
-offset_bottom = 242.0
-
-[node name="Label" type="Label" parent="PausePanel/VBoxContainer"]
-layout_mode = 2
+offset_bottom = 119.0
 theme_override_fonts/font = ExtResource("1_jvnd5")
 theme_override_font_sizes/font_size = 28
 text = "PAUSED
@@ -35,19 +41,45 @@ text = "PAUSED
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ResumeButton" type="Button" parent="PausePanel/VBoxContainer"]
+[node name="ResumeButton" type="Button" parent="PausePanel"]
 layout_mode = 2
+offset_left = 126.0
+offset_top = 99.0
+offset_right = 273.0
+offset_bottom = 141.0
+theme_override_fonts/font = ExtResource("3_komsw")
+theme_override_font_sizes/font_size = 24
 text = "Resume"
 
-[node name="MainMenuButton" type="Button" parent="PausePanel/VBoxContainer"]
+[node name="MainMenuButton" type="Button" parent="PausePanel"]
 layout_mode = 2
+offset_left = 126.0
+offset_top = 166.0
+offset_right = 273.0
+offset_bottom = 208.0
+theme_override_fonts/font = ExtResource("3_komsw")
+theme_override_font_sizes/font_size = 24
 text = "Main Menu"
 
-[node name="QuitButton" type="Button" parent="PausePanel/VBoxContainer"]
+[node name="QuitButton" type="Button" parent="PausePanel"]
 layout_mode = 2
+offset_left = 126.0
+offset_top = 230.0
+offset_right = 273.0
+offset_bottom = 261.0
+theme_override_fonts/font = ExtResource("3_komsw")
+theme_override_font_sizes/font_size = 24
 text = "Quit
 "
 
-[connection signal="pressed" from="PausePanel/VBoxContainer/ResumeButton" to="." method="_on_resume_pressed"]
-[connection signal="pressed" from="PausePanel/VBoxContainer/MainMenuButton" to="." method="_on_main_menu_pressed"]
-[connection signal="pressed" from="PausePanel/VBoxContainer/QuitButton" to="." method="_on_quit_pressed"]
+[node name="VBoxContainer" type="VBoxContainer" parent="PausePanel"]
+visible = false
+layout_mode = 0
+offset_left = 126.0
+offset_top = 46.0
+offset_right = 273.0
+offset_bottom = 242.0
+
+[connection signal="pressed" from="PausePanel/ResumeButton" to="." method="_on_resume_pressed"]
+[connection signal="pressed" from="PausePanel/MainMenuButton" to="." method="_on_main_menu_pressed"]
+[connection signal="pressed" from="PausePanel/QuitButton" to="." method="_on_quit_pressed"]

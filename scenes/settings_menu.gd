@@ -10,7 +10,7 @@ var sfx_value: Label
 
 # Video controls
 var fullscreen_checkbox: CheckBox
-var vsync_checkbox: CheckBox
+var vsync_option: OptionButton
 var resolution_option: OptionButton
 
 func _ready():
@@ -51,7 +51,10 @@ func find_ui_elements():
 		
 		var vsync_container = video_section.find_child("VSync")
 		if vsync_container:
-			vsync_checkbox = vsync_container.find_child("CheckBox")
+			# Try to find OptionButton first, fallback to CheckBox if not converted yet
+			vsync_option = vsync_container.find_child("OptionButton")
+			if not vsync_option:
+				vsync_option = vsync_container.find_child("CheckBox")
 		
 		var resolution_container = video_section.find_child("Resolution")
 		if resolution_container:
@@ -91,9 +94,18 @@ func connect_signals():
 		fullscreen_checkbox.toggled.connect(_on_fullscreen_toggled)
 		print("Fullscreen checkbox connected")
 	
-	if vsync_checkbox:
-		vsync_checkbox.toggled.connect(_on_vsync_toggled)
-		print("VSync checkbox connected")
+	if vsync_option:
+		vsync_option.item_selected.connect(_on_vsync_selected)
+		vsync_option.clear()
+		vsync_option.add_item("Disabled")
+		vsync_option.add_item("Enabled")
+		vsync_option.add_item("30 FPS")
+		vsync_option.add_item("60 FPS")
+		vsync_option.add_item("120 FPS")
+		vsync_option.add_item("144 FPS")
+		print("VSync option button connected")
+	else:
+		print("ERROR: VSync control not found!")
 	
 	if resolution_option:
 		resolution_option.item_selected.connect(_on_resolution_selected)
@@ -127,8 +139,9 @@ func load_current_settings():
 	if fullscreen_checkbox:
 		fullscreen_checkbox.button_pressed = SettingsManager.settings.video.fullscreen
 	
-	if vsync_checkbox:
-		vsync_checkbox.button_pressed = SettingsManager.settings.video.vsync
+	if vsync_option and vsync_option is OptionButton:
+		var vsync_mode = SettingsManager.settings.video.get("vsync_mode", 1)
+		vsync_option.selected = vsync_mode
 	
 	if resolution_option:
 		var current_res = SettingsManager.settings.video.resolution
@@ -165,9 +178,14 @@ func _on_fullscreen_toggled(button_pressed: bool):
 	SettingsManager.set_fullscreen(button_pressed)
 	print("Fullscreen toggled: ", button_pressed)
 
-func _on_vsync_toggled(button_pressed: bool):
-	SettingsManager.set_vsync(button_pressed)
-	print("VSync toggled: ", button_pressed)
+func _on_vsync_selected(index: int):
+	SettingsManager.set_vsync_mode(index)
+	print("VSync mode changed to: ", index)
+
+# Fallback for if CheckBox hasn't been converted yet
+func _on_vsync_checkbox_fallback(button_pressed: bool):
+	SettingsManager.set_vsync_mode(1 if button_pressed else 0)
+	print("VSync toggled (fallback): ", button_pressed)
 
 func _on_resolution_selected(index: int):
 	if resolution_option:

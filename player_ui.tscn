@@ -8,10 +8,10 @@
 [ext_resource type="Texture2D" uid="uid://dd0gqips5pn8y" path="res://Assets/L1.png" id="6_gxl1c"]
 [ext_resource type="Script" uid="uid://d2wr72yy2hh5q" path="res://fps_counter.gd" id="7_gxl1c"]
 [ext_resource type="Script" uid="uid://cwpt7fbm7137s" path="res://level_timer.gd" id="8_vg8o0"]
-[ext_resource type="FontFile" uid="uid://cuifcrxdin7jw" path="res://Assets/100-Sub-Assets-Free/Fonts/PixeloidMono-1G8ae.ttf" id="9_hiloj"]
-[ext_resource type="FontFile" uid="uid://cxmygrl8lpf7k" path="res://Assets/100-Sub-Assets-Free/Fonts/PixeloidSansBold-RpeJo.ttf" id="10_babf8"]
+[ext_resource type="FontFile" uid="uid://cuifcrxdin7jw" path="res://Fonts/PixeloidMono-1G8ae.ttf" id="9_hiloj"]
+[ext_resource type="FontFile" uid="uid://cxmygrl8lpf7k" path="res://Fonts/PixeloidSansBold-RpeJo.ttf" id="10_babf8"]
 [ext_resource type="Texture2D" uid="uid://7jsd5egoaoi5" path="res://Assets/pngwing.com.png" id="10_cbg41"]
-[ext_resource type="FontFile" uid="uid://vkfuxgs5bk41" path="res://Assets/100-Sub-Assets-Free/Fonts/PixeloidSans-nR3g1.ttf" id="10_wotjm"]
+[ext_resource type="FontFile" uid="uid://vkfuxgs5bk41" path="res://Fonts/PixeloidSans-nR3g1.ttf" id="10_wotjm"]
 [ext_resource type="AudioStream" uid="uid://owjcku7p77uw" path="res://audio/enemy felled SFX.mp3" id="12_qadsr"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hiloj"]
@@ -110,11 +110,8 @@ offset_right = 515.0
 offset_bottom = 883.0
 theme_override_font_sizes/font_size = 22
 text = "
-E - Interact
-Tab - INVENTORY
-Shift - Dash
-J - Quest Log
-Escape - Pause"
+
+"
 horizontal_alignment = 1
 uppercase = true
 

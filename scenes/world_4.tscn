@@ -26,7 +26,7 @@
 [ext_resource type="PackedScene" uid="uid://drik1twhweam8" path="res://scenes/slime_enemy.tscn" id="24_bgf5n"]
 [ext_resource type="PackedScene" uid="uid://fmjm73g3uhw7" path="res://goblin_enemy.tscn" id="25_mmbe8"]
 [ext_resource type="PackedScene" uid="uid://con8irkei050h" path="res://dark_elf_enemy.tscn" id="26_isq8n"]
-[ext_resource type="FontFile" uid="uid://vkfuxgs5bk41" path="res://Assets/100-Sub-Assets-Free/Fonts/PixeloidSans-nR3g1.ttf" id="27_bgf5n"]
+[ext_resource type="FontFile" uid="uid://vkfuxgs5bk41" path="res://Fonts/PixeloidSans-nR3g1.ttf" id="27_bgf5n"]
 [ext_resource type="PackedScene" uid="uid://dq5abinvfao8t" path="res://dark_elf.tscn" id="28_mmbe8"]
 [ext_resource type="AudioStream" uid="uid://dbp8f1kx3bysn" path="res://audio/10. Ornstein & Smough.mp3" id="29_isq8n"]
 

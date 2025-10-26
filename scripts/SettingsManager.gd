@@ -1,7 +1,6 @@
 extends Node
 
 const SETTINGS_FILE = "user://settings.cfg"
-
 var config = ConfigFile.new()
 
 var settings = {
@@ -12,7 +11,7 @@ var settings = {
 	},
 	"video": {
 		"fullscreen": false,
-		"vsync": true,
+		"vsync_mode": 3,  # 0=Disabled, 1=Enabled, 2=30fps, 3=60fps, 4=120fps, 5=144fps
 		"resolution": Vector2i(1920, 1080)
 	},
 	"gameplay": {
@@ -37,6 +36,12 @@ func load_settings():
 		for key in settings[section].keys():
 			if config.has_section_key(section, key):
 				settings[section][key] = config.get_value(section, key)
+	
+	# Migrate old vsync boolean to vsync_mode
+	if config.has_section_key("video", "vsync") and not config.has_section_key("video", "vsync_mode"):
+		var old_vsync = config.get_value("video", "vsync")
+		settings.video.vsync_mode = 1 if old_vsync else 0
+		save_settings()
 	
 	print("Settings loaded successfully")
 
@@ -70,20 +75,38 @@ func apply_audio_settings():
 		AudioServer.set_bus_volume_db(sfx_bus, linear_to_db(settings.audio.sfx_volume))
 
 func apply_video_settings():
+	# Apply fullscreen/windowed mode
 	if settings.video.fullscreen:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 		DisplayServer.window_set_size(settings.video.resolution)
 	
-	if settings.video.vsync:
-		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED)
-	else:
-		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+	# Apply VSync mode with framerate caps
+	match settings.video.vsync_mode:
+		0:  # Disabled
+			DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+			Engine.max_fps = 0  # Unlimited
+		1:  # Enabled (adaptive - matches monitor)
+			DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED)
+			Engine.max_fps = 0  # No cap, monitor decides
+		2:  # 30 FPS
+			DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED)
+			Engine.max_fps = 30
+		3:  # 60 FPS
+			DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED)
+			Engine.max_fps = 60
+		4:  # 120 FPS
+			DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED)
+			Engine.max_fps = 120
+		5:  # 144 FPS
+			DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED)
+			Engine.max_fps = 144
 
 func apply_gameplay_settings():
 	pass
 
+# Audio setters
 func set_master_volume(value: float):
 	settings.audio.master_volume = value
 	apply_audio_settings()
@@ -96,23 +119,22 @@ func set_sfx_volume(value: float):
 	settings.audio.sfx_volume = value
 	apply_audio_settings()
 
+# Video setters
 func set_fullscreen(enabled: bool):
 	settings.video.fullscreen = enabled
 	apply_video_settings()
 
-func set_vsync(enabled: bool):
-	settings.video.vsync = enabled
+func set_vsync_mode(mode: int):
+	settings.video.vsync_mode = mode
 	apply_video_settings()
 
 func set_resolution(resolution: Vector2i):
 	settings.video.resolution = resolution
 	apply_video_settings()
 
+# Gameplay setters
 func set_mouse_sensitivity(value: float):
 	settings.gameplay.mouse_sensitivity = value
 
 func set_show_fps(enabled: bool):
 	settings.gameplay.show_fps = enabled
-	
-func _on_back_pressed():
-		get_tree().change_scene_to_file("res://main_menu.tscn")
