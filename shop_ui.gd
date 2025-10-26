@@ -290,6 +290,8 @@ func calculate_sell_price(item_data: Dictionary) -> int:
 			return 3
 		"key":
 			return 10
+		"artifact":
+			return 30
 		_:
 			return 5
 

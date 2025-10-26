@@ -6215,8 +6215,7 @@ position = Vector2(-534, 1220)
 input_pickable = true
 is_locked = false
 loot_items = Array[String](["health_potion", "iron_sword", "dash_flask", "trinket"])
-loot_spawn_radius_base = 50.0
-loot_pop_height = 12.0
+loot_spawn_radius_base = 70.0
 
 [node name="Chest2" parent="." instance=ExtResource("9_7r4gi")]
 visible = false

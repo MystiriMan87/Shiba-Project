@@ -90,7 +90,7 @@ func load_weapons_database():
 			"attack_range": 45,
 			"icon_path": "res://textures/items/weapons/stone_sword_huge.png",
 			"sprite_path": "res://textures/items/weapons/stone_sword_huge.png",
-			"description": "An old, worn dagger. Still sharp enough to be dangerous.",
+			"description": "Massive, thick, heavy, and far too rough. Indeed, it was a heap of raw stone.",
 			"rarity": "common",
 			"stackable": false,
 			"max_stack": 1,
@@ -256,17 +256,17 @@ func load_items_database():
 			"max_stack": 20,
 			"weapon_scale": 1.5
 		},
-		"dragon_scale": {
-			"id": "dragon_scale",
-			"name": "Dragon Scale",
-			"type": "material",
-			"icon_path": "res://textures/items/materials/dragon_scale.png",
-			"description": "A scale from an ancient dragon.",
-			"rarity": "legendary",
-			"stackable": true,
-			"max_stack": 5,
-			"weapon_scale": 1.5
-		},
+		#"dragon_scale": {
+			#"id": "dragon_scale",
+			#"name": "Dragon Scale",
+			#"type": "material",
+			#"icon_path": "res://textures/items/materials/dragon_scale.png",
+			#"description": "A scale from an ancient dragon.",
+			#"rarity": "legendary",
+			#"stackable": true,
+			#"max_stack": 5,
+			#"weapon_scale": 1.5
+		#},
 		#"magic_ring": {
 			#"id": "magic_ring",
 			#"name": "Magic Ring",
@@ -283,8 +283,8 @@ func load_items_database():
 			"id": "trinket",
 			"name": "Trinket",
 			"type": "artifact",
-			"icon_path": "res://icon.svg",
-			"description": "An artifact of unknown origins",
+			"icon_path": "res://textures/items/materials/dragon_scale.png",
+			"description": "An artifact of unknown origins, valued at 30 gold",
 			"rarity": "legendary",
 			"stackable": false,
 			"max_stack": 1,
