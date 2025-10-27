@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://qofu2qdopbvy" path="res://scenes/loadingScreen.gd" id="1_rqcyv"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_40eju"]
+bg_color = Color(0.419608, 0.372549, 0.776471, 0.670588)
 corner_radius_top_left = 5
 corner_radius_top_right = 5
 corner_radius_bottom_right = 5
@@ -70,7 +71,6 @@ _data = {
 [node name="LoadingScreen" type="CanvasLayer"]
 layer = 10
 script = ExtResource("1_rqcyv")
-min_display_time = 2.0
 
 [node name="FadeOverlay" type="ColorRect" parent="."]
 modulate = Color(1, 1, 1, 0)
@@ -79,7 +79,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 1)
+color = Color(0.419608, 0.494118, 0.694118, 0.670588)
 
 [node name="Panel" type="Panel" parent="FadeOverlay"]
 custom_minimum_size = Vector2(600, 200)

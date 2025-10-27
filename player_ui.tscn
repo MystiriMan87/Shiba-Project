@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://cqk6unim2ftgo"]
+[gd_scene load_steps=23 format=3 uid="uid://cqk6unim2ftgo"]
 
 [ext_resource type="Script" uid="uid://bov65j62y0be8" path="res://scripts/PlayerUI.gd" id="1_lwipk"]
 [ext_resource type="Texture2D" uid="uid://d12anw6sa6wxg" path="res://Assets/16x64 Red Simple Healthbar.png" id="2_654h1"]
@@ -15,6 +15,7 @@
 [ext_resource type="Texture2D" uid="uid://7jsd5egoaoi5" path="res://Assets/pngwing.com.png" id="10_cbg41"]
 [ext_resource type="FontFile" uid="uid://vkfuxgs5bk41" path="res://Fonts/PixeloidSans-nR3g1.ttf" id="10_wotjm"]
 [ext_resource type="AudioStream" uid="uid://owjcku7p77uw" path="res://audio/enemy felled SFX.mp3" id="12_qadsr"]
+[ext_resource type="Script" uid="uid://b5n6ipdt4fymh" path="res://scripts/DeathScreen.gd" id="16_y7vyt"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hiloj"]
 bg_color = Color(0.674531, 0.412541, 0.239348, 1)
@@ -43,20 +44,16 @@ border_width_top = 2
 border_width_right = 3
 border_width_bottom = 3
 border_color = Color(0.149475, 0.149475, 0.149474, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iniqa"]
 bg_color = Color(0.588616, 0.357917, 2.88785e-07, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wotjm"]
-bg_color = Color(0.588235, 0.356863, 0, 0.721569)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
+bg_color = Color(0.627451, 0.384314, 0, 0)
 border_color = Color(0, 0, 0, 1)
 corner_radius_top_left = 3
 corner_radius_top_right = 3
@@ -89,14 +86,15 @@ script = ExtResource("1_lwipk")
 
 [node name="DashContainer" type="HBoxContainer" parent="."]
 layout_mode = 0
-offset_left = 253.0
-offset_top = 251.0
-offset_right = 293.0
-offset_bottom = 291.0
+offset_left = 1333.0
+offset_top = 999.0
+offset_right = 1373.0
+offset_bottom = 1039.0
 
 [node name="Sprite2D" type="Sprite2D" parent="DashContainer"]
-position = Vector2(39, -74)
-scale = Vector2(7, 7)
+position = Vector2(-1256, -484)
+rotation = -1.57079
+scale = Vector2(17.5604, 13.175)
 texture = ExtResource("2_wotjm")
 vframes = 4
 region_enabled = true
@@ -106,16 +104,16 @@ script = ExtResource("3_nma07")
 [node name="HealthContainer" type="HBoxContainer" parent="."]
 texture_filter = 1
 layout_mode = 1
-offset_left = 86.0
-offset_top = 86.0
-offset_right = 160.0
-offset_bottom = 113.0
+offset_left = 29.0
+offset_top = 45.0
+offset_right = 94.0
+offset_bottom = 58.0
 scale = Vector2(6, 6)
 
 [node name="Sprite2D" type="Sprite2D" parent="HealthContainer"]
 texture_filter = 1
-position = Vector2(31.5, 5.16667)
-scale = Vector2(1, 1.076)
+position = Vector2(47.5, 11.5)
+scale = Vector2(1.41667, 1.48867)
 texture = ExtResource("2_654h1")
 vframes = 5
 region_rect = Rect2(0, 10, 30, 40)
@@ -211,9 +209,9 @@ layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -128.0
+offset_left = -437.0
 offset_top = 32.0
-offset_right = 120.0
+offset_right = -189.0
 offset_bottom = 90.0
 grow_horizontal = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_cbg41")
@@ -232,9 +230,9 @@ vertical_alignment = 1
 [node name="ContentPanel" type="Panel" parent="InventoryPanel"]
 layout_mode = 0
 offset_left = 28.0
-offset_top = 128.0
+offset_top = 115.0
 offset_right = 905.0
-offset_bottom = 485.0
+offset_bottom = 477.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_babf8")
 
 [node name="ScrollContainer" type="ScrollContainer" parent="InventoryPanel/ContentPanel"]
@@ -251,9 +249,9 @@ columns = 5
 [node name="EquippedWeaponPanel" type="Panel" parent="InventoryPanel"]
 layout_mode = 0
 offset_left = 606.0
-offset_top = 166.0
+offset_top = 160.0
 offset_right = 850.0
-offset_bottom = 441.0
+offset_bottom = 435.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_iniqa")
 
 [node name="EquippedVBox" type="VBoxContainer" parent="InventoryPanel/EquippedWeaponPanel"]
@@ -465,3 +463,12 @@ flip_v = true
 
 [node name="VictorySound" type="AudioStreamPlayer" parent="VictoryPopup"]
 stream = ExtResource("12_qadsr")
+
+[node name="DeathScreen" type="Control" parent="."]
+anchors_preset = 0
+offset_left = 722.0
+offset_top = 138.0
+offset_right = 762.0
+offset_bottom = 178.0
+script = ExtResource("16_y7vyt")
+respawn_delay = 10.0

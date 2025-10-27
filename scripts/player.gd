@@ -931,8 +931,8 @@ func die():
 	if attack_area:
 		attack_area.monitoring = false
 	player_died.emit()
-	await get_tree().create_timer(1.0).timeout
-	get_tree().change_scene_to_file("res://scenes/world.tscn")
+	#await get_tree().create_timer(1.0).timeout
+	#get_tree().change_scene_to_file("res://scenes/world.tscn")
 
 func heal(amount: int):
 	var old_health = current_health
@@ -1111,6 +1111,7 @@ func _on_attack_area_body_entered(body):
 	if body.has_method("take_damage"):
 		var damage = get_damage_against_enemy(body)
 		body.take_damage(damage)
+		body.take_damage(damage, self) 
 		play_sword_slice_sound()
 		enemy_killed.emit()
 	elif body.has_method("on_sword_hit"):

@@ -1,7 +1,10 @@
-[gd_scene load_steps=3 format=3 uid="uid://cuuwjcs8nvtqa"]
+[gd_scene load_steps=4 format=3 uid="uid://cuuwjcs8nvtqa"]
 
 [ext_resource type="Script" uid="uid://8k2pw38m2a25" path="res://scenes/settings_menu.gd" id="1_yelko"]
 [ext_resource type="FontFile" uid="uid://vkfuxgs5bk41" path="res://Fonts/PixeloidSans-nR3g1.ttf" id="2_1yw23"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1yw23"]
+bg_color = Color(0.419608, 0.494118, 0.694118, 0.670588)
 
 [node name="SettingsMenu" type="Control"]
 layout_mode = 3
@@ -20,6 +23,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1yw23")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
 layout_mode = 1

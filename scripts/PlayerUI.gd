@@ -75,8 +75,8 @@ func _ready():
 		create_boss_bar()
 	#if not dash_bar:
 		#create_dash_bar()
-	if not death_screen:
-		setup_death_screen()
+	#if not death_screen:
+		#setup_death_screen()
 		
 	hover_timer = Timer.new()
 	hover_timer.wait_time = 0.15  # 150ms delay before hiding
@@ -111,9 +111,9 @@ func connect_signals():
 		#if player.has_signal("dash_energy_changed"):
 			#if not player.dash_energy_changed.is_connected(_on_player_dash_changed):
 				#player.dash_energy_changed.connect(_on_player_dash_changed)
-		if player.has_signal("player_died"):
-			if not player.player_died.is_connected(_on_player_died):
-				player.player_died.connect(_on_player_died)
+		#if player.has_signal("player_died"):
+			#if not player.player_died.is_connected(_on_player_died):
+				#player.player_died.connect(_on_player_died)
 		if player.has_signal("enemy_killed"):
 			if not player.enemy_killed.is_connected(_on_enemy_killed):
 				player.enemy_killed.connect(_on_enemy_killed)
@@ -252,7 +252,13 @@ func create_echo_pips():
 func create_boss_bar():
 	var container = Panel.new()
 	container.name = "BossBarContainer"
-	container.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	container.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	container.anchor_left = 0.5
+	container.anchor_right = 0.5
+	container.anchor_top = 1.0
+	container.anchor_bottom = 1.0
+	container.offset_left = -400
+	container.offset_right = 400
 	container.offset_top = -120
 	container.offset_bottom = -50
 	container.visible = false
@@ -291,7 +297,7 @@ func create_boss_bar():
 	boss_bar.min_value = 0
 	boss_bar.max_value = 100
 	boss_bar.value = 100
-	boss_bar.custom_minimum_size = Vector2(620, 28)
+	boss_bar.custom_minimum_size = Vector2(700, 28)
 	boss_bar.show_percentage = false
 	
 	var bar_style = StyleBoxFlat.new()
@@ -323,6 +329,7 @@ func create_boss_bar():
 	vbox.add_child(boss_bar)
 	
 	boss_bar_container = container
+	
 
 #func create_dash_bar():
 	#var dash_container = VBoxContainer.new()
@@ -345,24 +352,24 @@ func create_boss_bar():
 	#dash_bar.show_percentage = false
 	#dash_container.add_child(dash_bar)
 
-func setup_death_screen():
-	death_screen = Control.new()
-	death_screen.name = "DeathScreen"
-	death_screen.set_anchors_preset(Control.PRESET_FULL_RECT)
-	death_screen.visible = false
-	death_screen.modulate.a = 0.0
-	add_child(death_screen)
-	
-	var background = ColorRect.new()
-	background.color = Color(0.0, 0.0, 0.0, 0.7)
-	background.set_anchors_preset(Control.PRESET_FULL_RECT)
-	death_screen.add_child(background)
-	
-	var death_panel = Panel.new()
-	death_panel.set_anchors_preset(Control.PRESET_CENTER)
-	death_panel.size = Vector2(400, 300)
-	death_panel.position = Vector2(-200, -150)
-	death_screen.add_child(death_panel)
+#func setup_death_screen():
+	#death_screen = Control.new()
+	#death_screen.name = "DeathScreen"
+	#death_screen.set_anchors_preset(Control.PRESET_FULL_RECT)
+	#death_screen.visible = false
+	#death_screen.modulate.a = 0.0
+	#add_child(death_screen)
+	#
+	#var background = ColorRect.new()
+	#background.color = Color(0.0, 0.0, 0.0, 0.7)
+	#background.set_anchors_preset(Control.PRESET_FULL_RECT)
+	#death_screen.add_child(background)
+	#
+	#var death_panel = Panel.new()
+	#death_panel.set_anchors_preset(Control.PRESET_CENTER)
+	#death_panel.size = Vector2(400, 300)
+	#death_panel.position = Vector2(-200, -150)
+	#death_screen.add_child(death_panel)
 
 func toggle_inventory():
 	if inventory_panel:
@@ -516,11 +523,11 @@ func _on_player_health_changed(new_health: int):
 	#if dash_bar:
 		#dash_bar.value = new_energy
 
-func _on_player_died():
-	if death_screen:
-		death_screen.visible = true
-		var tween = create_tween()
-		tween.tween_property(death_screen, "modulate:a", 1.0, 0.5)
+#func _on_player_died():
+	#if death_screen:
+		#death_screen.visible = true
+		#var tween = create_tween()
+		#tween.tween_property(death_screen, "modulate:a", 1.0, 0.5)
 
 func _on_enemy_killed():
 	enemies_killed += 1

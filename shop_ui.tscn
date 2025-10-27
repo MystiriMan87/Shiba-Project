@@ -5,10 +5,14 @@
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_w63dr"]
 bg_color = Color(0, 0, 0, 0.333333)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [sub_resource type="LabelSettings" id="LabelSettings_l4r40"]
 font_size = 65

@@ -30,6 +30,11 @@ extends CharacterBody2D
 @export var trail_radius: float = 25.0
 @export var toxic_puddle_texture: Texture2D = null 
 
+@export var can_be_knocked_back: bool = true
+@export var player_knockback_force: float = 100.0
+@export var knockback_duration: float = 0.12
+
+var player_knockback_timer: float = 0.0
 var current_health
 var is_dead = false
 var is_taking_damage = false
@@ -155,7 +160,7 @@ func find_player():
 func _physics_process(delta):
 	if is_dead:
 		return
-	
+		
 	if is_taking_damage:
 		damage_timer -= delta
 		if damage_timer <= 0:
@@ -164,14 +169,26 @@ func _physics_process(delta):
 	
 	if attack_timer > 0:
 		attack_timer -= delta
-	
+		
 	state_timer += delta
 	
+	#Handle player knockback timer 
+	if player_knockback_timer > 0.0:
+		player_knockback_timer -= delta
+	
+	#Apply knockback from player attacks (priority)
+	if player_knockback_timer > 0.0 and knockback_velocity.length() > 5:
+		velocity = knockback_velocity
+		knockback_velocity = knockback_velocity.lerp(Vector2.ZERO, 8.0 * delta) 
+		move_and_slide()
+		return
+		
+	# Apply old knockback (from taking damage - different source)
 	if knockback_velocity.length() > 5 and not is_jumping:
 		velocity = knockback_velocity
 		knockback_velocity = knockback_velocity.lerp(Vector2.ZERO, knockback_friction)
 		move_and_slide()
-		return
+		return 
 	
 	match current_state:
 		SlimeState.IDLE:
@@ -186,16 +203,18 @@ func _physics_process(delta):
 			handle_landing_state(delta)
 		SlimeState.COOLDOWN:
 			handle_cooldown_state(delta)
-	
-	# Spawn toxic trail while moving
+			
+		
+	# Spawn toxic trail 
 	if leave_toxic_trail and is_moving and not is_dead and not is_jumping:
 		trail_spawn_timer -= delta
 		if trail_spawn_timer <= 0:
 			spawn_toxic_puddle()
 			trail_spawn_timer = trail_spawn_interval
-	
+			
 	if not is_jumping:
 		move_and_slide()
+		
 
 func handle_idle_state(delta):
 	target_velocity = Vector2.ZERO
@@ -476,7 +495,7 @@ func play_animation(anim_name: String, speed_multiplier: float = 1.0):
 				if animation_player.has_animation("idle"):
 					animation_player.play("idle")
 
-func take_damage(amount: int):
+func take_damage(amount: int, attacker: Node = null):
 	if is_dead:
 		return
 	
@@ -501,12 +520,27 @@ func take_damage(amount: int):
 	
 	flash_sprite(Color.RED, damage_flash_duration)
 	
-	if player and not is_jumping:
-		var knockback_dir = (global_position - player.global_position).normalized()
-		knockback_velocity = knockback_dir * knockback_force
+	# Apply knockback from player attack
+	if can_be_knocked_back and attacker and not is_jumping:
+		apply_knockback_from_player(attacker.global_position)
 	
 	if current_health <= 0:
 		die()
+	
+	
+func apply_knockback_from_player(attacker_position: Vector2):
+	"""Apply knockback when hit by player"""
+	if not can_be_knocked_back:
+		return
+	
+	var knockback_dir = (global_position - attacker_position).normalized()
+	knockback_velocity = knockback_dir * player_knockback_force
+	player_knockback_timer = knockback_duration
+	
+	#Interupt jump windup if being knocked back
+	if current_state == SlimeState.JUMP_WINDUP:
+		cancel_jump_windup()
+	
 
 func cancel_jump_windup():
 	change_state(SlimeState.IDLE)

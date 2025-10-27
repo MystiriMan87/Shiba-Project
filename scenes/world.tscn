@@ -6292,6 +6292,8 @@ scale = Vector2(4, 4)
 [node name="Enemy" parent="Enemies" instance=ExtResource("1_rwgxs")]
 position = Vector2(460, 586)
 scene_path = "res://scenes/slime_enemy.tscn"
+max_health = 45
+knockback_force = 10000
 toxic_puddle_texture = ExtResource("19_x2olw")
 
 [node name="Enemy2" parent="Enemies" instance=ExtResource("1_rwgxs")]
