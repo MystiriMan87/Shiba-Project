@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://qofu2qdopbvy" path="res://scenes/loadingScreen.gd" id="1_rqcyv"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_40eju"]
-bg_color = Color(0.419608, 0.372549, 0.776471, 0.670588)
 corner_radius_top_left = 5
 corner_radius_top_right = 5
 corner_radius_bottom_right = 5

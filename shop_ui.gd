@@ -8,7 +8,6 @@ signal shop_closed
 @onready var close_button: Button = $Panel/MarginContainer/VBoxContainer/TopBar/CloseButton
 @onready var message_label: Label = $Panel/MarginContainer/VBoxContainer/MessageLabel
 
-# New: Mode toggle buttons
 @onready var buy_button: Button = null
 @onready var sell_button: Button = null
 
@@ -18,12 +17,20 @@ var current_mode: String = "buy"  # "buy" or "sell"
 func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	add_to_group("shop_ui")
+	
+	# Ensure shop is on top layer
+	layer = 100
+	
+	# Make sure the shop can receive input when visible
+	if panel:
+		panel.mouse_filter = Control.MOUSE_FILTER_PASS  # Let input through to children
+	
 	hide()
 	
-	# Create mode toggle buttons
 	create_mode_toggle_buttons()
 	
 	if close_button:
+		close_button.mouse_filter = Control.MOUSE_FILTER_STOP
 		close_button.pressed.connect(_on_close_pressed)
 
 func create_mode_toggle_buttons():
