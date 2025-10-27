@@ -6293,14 +6293,16 @@ scale = Vector2(4, 4)
 position = Vector2(460, 586)
 scene_path = "res://scenes/slime_enemy.tscn"
 max_health = 45
-knockback_force = 10000
 toxic_puddle_texture = ExtResource("19_x2olw")
+player_knockback_force = 250.0
 
 [node name="Enemy2" parent="Enemies" instance=ExtResource("1_rwgxs")]
 position = Vector2(293, 1421)
+player_knockback_force = 250.0
 
 [node name="Enemy3" parent="Enemies" instance=ExtResource("1_rwgxs")]
 position = Vector2(707, 1361)
+player_knockback_force = 250.0
 
 [node name="SkeletonEnemyV2" parent="Enemies" instance=ExtResource("10_w7kh3")]
 position = Vector2(429, 1247)

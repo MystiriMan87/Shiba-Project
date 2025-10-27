@@ -19,6 +19,11 @@ extends CharacterBody2D
 @export var lunge_duration: float = 0.12
 @export var enemy_type: String = "Dark_Elf"
 
+# Knockback exports - NEW SYSTEM
+@export var can_be_knocked_back: bool = true
+@export var knockback_force: float = 300.0
+@export var knockback_friction: float = 0.85
+
 @export_group("Wandering")
 @export var wander_enabled: bool = true
 @export var wander_speed: float = 30.0
@@ -45,6 +50,10 @@ var is_moving = false
 var last_speed_ratio: float = 0.0
 var facing_direction = "down"
 var is_taking_damage 
+
+# Knockback variables - NEW SYSTEM
+var knockback_velocity: Vector2 = Vector2.ZERO
+var is_being_knocked_back: bool = false
 
 var wander_target: Vector2 = Vector2.ZERO
 var wander_timer: float = 0.0
@@ -125,15 +134,6 @@ func find_player():
 		player = players[0]
 
 func _physics_process(delta):
-	if velocity.length() < 1 and not is_dead and current_state != GoblinState.IDLE:
-		stuck_timer += delta
-		if stuck_timer > 1.0:  # Stuck for more than 1 second
-			print("Enemy appears stuck, forcing state reset")
-			force_state_reset()
-			stuck_timer = 0.0
-	else:
-		stuck_timer = 0.0
-	
 	if is_dead:
 		return
 	
@@ -142,6 +142,17 @@ func _physics_process(delta):
 	
 	if attack_timer > 0:
 		attack_timer -= delta
+	
+	# NEW KNOCKBACK SYSTEM - Apply knockback friction continuously
+	if knockback_velocity.length() > 5:
+		is_being_knocked_back = true
+		velocity = knockback_velocity
+		knockback_velocity *= knockback_friction  # Smooth friction deceleration
+		move_and_collide(velocity * delta)
+		return  # Skip normal movement while being knocked back
+	else:
+		is_being_knocked_back = false
+		knockback_velocity = Vector2.ZERO
 	
 	match current_state:
 		GoblinState.IDLE:
@@ -344,10 +355,17 @@ func _on_animation_finished(anim_name: String) -> void:
 		change_state(GoblinState.WALKING)
 	elif anim_name.begins_with("hurt"):
 		hurt_locked = false
-		print("Hurt animation finished, unlocked")
 
-func take_damage(amount: int):
-	if is_dead or hurt_locked or damage_timer > 0.0:
+func take_damage(amount: int, attacker: Node = null):
+	if is_dead:
+		return
+	
+	# Apply knockback FIRST before any checks
+	if can_be_knocked_back and attacker:
+		apply_knockback(attacker.global_position)
+	
+	# Check if damage should be blocked
+	if hurt_locked or damage_timer > 0.0:
 		return
 	
 	if get_tree() and get_tree().current_scene:
@@ -364,13 +382,20 @@ func take_damage(amount: int):
 			animation_player.speed_scale = 0.8
 			animation_player.play(hit_anim)
 		else:
-			print("WARNING: Animation not found: ", hit_anim)
 			hurt_locked = false
 	else:
 		hurt_locked = false
 	
 	if current_health <= 0:
 		die()
+
+func apply_knockback(attacker_position: Vector2):
+	"""Apply instant knockback force - NEW SYSTEM"""
+	if not can_be_knocked_back:
+		return
+	
+	var direction = (global_position - attacker_position).normalized()
+	knockback_velocity = direction * knockback_force
 
 func die():
 	if is_dead:
@@ -394,7 +419,6 @@ func die():
 		respawn_manager.register_enemy_death(self)
 
 	DropSystem.handle_enemy_death(enemy_type, global_position, get_tree())
-	#_drop_keys_like_slime()
 	
 	collision_shape.disabled = true
 	
@@ -405,18 +429,6 @@ func die():
 	tween.parallel().tween_property(sprite, "scale", Vector2(1.5, 0.5), 0.6)
 	tween.tween_callback(queue_free)
 
-#func _drop_keys_like_slime():
-	#var key_drop_chance = 0.3
-	#if randf() < key_drop_chance:
-		#var key_type = "iron"
-		#var key_id = key_type + "_key"
-		#var pickup_scene = load("res://scenes/PickupItem.tscn")
-		#if pickup_scene:
-			#var pickup = pickup_scene.instantiate()
-			#get_tree().current_scene.add_child(pickup)
-			#pickup.global_position = global_position + Vector2(randf_range(-20, 20), -20)
-			#pickup.set_item(key_id, 1)
-
 func _on_detection_area_entered(body):
 	if body.is_in_group("player"):
 		player_in_detection_range = true
@@ -426,26 +438,21 @@ func _on_detection_area_entered(body):
 func _on_detection_area_exited(body):
 	if body.is_in_group("player"):
 		player_in_detection_range = false
-		
+
 func force_state_reset():
 	"""Emergency state reset when enemy gets stuck"""
 	is_taking_damage = false
 	damage_timer = 0.0
 	is_attacking = false
 	attack_timer = 0.0
+	knockback_velocity = Vector2.ZERO
+	is_being_knocked_back = false
 	
-	# Reset sprite
 	if sprite:
 		sprite.modulate = Color.WHITE
 	
-	# Reset animation
 	if animation_player:
 		animation_player.speed_scale = 1.0
-		if current_state == GoblinState.WALKING:
-			animation_player.play("idle")
 	
-	# Reset collision
 	if collision_shape:
 		collision_shape.disabled = false
-	
-	print("State force-reset completed")

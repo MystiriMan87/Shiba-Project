@@ -6,8 +6,6 @@
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jix8l"]
 bg_color = Color(0.133333, 0.133333, 0.133333, 0)
-border_width_left = 15
-border_color = Color(0.8, 0.8, 0.8, 0)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glbon"]
 bg_color = Color(0, 0, 0, 0)

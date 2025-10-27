@@ -1485,7 +1485,7 @@ max_health = 100
 [node name="Chest" parent="." instance=ExtResource("12_gpm48")]
 position = Vector2(2338, 1751)
 is_locked = false
-loot_items = Array[String](["health_potion", "coin", "legendary_mace"])
+loot_items = Array[String](["health_potion", "coin", "iron_buster_sword"])
 loot_spawn_radius_base = 30.0
 loot_pop_height = 12.0
 

@@ -1453,6 +1453,7 @@ detection_range = 200
 [node name="mimic_enemy" parent="." instance=ExtResource("25_3xk2h")]
 position = Vector2(-675, 26)
 scale = Vector2(4, 4)
+loot_items = Array[String](["health_potion", "coin", "coin", "scythe"])
 
 [node name="Level_Change_Pedestal" parent="." instance=ExtResource("26_gph3w")]
 position = Vector2(1152, -3250)

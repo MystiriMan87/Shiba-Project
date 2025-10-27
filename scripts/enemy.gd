@@ -160,7 +160,7 @@ func find_player():
 func _physics_process(delta):
 	if is_dead:
 		return
-		
+	
 	if is_taking_damage:
 		damage_timer -= delta
 		if damage_timer <= 0:
@@ -169,26 +169,23 @@ func _physics_process(delta):
 	
 	if attack_timer > 0:
 		attack_timer -= delta
-		
+	
 	state_timer += delta
 	
-	#Handle player knockback timer 
+	# Handle player knockback timer
 	if player_knockback_timer > 0.0:
 		player_knockback_timer -= delta
-	
-	#Apply knockback from player attacks (priority)
-	if player_knockback_timer > 0.0 and knockback_velocity.length() > 5:
+		# Apply knockback velocity directly
 		velocity = knockback_velocity
-		knockback_velocity = knockback_velocity.lerp(Vector2.ZERO, 8.0 * delta) 
+		knockback_velocity = knockback_velocity.lerp(Vector2.ZERO, 6.0 * delta)
 		move_and_slide()
-		return
-		
-	# Apply old knockback (from taking damage - different source)
+		return  # Don't process any other movement while being knocked back
+	
 	if knockback_velocity.length() > 5 and not is_jumping:
 		velocity = knockback_velocity
 		knockback_velocity = knockback_velocity.lerp(Vector2.ZERO, knockback_friction)
 		move_and_slide()
-		return 
+		return
 	
 	match current_state:
 		SlimeState.IDLE:
@@ -203,18 +200,16 @@ func _physics_process(delta):
 			handle_landing_state(delta)
 		SlimeState.COOLDOWN:
 			handle_cooldown_state(delta)
-			
-		
-	# Spawn toxic trail 
+	
+	# Spawn toxic trail while moving
 	if leave_toxic_trail and is_moving and not is_dead and not is_jumping:
 		trail_spawn_timer -= delta
 		if trail_spawn_timer <= 0:
 			spawn_toxic_puddle()
 			trail_spawn_timer = trail_spawn_interval
-			
+	
 	if not is_jumping:
 		move_and_slide()
-		
 
 func handle_idle_state(delta):
 	target_velocity = Vector2.ZERO
@@ -526,6 +521,7 @@ func take_damage(amount: int, attacker: Node = null):
 	
 	if current_health <= 0:
 		die()
+
 	
 	
 func apply_knockback_from_player(attacker_position: Vector2):
@@ -537,10 +533,9 @@ func apply_knockback_from_player(attacker_position: Vector2):
 	knockback_velocity = knockback_dir * player_knockback_force
 	player_knockback_timer = knockback_duration
 	
-	#Interupt jump windup if being knocked back
+	# Interrupt jump windup if being knocked back
 	if current_state == SlimeState.JUMP_WINDUP:
 		cancel_jump_windup()
-	
 
 func cancel_jump_windup():
 	change_state(SlimeState.IDLE)

@@ -19,6 +19,11 @@ extends CharacterBody2D
 @export var lunge_duration: float = 0.12
 @export var enemy_type: String = "skeleton"
 
+# Knockback exports - NEW SYSTEM
+@export var can_be_knocked_back: bool = true
+@export var knockback_force: float = 300.0
+@export var knockback_friction: float = 0.85
+
 @export_group("Wandering")
 @export var wander_enabled: bool = true
 @export var wander_speed: float = 30.0
@@ -45,6 +50,10 @@ var is_taking_damage
 var is_stuck: bool = false
 var stuck_timer: float = 0.0
 var last_velocity: Vector2 = Vector2.ZERO
+
+# Knockback variables - NEW SYSTEM
+var knockback_velocity: Vector2 = Vector2.ZERO
+var is_being_knocked_back: bool = false
 
 var wander_target: Vector2 = Vector2.ZERO
 var wander_timer: float = 0.0
@@ -125,15 +134,6 @@ func find_player():
 		player = players[0]
 
 func _physics_process(delta):
-	if velocity.length() < 1 and not is_dead and current_state != SkeletonState.IDLE:
-		stuck_timer += delta
-		if stuck_timer > 1.0:  # Stuck for more than 1 second
-			print("Enemy appears stuck, forcing state reset")
-			force_state_reset()
-			stuck_timer = 0.0
-	else:
-		stuck_timer = 0.0
-	
 	if is_dead:
 		return
 	
@@ -142,6 +142,17 @@ func _physics_process(delta):
 	
 	if attack_timer > 0:
 		attack_timer -= delta
+	
+	# NEW KNOCKBACK SYSTEM - Apply knockback friction continuously
+	if knockback_velocity.length() > 5:
+		is_being_knocked_back = true
+		velocity = knockback_velocity
+		knockback_velocity *= knockback_friction  # Smooth friction deceleration
+		move_and_collide(velocity * delta)
+		return  # Skip normal movement while being knocked back
+	else:
+		is_being_knocked_back = false
+		knockback_velocity = Vector2.ZERO
 	
 	match current_state:
 		SkeletonState.IDLE:
@@ -345,8 +356,16 @@ func _on_animation_finished(anim_name: String) -> void:
 	elif anim_name.begins_with("hit"):
 		hurt_locked = false
 
-func take_damage(amount: int):
-	if is_dead or hurt_locked or damage_timer > 0.0:
+func take_damage(amount: int, attacker: Node = null):
+	if is_dead:
+		return
+	
+	# Apply knockback FIRST before any checks
+	if can_be_knocked_back and attacker:
+		apply_knockback(attacker.global_position)
+	
+	# Check if damage should be blocked
+	if hurt_locked or damage_timer > 0.0:
 		return
 	
 	if get_tree() and get_tree().current_scene:
@@ -365,6 +384,14 @@ func take_damage(amount: int):
 	
 	if current_health <= 0:
 		die()
+
+func apply_knockback(attacker_position: Vector2):
+	"""Apply instant knockback force - NEW SYSTEM"""
+	if not can_be_knocked_back:
+		return
+	
+	var direction = (global_position - attacker_position).normalized()
+	knockback_velocity = direction * knockback_force
 
 func die():
 	if is_dead:
@@ -420,26 +447,21 @@ func _on_detection_area_entered(body):
 func _on_detection_area_exited(body):
 	if body.is_in_group("player"):
 		player_in_detection_range = false
-		
+
 func force_state_reset():
 	"""Emergency state reset when enemy gets stuck"""
 	is_taking_damage = false
 	damage_timer = 0.0
 	is_attacking = false
 	attack_timer = 0.0
+	knockback_velocity = Vector2.ZERO
+	is_being_knocked_back = false
 	
-	# Reset sprite
 	if sprite:
 		sprite.modulate = Color.WHITE
 	
-	# Reset animation
 	if animation_player:
 		animation_player.speed_scale = 1.0
-		if current_state == SkeletonState.WALKING:
-			animation_player.play("idle")
 	
-	# Reset collision
 	if collision_shape:
 		collision_shape.disabled = false
-	
-	print("State force-reset completed")
