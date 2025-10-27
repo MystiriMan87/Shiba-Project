@@ -353,6 +353,8 @@ func _ready():
 		if not item_manager.item_picked_up.is_connected(_on_item_picked_up):
 			item_manager.item_picked_up.connect(_on_item_picked_up)
 	update_magic_ring_display()
+	call_deferred("_refresh_weapon_visual")
+	call_deferred("_delayed_weapon_refresh")
 	
 	player_ready.emit()  
 
@@ -365,6 +367,8 @@ func _on_body_entered(body: Node):
 		fx.emitting = true	
 	if body and body.has_method("take_damage"):
 		body.take_damage(attack_damage)
+
+
 
 func setup_sound_effects():
 	# Footstep Audio Player
@@ -1353,3 +1357,64 @@ func get_directional_input() -> Vector2:
 			input_vector = raw_input.normalized()
 	
 	return input_vector
+	
+func _refresh_weapon_visual():
+	await get_tree().process_frame
+	
+	var item_manager = get_node_or_null("/root/ItemManager")
+	if not item_manager:
+		print("ItemManager not found!")
+		return
+	
+	var equipped = item_manager.get_equipped_weapon()
+	if equipped.is_empty():
+		print("No weapon equipped")
+		return
+	
+	print("Refreshing weapon visual: ", equipped.get("name", "Unknown"))
+	
+	# Update attack sprite texture
+	if attack_sprite:
+		print("BEFORE - Scale: ", attack_sprite.scale, " Texture: ", attack_sprite.texture)
+		
+		var weapon_texture_path = equipped.get("sprite_path", equipped.get("icon_path", ""))
+		if weapon_texture_path != "" and ResourceLoader.exists(weapon_texture_path):
+			var weapon_texture = load(weapon_texture_path)
+			attack_sprite.texture = weapon_texture
+			
+			# FIXED: Use weapon_scale from ItemManager data
+			var weapon_scale = equipped.get("weapon_scale", 2.5)  # Default to 2.5 if not specified
+			attack_sprite.scale = Vector2(weapon_scale, weapon_scale)
+			
+			# Make sure sprite properties are correct
+			attack_sprite.visible = false  # Hidden until attack
+			attack_sprite.centered = true
+			
+			print("AFTER - Scale: ", attack_sprite.scale, " Texture: ", attack_sprite.texture)
+			print("✓ Weapon texture updated with scale: ", weapon_scale)
+		else:
+			print("✗ Weapon texture not found: ", weapon_texture_path)
+	else:
+		print("✗ attack_sprite not found!")
+	
+	# Update weapon stats
+	if "damage" in equipped:
+		attack_damage = equipped.damage
+		print("✓ Damage updated: ", attack_damage)
+	
+	if "attack_range" in equipped:
+		attack_range = equipped.attack_range
+		print("✓ Range updated: ", attack_range)
+	
+	if "attack_speed" in equipped:
+		var weapon_speed = equipped.attack_speed
+		attack_cooldown = 1.0 / weapon_speed
+		print("✓ Attack speed updated: ", weapon_speed)
+	
+	print("Weapon refresh complete!")
+	
+
+
+func _delayed_weapon_refresh():
+	await get_tree().create_timer(0.1).timeout  # Wait a bit longer
+	_refresh_weapon_visual()

@@ -310,7 +310,7 @@ func load_items_database():
 			"name": "Iron Ore",
 			"type": "material",
 			"icon_path": "res://textures/items/materials/iron_ore.png",
-			"description": "Raw iron ore, useful for crafting.",
+			"description": "No use as of now, WIP :( Apologies from the dev :] You can sell it though)",
 			"rarity": "common",
 			"stackable": true,
 			"max_stack": 20,

@@ -71,6 +71,13 @@ func load_shop_items():
 			"description": "Opens iron chests",
 			"price": 50,
 			"type": "key"
+		},
+		"iron_ore": {
+			"id": "iron_ore",
+			"name": "Iron Ore",
+			"description": "WIP :(",
+			"price": 100,
+			"type": "material"	
 		}
 	}
 

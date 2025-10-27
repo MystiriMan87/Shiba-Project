@@ -91,6 +91,8 @@ func _ready():
 	connect_signals()
 	setup_inventory_ui()
 	update_health_display()
+	call_deferred("_refresh_player_weapon")
+
 	
 	if inventory_panel:
 		inventory_panel.visible = false
@@ -971,3 +973,11 @@ func get_rarity_color(rarity: String) -> Color:
 		"legendary": Color(1.0, 0.6, 0.2)    # Orange/Gold
 	}
 	return rarity_colors.get(rarity, Color.WHITE)
+	
+func _refresh_player_weapon():
+	await get_tree().process_frame
+	
+	if player and item_manager:
+		var equipped = item_manager.get_equipped_weapon()
+		if not equipped.is_empty() and player.has_method("equip_weapon"):
+			player.equip_weapon(equipped)
