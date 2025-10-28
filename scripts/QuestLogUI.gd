@@ -49,12 +49,23 @@ func open_quest_log():
 	print("Opening quest log...")
 	show()
 	get_tree().paused = true
+	
+	var virtual_cursor = get_node_or_null("/root/VirtualCursor")
+	if virtual_cursor:
+		virtual_cursor.on_menu_opened()
+		virtual_cursor.force_activate()
+	
 	refresh_all_tabs()
 
 func close_quest_log():
 	print("Closing quest log...")
 	hide()
 	get_tree().paused = false
+	
+	var virtual_cursor = get_node_or_null("/root/VirtualCursor")
+	if virtual_cursor:
+		virtual_cursor.on_menu_closed()
+		
 	quest_log_closed.emit()
 
 func refresh_all_tabs():

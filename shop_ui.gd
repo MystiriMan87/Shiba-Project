@@ -104,6 +104,11 @@ func open_shop(player_ref: Node):
 	show()
 	get_tree().paused = true
 	
+	var virtual_cursor = get_node_or_null("/root/VirtualCursor")
+	if virtual_cursor:
+		virtual_cursor.on_menu_opened()
+		virtual_cursor.force_activate()
+	
 	if not items_container:
 		print("ERROR: items_container is null!")
 		return
@@ -119,6 +124,11 @@ func open_shop(player_ref: Node):
 func close_shop():
 	hide()
 	get_tree().paused = false
+	
+	var virtual_cursor = get_node_or_null("/root/VirtualCursor")
+	if virtual_cursor: 
+		virtual_cursor.on_menu_closed()
+	
 	shop_closed.emit()
 
 func populate_shop_items():

@@ -1,4 +1,4 @@
-[gd_scene load_steps=60 format=4 uid="uid://dpcl1dclvepl8"]
+[gd_scene load_steps=59 format=4 uid="uid://dpcl1dclvepl8"]
 
 [ext_resource type="Script" uid="uid://c4k4k8r5ebb5c" path="res://scenes/world.gd" id="1_4mrxx"]
 [ext_resource type="PackedScene" uid="uid://hqa6411o6hsf" path="res://scenes/player.tscn" id="1_nnsk1"]
@@ -34,7 +34,6 @@
 [ext_resource type="Script" uid="uid://50e53w87g0k4" path="res://scenes/ladder_up.gd" id="33_4kbfs"]
 [ext_resource type="PackedScene" uid="uid://bq7bbdmxxgdbv" path="res://level_change_pedestal.tscn" id="33_f17e3"]
 [ext_resource type="PackedScene" uid="uid://deu077hu7c72v" path="res://viewport_culler.tscn" id="33_rup4s"]
-[ext_resource type="PackedScene" uid="uid://con8irkei050h" path="res://dark_elf_enemy.tscn" id="34_4kbfs"]
 [ext_resource type="PackedScene" uid="uid://co1aha623au6i" path="res://mimic_enemy.tscn" id="35_f17e3"]
 [ext_resource type="PackedScene" uid="uid://dlsog5o45sqr6" path="res://scenes/PauseMenu.tscn" id="37_817gm"]
 
@@ -6379,9 +6378,20 @@ z_index = -1
 position = Vector2(-178, 830)
 
 [node name="SpikeTrap2" parent="." instance=ExtResource("16_dss4m")]
-visible = false
 z_index = -1
-position = Vector2(-178, 911)
+position = Vector2(475, 2614)
+
+[node name="SpikeTrap3" parent="." instance=ExtResource("16_dss4m")]
+z_index = -1
+position = Vector2(898, 2505)
+
+[node name="SpikeTrap4" parent="." instance=ExtResource("16_dss4m")]
+z_index = -1
+position = Vector2(32, 2403)
+
+[node name="SpikeTrap5" parent="." instance=ExtResource("16_dss4m")]
+z_index = -1
+position = Vector2(581, 2239)
 
 [node name="WoodenDoor" parent="." instance=ExtResource("19_pm21f")]
 visible = false
@@ -6435,14 +6445,6 @@ collision_mask = 31
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="Level_Change_Pedestal"]
 position = Vector2(-0.299999, 0.0999756)
 shape = SubResource("RectangleShape2D_4kbfs")
-
-[node name="darkElf_enemy" parent="." instance=ExtResource("34_4kbfs")]
-position = Vector2(466, 2860)
-scale = Vector2(3, 3)
-
-[node name="darkElf_enemy2" parent="." instance=ExtResource("34_4kbfs")]
-position = Vector2(544, 2859)
-scale = Vector2(3, 3)
 
 [node name="mimic_enemy" parent="." instance=ExtResource("35_f17e3")]
 position = Vector2(-309, 1221)

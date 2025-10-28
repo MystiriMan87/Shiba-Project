@@ -47,7 +47,8 @@ var loot_tables = {
 			{"item_id": "health_potion", "chance": 0.1, "min_qty": 1, "max_qty": 1},
 			#{"item_id": "iron_dagger", "chance": 0.05, "min_qty": 1, "max_qty": 1},
 			{"item_id": "fire_gem", "chance": 0.9, "min_qty": 1, "max_qty": 1},
-			{"item_id": "golden_key", "chance": 0.9, "min_qty": 1, "max_qty": 1}
+			{"item_id": "golden_key", "chance": 0.9, "min_qty": 1, "max_qty": 1},
+			{"item_id": "elven_greatsword", "chance": 0.9, "min_qty": 1, "max_qty": 1}
 		]
 	},
 	"goblin_rogue": {
