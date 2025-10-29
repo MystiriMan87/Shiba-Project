@@ -52,10 +52,15 @@ func open_quest_log():
 	
 	var virtual_cursor = get_node_or_null("/root/VirtualCursor")
 	if virtual_cursor:
+		print("Unlocking cursor from orbit...")
 		virtual_cursor.on_menu_opened()
 		virtual_cursor.force_activate()
+		print("Cursor orbit_around_player: ", virtual_cursor.orbit_around_player)
+	else:
+		print("WARNING: VirtualCursor not found!")
 	
 	refresh_all_tabs()
+
 
 func close_quest_log():
 	print("Closing quest log...")
@@ -64,8 +69,11 @@ func close_quest_log():
 	
 	var virtual_cursor = get_node_or_null("/root/VirtualCursor")
 	if virtual_cursor:
+		print("Locking ursor back to orbit... ")
 		virtual_cursor.on_menu_closed()
+		print("Cursor orbit_around_player: ", virtual_cursor.orbit_around_player)
 		
+
 	quest_log_closed.emit()
 
 func refresh_all_tabs():
@@ -298,7 +306,11 @@ func _on_close_pressed():
 func _input(event):
 	if not visible:
 		return
-	
+		
 	if event.is_action_pressed("ui_cancel"):
+		close_quest_log()
+		get_viewport().set_input_as_handled()
+		
+	if event.is_action_pressed("open_quest_log"):
 		close_quest_log()
 		get_viewport().set_input_as_handled()

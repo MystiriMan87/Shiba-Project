@@ -1,18 +1,16 @@
 extends Node
 
-# Virtual cursor for controller/touchpad navigation
-
-@export var cursor_speed: float = 800.0
+@export var cursor_speed: float = 1600.0
 @export var cursor_texture: Texture2D = null
 @export var cursor_color: Color = Color(1.0, 1.0, 1.0, 0.9)
 @export var cursor_size: Vector2 = Vector2(32, 32)
-@export var stick_deadzone: float = 0.15
+@export var stick_deadzone: float = 0.12
 @export var touchpad_sensitivity: float = 2.0
 
-# Player orbit settings
 @export var orbit_around_player: bool = true
-@export var orbit_min_distance: float = 80.0   # Minimum distance from player
-@export var orbit_max_distance: float = 200.0  # Maximum distance from player
+@export var orbit_min_distance: float = 80.0
+@export var orbit_max_distance: float = 200.0
+@export var orbit_sensitivity_multiplier: float = 1.8
 
 var cursor_position: Vector2 = Vector2.ZERO
 var is_active: bool = false
@@ -20,104 +18,110 @@ var canvas_layer: CanvasLayer = null
 var sprite: Sprite2D = null
 var last_input_was_controller: bool = false
 
-# For click detection
 var click_timer: float = 0.0
 var click_cooldown: float = 0.2
 
-# Track if we've detected any controller
 var controller_connected: bool = false
 
-# Player reference
 var player: Node2D = null
 
+var hovered_control: Control = null
+
 func _ready():
-	# CRITICAL: Make sure cursor works even when game is paused
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	
-	# Create a CanvasLayer to hold the cursor
 	canvas_layer = CanvasLayer.new()
-	canvas_layer.layer = 100  # On top of everything
+	canvas_layer.layer = 10000
 	canvas_layer.name = "VirtualCursorLayer"
-	canvas_layer.process_mode = Node.PROCESS_MODE_ALWAYS  # Also works when paused
+	canvas_layer.process_mode = Node.PROCESS_MODE_ALWAYS
 	
-	# Create cursor sprite
 	sprite = Sprite2D.new()
-	sprite.z_index = 1000  # Always on top
-	sprite.process_mode = Node.PROCESS_MODE_ALWAYS  # Also works when paused
+	sprite.z_index = 10000
+	sprite.process_mode = Node.PROCESS_MODE_ALWAYS
 	
 	if cursor_texture:
 		sprite.texture = cursor_texture
 	else:
-		# Create a simple default cursor
 		sprite.texture = create_default_cursor()
 	
 	sprite.modulate = cursor_color
 	
-	# Scale the sprite to desired size
 	if sprite.texture:
 		var tex_size = sprite.texture.get_size()
 		if tex_size.x > 0 and tex_size.y > 0:
 			sprite.scale = cursor_size / tex_size
 	
-	# Add sprite to canvas layer
 	canvas_layer.add_child(sprite)
+	get_tree().root.call_deferred("add_child", canvas_layer)
 	
-	# Add canvas layer to scene tree
-	get_tree().root.add_child(canvas_layer)
+	await get_tree().process_frame
 	
-	# Start at center of screen
 	var viewport_size = get_viewport().get_visible_rect().size
 	cursor_position = viewport_size / 2
 	sprite.position = cursor_position
+	sprite.global_position = cursor_position
 	
-	# Check if controller is connected
 	controller_connected = Input.get_connected_joypads().size() > 0
 	
-	# Hide initially - will activate on controller input
 	canvas_layer.visible = false
+	sprite.visible = false
 	is_active = false
 	
 	print("Virtual Cursor initialized")
 	print("Controller connected: ", controller_connected)
-	print("Cursor sprite texture: ", sprite.texture)
-	print("Cursor size: ", cursor_size)
+	print("Canvas layer added to tree: ", canvas_layer.is_inside_tree())
+	print("Sprite texture set: ", sprite.texture != null)
 	
-	# Connect to joypad connection signals
 	Input.joy_connection_changed.connect(_on_joy_connection_changed)
 	
-	# Enable processing
 	set_process(true)
 	set_process_input(true)
+	
+	if controller_connected:
+		print("Controller detected - virtual cursor ready. Press F1 or move right stick to activate.")
 
 func _on_joy_connection_changed(device: int, connected: bool):
 	controller_connected = Input.get_connected_joypads().size() > 0
 	print("Controller ", device, " ", "connected" if connected else "disconnected")
-	print("Total controllers: ", Input.get_connected_joypads().size())
 	
 	if not controller_connected:
 		deactivate()
 
 func _input(event):
-	# Detect if using mouse - but ignore programmatic mouse events
-	if event is InputEventMouse and not event is InputEventMouseMotion:
-		# Only deactivate on actual mouse clicks, not our simulated motion
-		last_input_was_controller = false
-		if is_active:
-			deactivate()
-	elif event is InputEventJoypadButton or event is InputEventJoypadMotion:
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_F1:
+			if is_active:
+				print("F1: Deactivating cursor")
+				deactivate()
+			else:
+				print("F1: Activating cursor")
+				activate()
+			get_viewport().set_input_as_handled()
+			return
+	
+	if event is InputEventMouseButton or event is InputEventMouseMotion:
+		if event is InputEventMouseButton:
+			last_input_was_controller = false
+			if is_active:
+				print("Mouse input detected - deactivating virtual cursor")
+				deactivate()
+		return
+	
+	if event is InputEventJoypadButton or event is InputEventJoypadMotion:
 		last_input_was_controller = true
 		
-		# Activate on any stick movement or button press
-		if not is_active:
-			# Check if there's meaningful input
+		if not is_active and controller_connected:
 			if event is InputEventJoypadMotion:
-				if abs(event.axis_value) > stick_deadzone:
-					activate()
+				if event.axis == JOY_AXIS_RIGHT_X or event.axis == JOY_AXIS_RIGHT_Y:
+					if abs(event.axis_value) > stick_deadzone:
+						print("Right stick movement detected - activating cursor")
+						activate()
 			elif event is InputEventJoypadButton and event.pressed:
-				activate()
+				if event.button_index == JOY_BUTTON_RIGHT_SHOULDER:
+					print("Right shoulder button pressed - activating cursor")
+					activate()
 
 func _process(delta):
-	# Always try to find player if we don't have one
 	if not player or not is_instance_valid(player):
 		find_player()
 	
@@ -126,10 +130,8 @@ func _process(delta):
 	
 	click_timer = max(0.0, click_timer - delta)
 	
-	# Get controller input - ONLY RIGHT STICK
 	var input_vector = Vector2.ZERO
 	
-	# RIGHT STICK ONLY for cursor movement
 	var right_stick = Vector2(
 		Input.get_joy_axis(0, JOY_AXIS_RIGHT_X),
 		Input.get_joy_axis(0, JOY_AXIS_RIGHT_Y)
@@ -138,7 +140,6 @@ func _process(delta):
 	if right_stick.length() > stick_deadzone:
 		input_vector = right_stick
 	
-	# D-pad support (optional alternative)
 	if Input.is_joy_button_pressed(0, JOY_BUTTON_DPAD_UP):
 		input_vector.y -= 1.0
 	if Input.is_joy_button_pressed(0, JOY_BUTTON_DPAD_DOWN):
@@ -148,17 +149,18 @@ func _process(delta):
 	if Input.is_joy_button_pressed(0, JOY_BUTTON_DPAD_RIGHT):
 		input_vector.x += 1.0
 	
-	# Move cursor
 	if input_vector.length() > 0:
-		cursor_position += input_vector.normalized() * cursor_speed * delta
+		var current_speed = cursor_speed
+		if orbit_around_player and player and is_instance_valid(player):
+			current_speed *= orbit_sensitivity_multiplier
 		
-		# Apply orbit constraint around player
+		cursor_position += input_vector.normalized() * current_speed * delta
+		
 		if orbit_around_player and player and is_instance_valid(player):
 			var player_pos = get_player_screen_position()
 			var offset_from_player = cursor_position - player_pos
 			var distance = offset_from_player.length()
 			
-			# Clamp distance to orbit range
 			if distance < orbit_min_distance:
 				offset_from_player = offset_from_player.normalized() * orbit_min_distance
 				cursor_position = player_pos + offset_from_player
@@ -166,152 +168,228 @@ func _process(delta):
 				offset_from_player = offset_from_player.normalized() * orbit_max_distance
 				cursor_position = player_pos + offset_from_player
 		else:
-			# Clamp to viewport if no player orbit
 			var viewport_size = get_viewport().get_visible_rect().size
 			cursor_position.x = clamp(cursor_position.x, 0, viewport_size.x)
 			cursor_position.y = clamp(cursor_position.y, 0, viewport_size.y)
 		
 		sprite.position = cursor_position
 		
-		# Warp the real mouse cursor to match our virtual cursor position
-		Input.warp_mouse(cursor_position)
+		update_hovered_control()
 	
-	# Handle clicks
 	if Input.is_joy_button_pressed(0, JOY_BUTTON_A) and click_timer <= 0:
-		simulate_mouse_click(MOUSE_BUTTON_LEFT)
+		click_at_cursor()
 		click_timer = click_cooldown
 	
 	if Input.is_joy_button_pressed(0, JOY_BUTTON_B) and click_timer <= 0:
-		simulate_mouse_click(MOUSE_BUTTON_RIGHT)
+		right_click_at_cursor()
 		click_timer = click_cooldown
 
-func activate():
-	if not controller_connected:
-		print("Cannot activate cursor - no controller connected")
-		return
-	
-	is_active = true
-	if canvas_layer:
-		canvas_layer.visible = true
-	
-	# Try to find player
-	find_player()
-	
-	# Start position based on player or screen center
-	if orbit_around_player and player and is_instance_valid(player):
-		var player_pos = get_player_screen_position()
-		# Start at a comfortable distance to the right of player
-		cursor_position = player_pos + Vector2(orbit_min_distance + 50, 0)
-	else:
-		var viewport_size = get_viewport().get_visible_rect().size
-		cursor_position = viewport_size / 2
-	
-	sprite.position = cursor_position
-	
-	# Warp the actual mouse cursor to match our virtual cursor
-	Input.warp_mouse(cursor_position)
-	
-	# Hide the real mouse cursor (optional - makes it cleaner)
-	Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
-	
-	print("Virtual cursor activated at: ", cursor_position)
+func update_hovered_control():
+	var root = get_tree().root
+	hovered_control = find_control_at_position(root, cursor_position)
 
-func deactivate():
-	is_active = false
-	if canvas_layer:
-		canvas_layer.visible = false
+func find_control_at_position(node: Node, pos: Vector2) -> Control:
+	if node is Control:
+		var control = node as Control
+		if control.visible and control.global_position.distance_to(Vector2.ZERO) < 100000:
+			var rect = Rect2(control.global_position, control.size)
+			if rect.has_point(pos):
+				for child in control.get_children():
+					var child_result = find_control_at_position(child, pos)
+					if child_result:
+						return child_result
+				return control
 	
-	# Show the real mouse cursor again
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	for child in node.get_children():
+		var result = find_control_at_position(child, pos)
+		if result:
+			return result
 	
-	print("Virtual cursor deactivated")
+	return null
 
-# Remove the simulate_mouse_motion function - we don't need it anymore
-# We use Input.warp_mouse() instead
-
-func simulate_mouse_click(button_index: int):
-	print("Simulating click at: ", cursor_position)
+func click_at_cursor():
+	if hovered_control and is_instance_valid(hovered_control):
+		if hovered_control is Button:
+			var button = hovered_control as Button
+			if button.disabled:
+				return
+			print("Clicking button: ", button.name)
+			button.emit_signal("pressed")
+			flash_cursor()
+			return
+		elif hovered_control is BaseButton:
+			var base_button = hovered_control as BaseButton
+			if base_button.disabled:
+				return
+			print("Clicking base button: ", base_button.name)
+			base_button.emit_signal("pressed")
+			flash_cursor()
+			return
 	
-	# Press
+	var motion_event = InputEventMouseMotion.new()
+	motion_event.position = cursor_position
+	motion_event.global_position = cursor_position
+	Input.parse_input_event(motion_event)
+	
+	await get_tree().process_frame
+	
 	var press_event = InputEventMouseButton.new()
-	press_event.button_index = button_index
+	press_event.button_index = MOUSE_BUTTON_LEFT
 	press_event.pressed = true
 	press_event.position = cursor_position
 	press_event.global_position = cursor_position
 	Input.parse_input_event(press_event)
 	
-	# Small delay
 	await get_tree().create_timer(0.05).timeout
 	
-	# Release
 	var release_event = InputEventMouseButton.new()
-	release_event.button_index = button_index
+	release_event.button_index = MOUSE_BUTTON_LEFT
+	release_event.pressed = false
+	release_event.position = cursor_position
+	release_event.global_position = cursor_position
+	Input.parse_input_event(release_event)
+	
+	flash_cursor()
+
+func right_click_at_cursor():
+	var motion_event = InputEventMouseMotion.new()
+	motion_event.position = cursor_position
+	motion_event.global_position = cursor_position
+	Input.parse_input_event(motion_event)
+	
+	await get_tree().process_frame
+	
+	var press_event = InputEventMouseButton.new()
+	press_event.button_index = MOUSE_BUTTON_RIGHT
+	press_event.pressed = true
+	press_event.position = cursor_position
+	press_event.global_position = cursor_position
+	Input.parse_input_event(press_event)
+	
+	await get_tree().create_timer(0.05).timeout
+	
+	var release_event = InputEventMouseButton.new()
+	release_event.button_index = MOUSE_BUTTON_RIGHT
 	release_event.pressed = false
 	release_event.position = cursor_position
 	release_event.global_position = cursor_position
 	Input.parse_input_event(release_event)
 
+func flash_cursor():
+	if not sprite:
+		return
+	var original_scale = sprite.scale
+	var tween = create_tween()
+	tween.tween_property(sprite, "scale", original_scale * 1.3, 0.05)
+	tween.tween_property(sprite, "scale", original_scale, 0.05)
+
+func activate():
+	print("=== ACTIVATING CURSOR ===")
+	
+	if not controller_connected:
+		print("Cannot activate cursor - no controller connected")
+		return
+	
+	is_active = true
+	
+	if not canvas_layer or not is_instance_valid(canvas_layer):
+		print("ERROR: canvas_layer is null or invalid!")
+		return
+	
+	if not sprite or not is_instance_valid(sprite):
+		print("ERROR: sprite is null or invalid!")
+		return
+	
+	canvas_layer.visible = true
+	sprite.visible = true
+	
+	print("Canvas layer visible: ", canvas_layer.visible)
+	print("Sprite visible: ", sprite.visible)
+	print("Sprite texture: ", sprite.texture)
+	print("Sprite position: ", sprite.position)
+	print("Sprite global_position: ", sprite.global_position)
+	print("Sprite scale: ", sprite.scale)
+	print("Sprite modulate: ", sprite.modulate)
+	print("Canvas layer: ", canvas_layer.layer)
+	print("Sprite z_index: ", sprite.z_index)
+	
+	find_player()
+	
+	if orbit_around_player and player and is_instance_valid(player):
+		var player_pos = get_player_screen_position()
+		cursor_position = player_pos + Vector2(orbit_min_distance + 50, 0)
+		print("Starting cursor near player at: ", cursor_position)
+	else:
+		var viewport_size = get_viewport().get_visible_rect().size
+		cursor_position = viewport_size / 2
+		print("Starting cursor at screen center: ", cursor_position)
+	
+	sprite.position = cursor_position
+	
+	print("Virtual cursor activated")
+	print("===========================")
+
+func deactivate():
+	is_active = false
+	if canvas_layer:
+		canvas_layer.visible = false
+	if sprite:
+		sprite.visible = false
+	
+	hovered_control = null
+	
+	print("Virtual cursor deactivated")
+
 func create_default_cursor() -> ImageTexture:
-	"""Create a simple default cursor texture"""
 	var size = 32
 	var image = Image.create(size, size, false, Image.FORMAT_RGBA8)
 	image.fill(Color.TRANSPARENT)
 	
-	# Draw a simple crosshair cursor
 	var center = size / 2
 	var arm_length = 12
 	var thickness = 3
 	
-	# Draw crosshair
 	for i in range(size):
-		# Horizontal line
 		if abs(i - center) < arm_length:
 			for t in range(thickness):
 				var offset = t - thickness / 2
 				if center + offset >= 0 and center + offset < size:
 					image.set_pixel(i, center + offset, Color.WHITE)
-					if center + offset + 1 < size:
-						image.set_pixel(i, center + offset + 1, Color.BLACK)  # Outline
-					if center + offset - 1 >= 0:
-						image.set_pixel(i, center + offset - 1, Color.BLACK)  # Outline
 		
-		# Vertical line
 		if abs(i - center) < arm_length:
 			for t in range(thickness):
 				var offset = t - thickness / 2
 				if center + offset >= 0 and center + offset < size:
 					image.set_pixel(center + offset, i, Color.WHITE)
-					if center + offset + 1 < size:
-						image.set_pixel(center + offset + 1, i, Color.BLACK)  # Outline
-					if center + offset - 1 >= 0:
-						image.set_pixel(center + offset - 1, i, Color.BLACK)  # Outline
 	
-	# Draw center dot
-	for x in range(center - 2, center + 3):
-		for y in range(center - 2, center + 3):
+	for x in range(center - 3, center + 4):
+		for y in range(center - 3, center + 4):
 			if x >= 0 and x < size and y >= 0 and y < size:
-				if (x - center) * (x - center) + (y - center) * (y - center) <= 4:
+				if (x - center) * (x - center) + (y - center) * (y - center) <= 9:
 					image.set_pixel(x, y, Color.RED)
 	
 	var texture = ImageTexture.create_from_image(image)
+	print("Default cursor texture created: ", texture.get_size())
 	return texture
 
 func set_cursor_texture(texture: Texture2D):
+	print("Setting cursor texture: ", texture)
 	if sprite:
 		sprite.texture = texture
+		sprite.visible = true
 		
-		# Recalculate scale
 		if texture:
 			var tex_size = texture.get_size()
+			print("Texture size: ", tex_size)
 			if tex_size.x > 0 and tex_size.y > 0:
 				sprite.scale = cursor_size / tex_size
+				print("Sprite scale: ", sprite.scale)
 
 func set_cursor_color(color: Color):
 	cursor_color = color
 	if sprite:
 		sprite.modulate = color
 
-# Utility functions
 func get_cursor_position() -> Vector2:
 	return cursor_position
 
@@ -327,63 +405,44 @@ func set_cursor_position(pos: Vector2):
 func is_cursor_active() -> bool:
 	return is_active
 
-# Manual activation/deactivation methods for testing
 func force_activate():
 	activate()
 
 func force_deactivate():
 	deactivate()
 
-# Player tracking functions
 func find_player():
-	"""Find the player node in the scene"""
 	var players = get_tree().get_nodes_in_group("player")
 	if players.size() > 0:
 		player = players[0]
-		print("Virtual cursor found player: ", player.name)
-	else:
-		player = null
 
 func get_player_screen_position() -> Vector2:
-	"""Get player's position in screen coordinates"""
 	if not player or not is_instance_valid(player):
 		return get_viewport().get_visible_rect().size / 2
 	
-	# Get the camera
 	var camera = get_viewport().get_camera_2d()
 	if camera:
-		# Convert world position to screen position
 		var player_global = player.global_position
-		var camera_offset = camera.get_screen_center_position() - camera.global_position
 		var screen_pos = player_global - camera.global_position + get_viewport().get_visible_rect().size / 2
 		return screen_pos
 	else:
-		# No camera, use direct position
 		return player.global_position
 
 func set_orbit_enabled(enabled: bool):
-	"""Enable or disable player orbit mode"""
 	orbit_around_player = enabled
-	print("Player orbit mode: ", "enabled" if enabled else "disabled")
-	
-	# If disabling orbit, reposition cursor to screen center
-	if not enabled and is_active:
-		var viewport_size = get_viewport().get_visible_rect().size
-		cursor_position = viewport_size / 2
-		sprite.position = cursor_position
-		Input.warp_mouse(cursor_position)
+	print(">>> Virtual Cursor: Orbit mode ", "ENABLED" if enabled else "DISABLED", " <<<")
 
 func set_orbit_distance(min_dist: float, max_dist: float):
-	"""Set the orbit distance range"""
 	orbit_min_distance = min_dist
 	orbit_max_distance = max_dist
-	print("Orbit distance set to: ", min_dist, " - ", max_dist)
 
-# Helper function to call when entering/exiting menus
 func on_menu_opened():
-	"""Call this when a menu opens - disables player orbit"""
 	set_orbit_enabled(false)
+	print("Menu opened - cursor unlocked")
 
 func on_menu_closed():
-	"""Call this when a menu closes - enables player orbit"""
 	set_orbit_enabled(true)
+	print("Menu closed - cursor locked to orbit")
+
+func set_cursor_sensitivity(sensitivity: float):
+	cursor_speed = sensitivity

@@ -356,8 +356,28 @@ func _ready():
 	call_deferred("_refresh_weapon_visual")
 	call_deferred("_delayed_weapon_refresh")
 	
-	player_ready.emit()  
-
+	await get_tree().create_timer(1.0).timeout
+	
+	var vc = get_node("/root/VirtualCursor")
+	if vc:
+		print("Testing virtual cursor...")
+		print("VirtualCursor found: ", vc)
+		vc.force_activate()
+		
+		if vc.sprite:
+			print("Sprite exists: ", vc.sprite)
+			print("Sprite texture: ", vc.sprite.texture)
+			print("Sprite visible: ", vc.sprite.visible)
+			print("Sprite position: ", vc.sprite.position)
+		
+		var custom_texture = load("res://icon.svg")
+		if custom_texture:
+			vc.set_cursor_texture(custom_texture)
+			print("Custom texture set!")
+	else:
+		print("ERROR: VirtualCursor not found in autoload!")
+	
+	player_ready.emit()
 func _on_body_entered(body: Node):
 	var fx = HitEffectScene.instantiate()
 	fx.global_position = body.global_position

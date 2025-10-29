@@ -375,13 +375,34 @@ func create_boss_bar():
 
 func toggle_inventory():
 	if inventory_panel:
-		inventory_panel.visible = !inventory_panel.visible
-		if inventory_panel.visible:
+		var is_opening = not inventory_panel.visible
+		inventory_panel.visible = is_opening
+		
+		var virtual_cursor = get_node_or_null("/root/VirtualCursor")
+		
+		if is_opening:
+			print("Opening Inventory....")
+			get_tree().paused = true
+			
+			if virtual_cursor:
+				print("Unlocking cursor from orbit...")
+				virtual_cursor.on_menu_opened()
+				virtual_cursor.force_activate()
+				print("Cursor orbit_around_player: ", virtual_cursor.orbit_around_player)
+				
 			refresh_inventory_display()
 			update_equipped_weapon_display()
 			selected_slot_index = 0
 			update_inventory_selection()
 		else:
+			print("Closing inventory...")
+			get_tree().paused = false
+			
+			if virtual_cursor:
+				print("Locking cursor back to orbit...")
+				virtual_cursor.on_menu_closed()
+				print("Cursor orbit_around_player: ", virtual_cursor.orbit_around_player)
+				
 			selected_slot_index = -1
 			hide_item_description()
 
@@ -478,9 +499,14 @@ func update_inventory_selection():
 			selected_slot.get_node("SelectionOverlay").visible = true
 
 func _input(event):
-	if event is InputEventKey and event.pressed and not event.echo:
-		if event.is_action_pressed("inventory_toggle"):
+	if event.is_action_pressed("toggle_inventory"):
+		toggle_inventory()
+		get_viewport().set_input_as_handled()
+		
+	if inventory_panel and inventory_panel.visible:
+		if event.is_action_pressed("ui_cancel"):
 			toggle_inventory()
+			get_viewport().set_input_as_handled()
 
 func _process(_delta):
 	if not player:
