@@ -52,8 +52,8 @@ var dialogues = {
 	],
 	"merchant_intro": [
 		{"speaker": "Merchant", "text": "Looking to buy some potions?"},
-		{"speaker": "Player", "text": "What do you have?"},
-		{"speaker": "Merchant", "text": "Health, dash potions, and more! Very useful for adventurers. If you bring me upgrades I will be able to sell you more items. Take a look at my supplies here, if anything catches your eye"},
+		#{"speaker": "Player", "text": "What do you have?"},
+		{"speaker": "Merchant", "text": "Health, dash potions, and more! Very useful for adventurers. Take a look at my supplies here, if anything catches your eye"},
 	],
 	"quest_giver": [
 		{"speaker": "Elder", "text": "The forest has become dangerous lately."},

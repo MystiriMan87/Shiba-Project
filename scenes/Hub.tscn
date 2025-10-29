@@ -1,4 +1,4 @@
-[gd_scene load_steps=43 format=4 uid="uid://bqugjkay7yqn1"]
+[gd_scene load_steps=44 format=4 uid="uid://bqugjkay7yqn1"]
 
 [ext_resource type="Texture2D" uid="uid://cnv2efmaeat5p" path="res://Assets/Snoblin/Snoblin_Default_Tilemap/Assets/pixel_rpg_tiles.png" id="1_4qglb"]
 [ext_resource type="Script" uid="uid://dedci05mgixib" path="res://scenes/hub.gd" id="1_gqhal"]
@@ -33,6 +33,7 @@
 [ext_resource type="PackedScene" uid="uid://cme4secwfuob2" path="res://torch.tscn" id="30_yt83c"]
 [ext_resource type="PackedScene" uid="uid://d14w75lwsi7ls" path="res://scenes/chest.tscn" id="31_6y564"]
 [ext_resource type="PackedScene" uid="uid://by1jn57kvr6i7" path="res://scenes/LoadingScreen.tscn" id="33_t5nmn"]
+[ext_resource type="Script" uid="uid://cuql8vmr3m3i5" path="res://scripts/VirtualCursor.gd" id="34_mls0d"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_16ktt"]
 texture = ExtResource("1_4qglb")
@@ -1450,3 +1451,15 @@ loot_spawn_radius_base = 70.0
 [node name="PauseMenu" parent="." instance=ExtResource("29_8metk")]
 
 [node name="LoadingScreen" parent="." instance=ExtResource("33_t5nmn")]
+
+[node name="Label2" type="Label" parent="."]
+z_index = 1000
+offset_left = 346.0
+offset_top = -441.0
+offset_right = 430.0
+offset_bottom = -418.0
+text = "DEV CHEST"
+uppercase = true
+
+[node name="Node" type="Node" parent="."]
+script = ExtResource("34_mls0d")

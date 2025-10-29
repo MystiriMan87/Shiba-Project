@@ -56,6 +56,9 @@ func _ready():
 		var cl := get_parent() as CanvasLayer
 		cl.layer = 0
 	
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	process_priority = -100
+	
 	item_manager = get_node("/root/ItemManager") if has_node("/root/ItemManager") else null
 	player = get_tree().get_first_node_in_group("player")
 	set_process_input(true)
@@ -499,14 +502,20 @@ func update_inventory_selection():
 			selected_slot.get_node("SelectionOverlay").visible = true
 
 func _input(event):
-	if event.is_action_pressed("toggle_inventory"):
+	# Handle inventory toggle with TAB - works for both opening AND closing
+	if event.is_action_pressed("inventory_toggle") and not event.is_echo():
+		print("TAB pressed - toggling inventory!")
 		toggle_inventory()
 		get_viewport().set_input_as_handled()
-		
+		return
+	
+	# ESC also closes inventory if it's open
 	if inventory_panel and inventory_panel.visible:
-		if event.is_action_pressed("ui_cancel"):
+		if event.is_action_pressed("ui_cancel") and not event.is_echo():
+			print("ESC pressed - closing inventory")
 			toggle_inventory()
 			get_viewport().set_input_as_handled()
+			return
 
 func _process(_delta):
 	if not player:

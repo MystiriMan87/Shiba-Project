@@ -1,13 +1,14 @@
-[gd_scene load_steps=3 format=3 uid="uid://bkcsm36nf4kyd"]
+[gd_scene load_steps=4 format=3 uid="uid://bkcsm36nf4kyd"]
 
 [ext_resource type="Script" uid="uid://ouw84ow3cenv" path="res://dialogue_box.gd" id="1_senjy"]
+[ext_resource type="FontFile" uid="uid://vkfuxgs5bk41" path="res://Fonts/PixeloidSans-nR3g1.ttf" id="2_n23yb"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_senjy"]
 bg_color = Color(0.137255, 0.137255, 0.137255, 0.647059)
-corner_radius_top_left = 15
-corner_radius_top_right = 15
-corner_radius_bottom_right = 15
-corner_radius_bottom_left = 15
+corner_radius_top_left = 7
+corner_radius_top_right = 7
+corner_radius_bottom_right = 7
+corner_radius_bottom_left = 7
 
 [node name="DialogueBox" type="CanvasLayer"]
 process_mode = 3
@@ -59,12 +60,15 @@ size_flags_vertical = 4
 
 [node name="SpeakerLabel" type="Label" parent="Panel/MarginContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_n23yb")
+theme_override_font_sizes/font_size = 20
 text = "Speaker Name"
 
 [node name="TextLabel" type="RichTextLabel" parent="Panel/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(555.58, 116.6)
 layout_mode = 2
 theme_override_colors/default_color = Color(1, 1, 1, 1)
+theme_override_fonts/normal_font = ExtResource("2_n23yb")
 theme_override_font_sizes/normal_font_size = 16
 scroll_active = false
 
