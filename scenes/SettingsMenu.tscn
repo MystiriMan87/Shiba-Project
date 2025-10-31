@@ -37,7 +37,6 @@ theme_override_constants/separation = 20
 
 [node name="TitleLabel" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_1yw23")
 theme_override_font_sizes/font_size = 50
 text = "Settings
 "
@@ -48,7 +47,6 @@ layout_mode = 2
 
 [node name="AudioLabel" type="Label" parent="Panel/VBoxContainer/AudioSelection"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_1yw23")
 theme_override_font_sizes/font_size = 25
 text = "Audio"
 
@@ -57,7 +55,6 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/AudioSelection/MasterVolume"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_1yw23")
 theme_override_font_sizes/font_size = 19
 text = "Master Volume
 "
@@ -78,7 +75,6 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/AudioSelection/MusicVolume"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_1yw23")
 theme_override_font_sizes/font_size = 19
 text = "Music Volume
 "
@@ -99,7 +95,6 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/AudioSelection/SFXVolume"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_1yw23")
 theme_override_font_sizes/font_size = 19
 text = "SFX Volume
 "
@@ -120,7 +115,6 @@ layout_mode = 2
 
 [node name="VideoLabel" type="Label" parent="Panel/VBoxContainer/VideoSection"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_1yw23")
 theme_override_font_sizes/font_size = 25
 text = "Video
 "
@@ -130,7 +124,6 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/VideoSection/Fullscreen"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_1yw23")
 theme_override_font_sizes/font_size = 19
 text = "Fullscreen
 "
@@ -143,7 +136,6 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/VideoSection/VSync"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_1yw23")
 theme_override_font_sizes/font_size = 19
 text = "VSync
 "
@@ -156,7 +148,6 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/VideoSection/Resolution"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_1yw23")
 theme_override_font_sizes/font_size = 19
 text = "Resolution"
 
@@ -194,7 +185,6 @@ offset_left = 793.0
 offset_top = 277.0
 offset_right = 1115.0
 offset_bottom = 787.0
-theme_override_fonts/font = ExtResource("2_1yw23")
 theme_override_font_sizes/font_size = 39
 text = "E - Interact
 
