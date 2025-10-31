@@ -5,7 +5,7 @@ func _ready():
 	LocalizationManager.language_changed.connect(_on_language_changed)
 
 func update_text():
-	text = LocalizationManager.t("health")
+	text = LocalizationManager.t("Gameplay")
 
 func _on_language_changed(_lang: String):
 	update_text()
