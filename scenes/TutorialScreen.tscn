@@ -1,0 +1,106 @@
+[gd_scene load_steps=4 format=3 uid="uid://d12jeb2ckwoy"]
+
+[ext_resource type="Script" uid="uid://b6356b0ltfh41" path="res://scenes/tutorial_screen.gd" id="1_yvb13"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pe08h"]
+bg_color = Color(0.380392, 0.454902, 0.784314, 0.670588)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_yvb13"]
+
+[node name="TutorialScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_yvb13")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pe08h")
+
+[node name="SkipButton" type="Button" parent="Panel"]
+layout_mode = 2
+offset_left = 723.0
+offset_top = 830.0
+offset_right = 878.0
+offset_bottom = 909.0
+theme_override_font_sizes/font_size = 22
+text = "Skip Tutorial"
+
+[node name="NextButton" type="Button" parent="Panel"]
+layout_mode = 2
+offset_left = 1019.0
+offset_top = 830.0
+offset_right = 1174.0
+offset_bottom = 909.0
+theme_override_font_sizes/font_size = 22
+text = "Next"
+
+[node name="TitleLabel" type="Label" parent="Panel"]
+layout_mode = 2
+offset_top = 63.0
+offset_right = 1920.0
+offset_bottom = 132.0
+theme_override_font_sizes/font_size = 50
+text = "TESTING"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DescriptionLabel" type="Label" parent="Panel"]
+layout_mode = 2
+offset_left = 1019.0
+offset_top = 266.0
+offset_right = 1401.0
+offset_bottom = 639.0
+theme_override_font_sizes/font_size = 25
+text = "TESTING"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="ProgressLabel" type="Label" parent="Panel"]
+layout_mode = 2
+offset_top = 743.0
+offset_right = 1920.0
+offset_bottom = 785.0
+theme_override_font_sizes/font_size = 30
+text = "1 / 4"
+horizontal_alignment = 1
+
+[node name="ButtonContainer" type="HBoxContainer" parent="Panel"]
+visible = false
+layout_mode = 2
+offset_left = 802.0
+offset_top = 556.0
+offset_right = 1030.0
+offset_bottom = 713.0
+
+[node name="ImageRect" type="TextureRect" parent="Panel"]
+layout_mode = 2
+offset_left = 426.0
+offset_top = 251.0
+offset_right = 896.0
+offset_bottom = 654.0
+texture = SubResource("PlaceholderTexture2D_yvb13")
+
+[node name="MarginContainer" type="MarginContainer" parent="Panel"]
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 40.0
+grow_horizontal = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel/MarginContainer"]
+layout_mode = 2
+alignment = 1

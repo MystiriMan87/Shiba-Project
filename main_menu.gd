@@ -8,14 +8,18 @@ var button_original_positions: Dictionary = {}
 
 func _ready():
 	setup_button_animations()
+	update_ui_text()
+	
+	if has_node("/root/LocalizationManager"):
+		LocalizationManager.language_changed.connect(_on_language_changed)
 
 func setup_button_animations():
 	var buttons = find_buttons(self)
 	
-	for button in buttons:
-		button_original_positions[button] = button.position
-		button.mouse_entered.connect(_on_button_hover.bind(button))
-		button.mouse_exited.connect(_on_button_unhover.bind(button))
+	for child in buttons:
+		button_original_positions[child] = child.position
+		child.mouse_entered.connect(_on_button_hover.bind(child))
+		child.mouse_exited.connect(_on_button_unhover.bind(child))
 
 func find_buttons(node: Node) -> Array:
 	var buttons = []
@@ -42,18 +46,8 @@ func animate_button(button: Button, target_position: Vector2):
 	tween.tween_property(button, "position", target_position, slide_duration)
 
 func _on_play_pressed():
-	print("Play button pressed")
-	print("Has LoadingScreen autoload: ", has_node("/root/LoadingScreen"))
-	
-	if has_node("/root/LoadingScreen"):
-		print("Calling LoadingScreen.load_scene()")
-		LoadingScreen.load_scene("res://scenes/Hub.tscn")
-	else:
-		print("LoadingScreen not found, using fallback")
-		if game_scene:
-			get_tree().change_scene_to_packed(game_scene)
-		else:
-			get_tree().change_scene_to_file("res://scenes/Hub.tscn")
+	print("Play button pressed - showing tutorial")
+	get_tree().change_scene_to_file("res://scenes/TutorialScreen.tscn")
 
 func _on_settings_pressed():
 	get_tree().change_scene_to_file("res://scenes/SettingsMenu.tscn")
@@ -61,3 +55,15 @@ func _on_settings_pressed():
 func _on_button_quit_pressed():
 	get_tree().paused = false
 	get_tree().quit()
+	
+
+func update_ui_text():
+	if has_node("StartButton"):
+		$StartButton.text = LocalizationManager.t("start_game")
+	if has_node("SettingsButton"):
+		$SettingsButton.text = LocalizationManager.t("settings")
+	if has_node("QuitButton"):
+		$QuitButton.text = LocalizationManager.t("quit")
+
+func _on_language_changed(new_lang: String):
+	update_ui_text()

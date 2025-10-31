@@ -28,6 +28,7 @@ QuestManager="*res://scripts/QuestManager.gd"
 LoadingScreen="*res://scenes/LoadingScreen.tscn"
 SettingsManager="*res://scripts/SettingsManager.gd"
 VirtualCursor="*res://scripts/VirtualCursor.gd"
+LocalizationManager="*res://scripts/LocalizationManager.gd"
 
 [display]
 
