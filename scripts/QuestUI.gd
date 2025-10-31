@@ -21,8 +21,11 @@ func _ready():
 		quest_manager.quest_updated.connect(_on_quest_updated)
 		quest_manager.quest_started.connect(_on_quest_started)
 		quest_manager.quest_completed.connect(_on_quest_completed)
+		
+	
 	
 	refresh_quests()
+	
 
 func load_custom_font():
 	"""Load the custom font from the specified path"""

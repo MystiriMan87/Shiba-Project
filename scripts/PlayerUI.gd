@@ -95,6 +95,9 @@ func _ready():
 	setup_inventory_ui()
 	update_health_display()
 	call_deferred("_refresh_player_weapon")
+	
+	if has_node("/root/LocalizationManager"):
+		LocalizationManager.apply_font_to_new_node(self)
 
 	
 	if inventory_panel:
@@ -140,6 +143,8 @@ func _connect_to_existing_bosses():
 func setup_inventory_ui():
 	create_inventory_slots()
 	refresh_inventory_display()
+	if has_node("/root/LocalizationManager"):
+		LocalizationManager.apply_font_to_ui(self)
 
 func create_inventory_slots():
 	for slot in inventory_slots:

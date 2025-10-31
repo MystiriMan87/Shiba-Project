@@ -14,6 +14,9 @@ var failed_quests = []
 
 func _ready():
 	load_quests_database()
+	
+	if has_node("/root/LocalizationManager"):
+		LocalizationManager.apply_font_to_ui(self)
 
 func load_quests_database():
 	quests_database = {

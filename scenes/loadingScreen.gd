@@ -21,6 +21,8 @@ func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	set_process(false)
 	set_process_input(false)
+	if has_node("/root/LocalizationManager"):
+		LocalizationManager.apply_font_to_ui(self)
 
 func load_scene(scene_path: String):
 	if is_loading:

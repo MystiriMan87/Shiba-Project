@@ -23,18 +23,40 @@ func _ready():
 	
 	var saved_language = SettingsManager.settings.gameplay.get("language", "en") if has_node("/root/SettingsManager") else "en"
 	set_language(saved_language)
+	
+	# Auto-apply font whenever a new scene is loaded
+	get_tree().node_added.connect(_on_node_added)
+
+func _on_node_added(node: Node):
+	# When a new Control node is added to the scene, apply the current language font
+	# Skip TextureRect and other nodes that don't need fonts
+	if node is Control and not node is TextureRect and not node is ColorRect:
+		call_deferred("_apply_font_to_node_deferred", node)
+
+func _apply_font_to_node_deferred(node: Node):
+	if current_language == "ja" and japanese_font:
+		apply_font_recursively(node, japanese_font)
+	elif current_language == "en" and default_font:
+		apply_font_recursively(node, default_font)
+
+# Helper function to manually apply font to specific UI elements
+# Call this in your UI scripts for immediate font application
+func apply_font_to_ui(ui_node: Node):
+	if current_language == "ja" and japanese_font:
+		apply_font_recursively(ui_node, japanese_font)
+	elif current_language == "en" and default_font:
+		apply_font_recursively(ui_node, default_font)
 
 func load_fonts():
-	# Try Regular weight instead of Black
+	# Load your Japanese font - adjust the path to match your font file location
 	if ResourceLoader.exists("res://Fonts/Noto_Sans_JP/static/NotoSansJP-Regular.ttf"):
 		japanese_font = load("res://Fonts/Noto_Sans_JP/static/NotoSansJP-Regular.ttf")
 		print("Japanese font loaded successfully")
-	elif ResourceLoader.exists("res://Fonts/Noto_Sans_JP/static/NotoSansJP-Bold.ttf"):
-		japanese_font = load("res://Fonts/Noto_Sans_JP/static/NotoSansJP-Bold.ttf")
-		print("Japanese font (Bold) loaded successfully")
 	else:
-		push_warning("Japanese font not found")
+		push_warning("Japanese font not found at res://fonts/japanese_font.ttf")
 	
+	# Optional: load default font if you want to switch back
+	# If you don't set this, it will use Godot's default font for English
 	if ResourceLoader.exists("res://Fonts/PixeloidSans-nR3g1.ttf"):
 		default_font = load("res://Fonts/PixeloidSans-nR3g1.ttf")
 		print("Default font loaded successfully")
@@ -258,6 +280,13 @@ func apply_font_for_language(lang_code: String):
 			# Remove font overrides to use Godot's default
 			remove_font_overrides_recursively(root)
 			print("Removed font overrides, using Godot default")
+
+# Call this function when new scenes/UI elements are added to apply font to them
+func apply_font_to_new_node(node: Node):
+	if current_language == "ja" and japanese_font:
+		apply_font_recursively(node, japanese_font)
+	elif current_language == "en" and default_font:
+		apply_font_recursively(node, default_font)
 
 func apply_font_recursively(node: Node, font: Font):
 	# Apply font to all Control nodes that support text

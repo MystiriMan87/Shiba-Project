@@ -18,6 +18,8 @@ func _ready():
 		print("ERROR: QuestManager not found!")
 	
 	find_containers()
+	if has_node("/root/LocalizationManager"):
+		LocalizationManager.apply_font_to_new_node(self)
 
 func find_containers():
 	var tabs = get_node_or_null("Panel/MarginContainer/TabContainer")

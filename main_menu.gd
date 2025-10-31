@@ -11,7 +11,7 @@ func _ready():
 	update_ui_text()
 	
 	if has_node("/root/LocalizationManager"):
-		LocalizationManager.language_changed.connect(_on_language_changed)
+		LocalizationManager.apply_font_to_new_node(self)
 
 func setup_button_animations():
 	var buttons = find_buttons(self)
@@ -20,6 +20,8 @@ func setup_button_animations():
 		button_original_positions[child] = child.position
 		child.mouse_entered.connect(_on_button_hover.bind(child))
 		child.mouse_exited.connect(_on_button_unhover.bind(child))
+		
+		
 
 func find_buttons(node: Node) -> Array:
 	var buttons = []
