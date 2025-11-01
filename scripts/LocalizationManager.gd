@@ -20,7 +20,10 @@ func _ready():
 	var saved_language = SettingsManager.settings.gameplay.get("language", "en") if has_node("/root/SettingsManager") else "en"
 	set_language(saved_language)
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> parent of 9b2cc3f (japanese is awful to translate)
 
 func load_fonts():
 	# Try Regular weight instead of Black

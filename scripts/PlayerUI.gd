@@ -102,8 +102,11 @@ func _ready():
 	update_health_display()
 	call_deferred("_refresh_player_weapon")
 <<<<<<< HEAD
+<<<<<<< HEAD
 	
 	
+=======
+>>>>>>> parent of 9b2cc3f (japanese is awful to translate)
 =======
 >>>>>>> parent of 9b2cc3f (japanese is awful to translate)
 
@@ -161,8 +164,11 @@ func setup_inventory_ui():
 	create_inventory_slots()
 	refresh_inventory_display()
 <<<<<<< HEAD
+<<<<<<< HEAD
 	#if has_node("/root/LocalizationManager"):
 		#LocalizationManager.apply_font_to_ui(self)
+=======
+>>>>>>> parent of 9b2cc3f (japanese is awful to translate)
 =======
 >>>>>>> parent of 9b2cc3f (japanese is awful to translate)
 

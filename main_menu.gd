@@ -15,6 +15,9 @@ func _ready():
 =======
 	if has_node("/root/LocalizationManager"):
 		LocalizationManager.language_changed.connect(_on_language_changed)
+<<<<<<< HEAD
+>>>>>>> parent of 9b2cc3f (japanese is awful to translate)
+=======
 >>>>>>> parent of 9b2cc3f (japanese is awful to translate)
 
 func setup_button_animations():
