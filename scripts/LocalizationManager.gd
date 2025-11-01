@@ -25,6 +25,7 @@ func _ready():
 =======
 >>>>>>> parent of 9b2cc3f (japanese is awful to translate)
 
+<<<<<<< HEAD
 func load_fonts():
 	# Try Regular weight instead of Black
 	if ResourceLoader.exists("res://Fonts/Noto_Sans_JP/static/NotoSansJP-Regular.ttf"):
@@ -41,6 +42,8 @@ func load_fonts():
 		print("Default font loaded successfully")
 >>>>>>> parent of 9b2cc3f (japanese is awful to translate)
 
+=======
+>>>>>>> parent of 60d9732 (new japanese font)
 func load_translations():
 	translations["en"] = {
 		# UI
@@ -241,6 +244,7 @@ func set_language(lang_code: String):
 	language_changed.emit(lang_code)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 func apply_font_for_language(lang_code: String):
 	var root = get_tree().root
@@ -307,6 +311,8 @@ func remove_font_overrides_recursively(node: Node):
 		remove_font_overrides_recursively(child)
 
 >>>>>>> parent of 9b2cc3f (japanese is awful to translate)
+=======
+>>>>>>> parent of 60d9732 (new japanese font)
 func get_text(key: String, args: Array = []) -> String:
 	if not translations.has(current_language):
 		return key
