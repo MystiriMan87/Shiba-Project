@@ -52,6 +52,7 @@ var is_hovering: bool = false
 @onready var victory_banner: Panel = $VictoryPopup/Banner if has_node("VictoryPopup/Banner") else null
 
 func _ready():
+
 	if get_parent() is CanvasLayer:
 		var cl := get_parent() as CanvasLayer
 		cl.layer = 0
@@ -62,6 +63,11 @@ func _ready():
 	item_manager = get_node("/root/ItemManager") if has_node("/root/ItemManager") else null
 	player = get_tree().get_first_node_in_group("player")
 	set_process_input(true)
+	
+	if has_node("/root/LocalizationManager"):
+		LocalizationManager.language_changed.connect(_on_language_changed)
+		#LocalizationManager.apply_font_to_ui(self)
+	translate_ui_elements()
 	
 	if not InputMap.has_action("inventory_toggle"):
 		InputMap.add_action("inventory_toggle")
@@ -96,8 +102,7 @@ func _ready():
 	update_health_display()
 	call_deferred("_refresh_player_weapon")
 	
-	if has_node("/root/LocalizationManager"):
-		LocalizationManager.apply_font_to_new_node(self)
+	
 
 	
 	if inventory_panel:
@@ -139,12 +144,21 @@ func _connect_to_existing_bosses():
 	for boss in bosses:
 		if boss and is_instance_valid(boss):
 			_connect_boss_signals(boss)
+			
+func translate_ui_elements():
+	"""Translate all static UI text"""
+	pass
+	
+func _on_language_changed(_lang: String):
+	translate_ui_elements()
+	refresh_inventory_display()
+	update_equipped_weapon_display()
 
 func setup_inventory_ui():
 	create_inventory_slots()
 	refresh_inventory_display()
-	if has_node("/root/LocalizationManager"):
-		LocalizationManager.apply_font_to_ui(self)
+	#if has_node("/root/LocalizationManager"):
+		#LocalizationManager.apply_font_to_ui(self)
 
 func create_inventory_slots():
 	for slot in inventory_slots:
@@ -821,6 +835,11 @@ func show_victory_popup(boss_name: String = "ENEMY"):
 	if not victory_popup:
 		return
 	
+	if victory_sound:
+		victory_sound.play()
+	
+	if victory_text:
+		victory_text.text = LocalizationManager.t("boss_defeated")
 	# Play victory sound
 	if victory_sound:
 		victory_sound.play()
@@ -863,33 +882,36 @@ func update_equipped_weapon_display():
 	var equipped = item_manager.get_equipped_weapon()
 	
 	if equipped.is_empty():
-		# No weapon equipped
 		if equipped_weapon_name:
-			equipped_weapon_name.text = "None"
+			equipped_weapon_name.text = LocalizationManager.t("none")
 		if equipped_weapon_damage:
-			equipped_weapon_damage.text = "Damage: --"
+			equipped_weapon_damage.text = LocalizationManager.t("damage") + ": --"
 		if equipped_weapon_range:
-			equipped_weapon_range.text = "Range: --"
+			equipped_weapon_range.text = LocalizationManager.t("attack_range") + ": --"
 		if equipped_weapon_speed:
-			equipped_weapon_speed.text = "Speed: --"
+			equipped_weapon_speed.text = LocalizationManager.t("attack_speed") + ": --"
 		if equipped_weapon_icon:
 			equipped_weapon_icon.texture = null
 	else:
-		# Weapon is equipped
 		if equipped_weapon_name:
-			equipped_weapon_name.text = equipped.get("name", "Unknown")
+			# Try to translate weapon name
+			var weapon_key = equipped.get("name", "Unknown").to_lower().replace(" ", "_")
+			var translated_name = LocalizationManager.t(weapon_key)
+			if translated_name != weapon_key:
+				equipped_weapon_name.text = translated_name
+			else:
+				equipped_weapon_name.text = equipped.get("name", "Unknown")
 		
 		if equipped_weapon_damage:
-			equipped_weapon_damage.text = "Damage: " + str(equipped.get("damage", 0))
+			equipped_weapon_damage.text = LocalizationManager.t("damage") + ": " + str(equipped.get("damage", 0))
 		
 		if equipped_weapon_range:
-			equipped_weapon_range.text = "Range: " + str(equipped.get("attack_range", 0))
+			equipped_weapon_range.text = LocalizationManager.t("attack_range") + ": " + str(equipped.get("attack_range", 0))
 		
 		if equipped_weapon_speed:
 			var speed = equipped.get("attack_speed", 1.0)
-			equipped_weapon_speed.text = "Speed: " + str(snapped(speed, 0.1))
+			equipped_weapon_speed.text = LocalizationManager.t("attack_speed") + ": " + str(snapped(speed, 0.1))
 		
-		# Load weapon icon
 		if equipped_weapon_icon:
 			var icon_path = equipped.get("icon_path", "")
 			if icon_path != "" and ResourceLoader.exists(icon_path):
@@ -926,7 +948,6 @@ func _on_slot_hover_exited(slot_index: int):
 			hover_timer.start()
 
 func _on_hover_timer_timeout():
-	# Only hide if we're still not hovering over anything
 	if not is_hovering:
 		hide_item_description()
 		hovered_slot_index = -1
@@ -939,27 +960,38 @@ func show_item_description(item: Dictionary):
 	if item_data.is_empty():
 		return
 	
-	# Get item properties
 	var item_name = item_data.get("name", "Unknown Item")
-	var item_type = item_data.get("type", "unknown").capitalize()
+	var item_type = item_data.get("type", "unknown")
 	var item_rarity = item_data.get("rarity", "common")
 	var description = item_data.get("description", "No description available.")
 	
-	# Set item name with rarity color
+	# Translate item type and rarity
+	var translated_type = LocalizationManager.t(item_type)
+	var translated_rarity = LocalizationManager.t(item_rarity)
+	
 	if item_name_label:
-		item_name_label.text = item_name
+		# Try to translate item name if translation exists
+		var translated_name = LocalizationManager.t(item_name.to_lower().replace(" ", "_"))
+		if translated_name != item_name.to_lower().replace(" ", "_"):
+			item_name_label.text = translated_name
+		else:
+			item_name_label.text = item_name
+		
 		var rarity_color = get_rarity_color(item_rarity)
 		item_name_label.add_theme_color_override("font_color", rarity_color)
 	
-	# Set item type
 	if item_type_label:
-		item_type_label.text = "Type: " + item_type + " | " + item_rarity.capitalize()
+		item_type_label.text = translated_type + " | " + translated_rarity
 	
-	# Set description
 	if item_description_label:
-		item_description_label.text = description
+		# Try to translate description
+		var desc_key = item_name.to_lower().replace(" ", "_") + "_desc"
+		var translated_desc = LocalizationManager.t(desc_key)
+		if translated_desc != desc_key:
+			item_description_label.text = translated_desc
+		else:
+			item_description_label.text = description
 	
-	# Set stats (if weapon or has special properties)
 	if item_stats_label:
 		var stats_text = ""
 		
@@ -968,21 +1000,20 @@ func show_item_description(item: Dictionary):
 			var attack_speed = item_data.get("attack_speed", 1.0)
 			var attack_range = item_data.get("attack_range", 0)
 			
-			stats_text += "Damage: " + str(damage) + "\n"
-			stats_text += "Speed: " + str(snapped(attack_speed, 0.1)) + "\n"
-			stats_text += "Range: " + str(attack_range)
+			stats_text += LocalizationManager.t("damage") + ": " + str(damage) + "\n"
+			stats_text += LocalizationManager.t("attack_speed") + ": " + str(snapped(attack_speed, 0.1)) + "\n"
+			stats_text += LocalizationManager.t("attack_range") + ": " + str(attack_range)
 		
 		elif item_type.to_lower() == "consumable":
 			var effect = item_data.get("effect", "").replace("_", " ").capitalize()
 			var effect_value = item_data.get("effect_value", 0)
-			stats_text += "Effect: " + effect + " +" + str(effect_value)
+			stats_text += LocalizationManager.t("effect") + ": " + effect + " +" + str(effect_value)
 		
 		elif "value" in item_data:
-			stats_text += "Value: " + str(item_data.value) + " gold"
+			stats_text += LocalizationManager.t("value") + ": " + str(item_data.value) + " " + LocalizationManager.t("gold")
 		
 		item_stats_label.text = stats_text
 	
-	# Show the panel immediately if hidden, or just update if already visible
 	if not item_description_panel.visible:
 		item_description_panel.visible = true
 		item_description_panel.modulate.a = 0.0
@@ -990,7 +1021,6 @@ func show_item_description(item: Dictionary):
 		var tween = create_tween()
 		tween.tween_property(item_description_panel, "modulate:a", 1.0, 0.2)
 	else:
-		# Already visible, just update the content (no animation needed)
 		item_description_panel.modulate.a = 1.0
 
 func hide_item_description():

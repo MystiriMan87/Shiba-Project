@@ -14,52 +14,11 @@ var translations: Dictionary = {
 	"ja": {}
 }
 
-var japanese_font: FontFile
-var default_font: FontFile
-
 func _ready():
-	load_fonts()
 	load_translations()
 	
 	var saved_language = SettingsManager.settings.gameplay.get("language", "en") if has_node("/root/SettingsManager") else "en"
 	set_language(saved_language)
-	
-	# Auto-apply font whenever a new scene is loaded
-	get_tree().node_added.connect(_on_node_added)
-
-func _on_node_added(node: Node):
-	# When a new Control node is added to the scene, apply the current language font
-	# Skip TextureRect and other nodes that don't need fonts
-	if node is Control and not node is TextureRect and not node is ColorRect:
-		call_deferred("_apply_font_to_node_deferred", node)
-
-func _apply_font_to_node_deferred(node: Node):
-	if current_language == "ja" and japanese_font:
-		apply_font_recursively(node, japanese_font)
-	elif current_language == "en" and default_font:
-		apply_font_recursively(node, default_font)
-
-# Helper function to manually apply font to specific UI elements
-# Call this in your UI scripts for immediate font application
-func apply_font_to_ui(ui_node: Node):
-	if current_language == "ja" and japanese_font:
-		apply_font_recursively(ui_node, japanese_font)
-	elif current_language == "en" and default_font:
-		apply_font_recursively(ui_node, default_font)
-
-func load_fonts():
-	# Load your Japanese font - adjust the path to match your font file location
-	if ResourceLoader.exists("res://Fonts/Noto_Sans_JP/static/NotoSansJP-Regular.ttf"):
-		japanese_font = load("res://Fonts/Noto_Sans_JP/static/NotoSansJP-Regular.ttf")
-		print("Japanese font loaded successfully")
-	else:
-		push_warning("Japanese font not found at res://fonts/japanese_font.ttf")
-	
-	# Optional: load default font if you want to switch back
-	# If you don't set this, it will use Godot's default font for English
-	if ResourceLoader.exists("res://Fonts/PixeloidSans-nR3g1.ttf"):
-		default_font = load("res://Fonts/PixeloidSans-nR3g1.ttf")
-		print("Default font loaded successfully")
 
 func load_translations():
 	translations["en"] = {
@@ -254,85 +213,11 @@ func set_language(lang_code: String):
 	current_language = lang_code
 	print("Language changed to: ", LANGUAGES[lang_code])
 	
-	# Apply font based on language
-	apply_font_for_language(lang_code)
-	
 	if has_node("/root/SettingsManager"):
 		SettingsManager.settings.gameplay["language"] = lang_code
 		SettingsManager.save_settings()
 	
 	language_changed.emit(lang_code)
-
-func apply_font_for_language(lang_code: String):
-	var root = get_tree().root
-	if lang_code == "ja":
-		if japanese_font:
-			apply_font_recursively(root, japanese_font)
-			print("Applied Japanese font to all UI elements")
-		else:
-			push_warning("Japanese font not loaded, cannot apply")
-	else:
-		# Optional: revert to default font
-		if default_font:
-			apply_font_recursively(root, default_font)
-			print("Applied default font to all UI elements")
-		else:
-			# Remove font overrides to use Godot's default
-			remove_font_overrides_recursively(root)
-			print("Removed font overrides, using Godot default")
-
-# Call this function when new scenes/UI elements are added to apply font to them
-func apply_font_to_new_node(node: Node):
-	if current_language == "ja" and japanese_font:
-		apply_font_recursively(node, japanese_font)
-	elif current_language == "en" and default_font:
-		apply_font_recursively(node, default_font)
-
-func apply_font_recursively(node: Node, font: Font):
-	# Apply font to all Control nodes that support text
-	if node is Label:
-		node.add_theme_font_override("font", font)
-	elif node is Button:
-		node.add_theme_font_override("font", font)
-	elif node is LineEdit:
-		node.add_theme_font_override("font", font)
-	elif node is TextEdit:
-		node.add_theme_font_override("font", font)
-	elif node is RichTextLabel:
-		node.add_theme_font_override("normal_font", font)
-	elif node is OptionButton:
-		node.add_theme_font_override("font", font)
-	elif node is CheckBox:
-		node.add_theme_font_override("font", font)
-	elif node is CheckButton:
-		node.add_theme_font_override("font", font)
-	
-	# Recursively apply to all children
-	for child in node.get_children():
-		apply_font_recursively(child, font)
-
-func remove_font_overrides_recursively(node: Node):
-	# Remove font overrides to revert to default theme
-	if node is Label:
-		node.remove_theme_font_override("font")
-	elif node is Button:
-		node.remove_theme_font_override("font")
-	elif node is LineEdit:
-		node.remove_theme_font_override("font")
-	elif node is TextEdit:
-		node.remove_theme_font_override("font")
-	elif node is RichTextLabel:
-		node.remove_theme_font_override("normal_font")
-	elif node is OptionButton:
-		node.remove_theme_font_override("font")
-	elif node is CheckBox:
-		node.remove_theme_font_override("font")
-	elif node is CheckButton:
-		node.remove_theme_font_override("font")
-	
-	# Recursively remove from all children
-	for child in node.get_children():
-		remove_font_overrides_recursively(child)
 
 func get_text(key: String, args: Array = []) -> String:
 	if not translations.has(current_language):

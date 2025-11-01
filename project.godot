@@ -158,6 +158,16 @@ open_quest_log={
 ]
 }
 
+[internationalization]
+
+locale/translation_remaps={
+"res://translations/translations_en.csv": PackedStringArray(),
+"res://translations/translations_en.en.translation": PackedStringArray(),
+"res://translations/translations_en.ja.translation": PackedStringArray()
+}
+locale/translations=PackedStringArray("res://translations/translations_en.ja.translation", "res://translations/translations_en.en.translation")
+locale/test="ja"
+
 [layer_names]
 
 2d_physics/layer_1="Enviorment"

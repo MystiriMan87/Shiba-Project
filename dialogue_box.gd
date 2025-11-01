@@ -58,14 +58,14 @@ func _ready():
 
 func apply_dialogue_font():
 	"""Apply the current language font to dialogue elements"""
-	if has_node("/root/LocalizationManager"):
+	#if has_node("/root/LocalizationManager"):
 		# Apply font to specific text elements only, not the portrait
-		if speaker_label:
-			LocalizationManager.apply_font_to_ui(speaker_label)
-		if text_label:
-			LocalizationManager.apply_font_to_ui(text_label)
-		if continue_indicator:
-			LocalizationManager.apply_font_to_ui(continue_indicator)
+		#if speaker_label:
+			##LocalizationManager.apply_font_to_ui(speaker_label)
+		#if text_label:
+			#LocalizationManager.apply_font_to_ui(text_label)
+		#if continue_indicator:
+			#LocalizationManager.apply_font_to_ui(continue_indicator)
 
 func start_dialogue(dialogue_id: String):
 	print("=== START DIALOGUE ===")

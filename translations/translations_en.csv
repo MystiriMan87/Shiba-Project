@@ -1,0 +1,34 @@
+keys,en,ja
+START_GAME,Start Game,ゲーム開始
+SETTINGS,Settings,設定
+QUIT,Quit,終了
+BACK,Back,戻る
+RESUME,Resume,再開
+MAIN_MENU,Main Menu,メインメニュー
+INVENTORY,Inventory,インベントリ
+QUEST_LOG,Quest Log,クエストログ
+YES,Yes,はい
+NO,No,いいえ
+LOADING,Loading,読み込み中
+LOADING_GAME,Loading Game...,ゲームを読み込んでいます...
+HEALTH,Health,体力
+DAMAGE,Damage,ダメージ
+LEVEL,Level,レベル
+EXPERIENCE,Experience,経験値
+HEALTH_POTION,Health Potion,体力ポーション
+DASH_POTION,Dash Potion,ダッシュポーション
+SWORD,Sword,剣
+AXE,Axe,斧
+SPEAR,Spear,槍
+EQUIPPED,Equipped,装備中
+SLIME,Slime,スライム
+SKELETON,Skeleton,スケルトン
+GOBLIN,Goblin,ゴブリン
+GHOST,Ghost,ゴースト
+BOSS,Boss,ボス
+QUEST_ACTIVE,Active Quest,進行中のクエスト
+QUEST_COMPLETED,Quest Completed!,クエスト完了！
+OBJECTIVES,Objectives:,目標:
+REWARDS,Rewards:,報酬:
+YOU_DIED,You Died,死亡
+RESPAWN,Respawn,復活

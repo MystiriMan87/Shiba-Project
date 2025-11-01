@@ -16,7 +16,7 @@ func _ready():
 	load_quests_database()
 	
 	if has_node("/root/LocalizationManager"):
-		LocalizationManager.apply_font_to_ui(self)
+		call_deferred("_apply_fonts_deferred")
 
 func load_quests_database():
 	quests_database = {
@@ -380,6 +380,8 @@ func save_quests() -> Dictionary:
 		"completed_quests": completed_quests,
 		"failed_quests": failed_quests
 	}
+
+
 
 func load_quests(save_data: Dictionary):
 	if "active_quests" in save_data:

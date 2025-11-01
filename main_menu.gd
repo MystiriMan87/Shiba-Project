@@ -10,8 +10,7 @@ func _ready():
 	setup_button_animations()
 	update_ui_text()
 	
-	if has_node("/root/LocalizationManager"):
-		LocalizationManager.apply_font_to_new_node(self)
+	
 
 func setup_button_animations():
 	var buttons = find_buttons(self)
