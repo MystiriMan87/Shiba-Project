@@ -21,8 +21,11 @@ func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	set_process(false)
 	set_process_input(false)
+<<<<<<< HEAD
 	
 	#if has_node("/root/LocalizationManager"):
+=======
+>>>>>>> parent of 9b2cc3f (japanese is awful to translate)
 
 func load_scene(scene_path: String):
 	if is_loading:

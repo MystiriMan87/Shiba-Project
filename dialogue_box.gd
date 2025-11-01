@@ -52,6 +52,7 @@ func _ready():
 	
 	if portrait_rect:
 		portrait_rect.visible = false
+<<<<<<< HEAD
 	
 	# Apply font for current language
 	apply_dialogue_font()
@@ -66,6 +67,8 @@ func apply_dialogue_font():
 			#LocalizationManager.apply_font_to_ui(text_label)
 		#if continue_indicator:
 			#LocalizationManager.apply_font_to_ui(continue_indicator)
+=======
+>>>>>>> parent of 9b2cc3f (japanese is awful to translate)
 
 func start_dialogue(dialogue_id: String):
 	print("=== START DIALOGUE ===")

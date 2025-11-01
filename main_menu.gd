@@ -10,7 +10,12 @@ func _ready():
 	setup_button_animations()
 	update_ui_text()
 	
+<<<<<<< HEAD
 	
+=======
+	if has_node("/root/LocalizationManager"):
+		LocalizationManager.language_changed.connect(_on_language_changed)
+>>>>>>> parent of 9b2cc3f (japanese is awful to translate)
 
 func setup_button_animations():
 	var buttons = find_buttons(self)
@@ -19,8 +24,6 @@ func setup_button_animations():
 		button_original_positions[child] = child.position
 		child.mouse_entered.connect(_on_button_hover.bind(child))
 		child.mouse_exited.connect(_on_button_unhover.bind(child))
-		
-		
 
 func find_buttons(node: Node) -> Array:
 	var buttons = []

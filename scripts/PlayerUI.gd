@@ -101,8 +101,11 @@ func _ready():
 	setup_inventory_ui()
 	update_health_display()
 	call_deferred("_refresh_player_weapon")
+<<<<<<< HEAD
 	
 	
+=======
+>>>>>>> parent of 9b2cc3f (japanese is awful to translate)
 
 	
 	if inventory_panel:
@@ -157,8 +160,11 @@ func _on_language_changed(_lang: String):
 func setup_inventory_ui():
 	create_inventory_slots()
 	refresh_inventory_display()
+<<<<<<< HEAD
 	#if has_node("/root/LocalizationManager"):
 		#LocalizationManager.apply_font_to_ui(self)
+=======
+>>>>>>> parent of 9b2cc3f (japanese is awful to translate)
 
 func create_inventory_slots():
 	for slot in inventory_slots:

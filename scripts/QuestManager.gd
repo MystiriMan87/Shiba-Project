@@ -14,9 +14,12 @@ var failed_quests = []
 
 func _ready():
 	load_quests_database()
+<<<<<<< HEAD
 	
 	if has_node("/root/LocalizationManager"):
 		call_deferred("_apply_fonts_deferred")
+=======
+>>>>>>> parent of 9b2cc3f (japanese is awful to translate)
 
 func load_quests_database():
 	quests_database = {
