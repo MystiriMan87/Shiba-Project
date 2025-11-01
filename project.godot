@@ -29,6 +29,7 @@ LoadingScreen="*res://scenes/LoadingScreen.tscn"
 SettingsManager="*res://scripts/SettingsManager.gd"
 VirtualCursor="*res://scripts/VirtualCursor.gd"
 LocalizationManager="*res://scripts/LocalizationManager.gd"
+TranslationLoader="*res://scripts/TranslationLoader.gd"
 
 [display]
 
@@ -167,6 +168,7 @@ locale/translation_remaps={
 }
 locale/translations=PackedStringArray("res://translations/translations_en.ja.translation", "res://translations/translations_en.en.translation")
 locale/test="ja"
+locale/locale_filter_mode=1
 
 [layer_names]
 

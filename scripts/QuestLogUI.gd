@@ -18,13 +18,6 @@ func _ready():
 		print("ERROR: QuestManager not found!")
 	
 	find_containers()
-<<<<<<< HEAD
-<<<<<<< HEAD
-	
-=======
->>>>>>> parent of 9b2cc3f (japanese is awful to translate)
-=======
->>>>>>> parent of 9b2cc3f (japanese is awful to translate)
 
 func find_containers():
 	var tabs = get_node_or_null("Panel/MarginContainer/TabContainer")

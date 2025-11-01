@@ -14,18 +14,18 @@ var translations: Dictionary = {
 	"ja": {}
 }
 
+var japanese_font: Font = null
+var default_font: Font = null
+
 func _ready():
 	load_translations()
+	load_fonts()
 	
-	var saved_language = SettingsManager.settings.gameplay.get("language", "en") if has_node("/root/SettingsManager") else "en"
+	var saved_language = "en"
+	if has_node("/root/SettingsManager"):
+		saved_language = SettingsManager.settings.gameplay.get("language", "en")
 	set_language(saved_language)
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> parent of 9b2cc3f (japanese is awful to translate)
 
-<<<<<<< HEAD
 func load_fonts():
 	# Try Regular weight instead of Black
 	if ResourceLoader.exists("res://Fonts/Noto_Sans_JP/static/NotoSansJP-Regular.ttf"):
@@ -35,16 +35,20 @@ func load_fonts():
 		japanese_font = load("res://Fonts/Noto_Sans_JP/static/NotoSansJP-Bold.ttf")
 		print("Japanese font (Bold) loaded successfully")
 	else:
-		push_warning("Japanese font not found")
+		# Optional fallback: check project Fonts folder for any font
+		if ResourceLoader.exists("res://Fonts/NotoSansJP-Regular.ttf"):
+			japanese_font = load("res://Fonts/NotoSansJP-Regular.ttf")
+			print("Japanese font loaded from alternate path")
+		else:
+			print("Japanese font not found")
 	
+	# Load default pixel font if available
 	if ResourceLoader.exists("res://Fonts/PixeloidSans-nR3g1.ttf"):
 		default_font = load("res://Fonts/PixeloidSans-nR3g1.ttf")
 		print("Default font loaded successfully")
->>>>>>> parent of 9b2cc3f (japanese is awful to translate)
 
-=======
->>>>>>> parent of 60d9732 (new japanese font)
 func load_translations():
+	# Existing hard-coded translations (fallback if you don't use .po/.translation files)
 	translations["en"] = {
 		# UI
 		"start_game": "Start Game",
@@ -241,11 +245,9 @@ func set_language(lang_code: String):
 		SettingsManager.settings.gameplay["language"] = lang_code
 		SettingsManager.save_settings()
 	
-	language_changed.emit(lang_code)
+	emit_signal("language_changed", lang_code)
+	apply_font_for_language(lang_code)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 func apply_font_for_language(lang_code: String):
 	var root = get_tree().root
 	if lang_code == "ja":
@@ -253,7 +255,7 @@ func apply_font_for_language(lang_code: String):
 			apply_font_recursively(root, japanese_font)
 			print("Applied Japanese font to all UI elements")
 		else:
-			push_warning("Japanese font not loaded, cannot apply")
+			print("Japanese font not loaded, cannot apply")
 	else:
 		# Optional: revert to default font
 		if default_font:
@@ -310,23 +312,25 @@ func remove_font_overrides_recursively(node: Node):
 	for child in node.get_children():
 		remove_font_overrides_recursively(child)
 
->>>>>>> parent of 9b2cc3f (japanese is awful to translate)
-=======
->>>>>>> parent of 60d9732 (new japanese font)
 func get_text(key: String, args: Array = []) -> String:
 	if not translations.has(current_language):
 		return key
 	
 	var lang_dict = translations[current_language]
 	if not lang_dict.has(key):
+		# Fallback to English if available
+		if translations.has("en") and translations["en"].has(key):
+			var fallback = translations["en"][key]
+			return _format_string(fallback, args)
 		push_warning("Translation key not found: " + key)
 		return key
 	
 	var text = lang_dict[key]
-	
+	return _format_string(text, args)
+
+func _format_string(text: String, args: Array) -> String:
 	for i in range(args.size()):
 		text = text.replace("{" + str(i) + "}", str(args[i]))
-	
 	return text
 
 func t(key: String, args: Array = []) -> String:

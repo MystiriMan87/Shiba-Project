@@ -52,26 +52,14 @@ func _ready():
 	
 	if portrait_rect:
 		portrait_rect.visible = false
-<<<<<<< HEAD
-<<<<<<< HEAD
-	
+
 	# Apply font for current language
-	apply_dialogue_font()
+	#apply_dialogue_font()
 
 func apply_dialogue_font():
 	"""Apply the current language font to dialogue elements"""
-	#if has_node("/root/LocalizationManager"):
-		# Apply font to specific text elements only, not the portrait
-		#if speaker_label:
-			##LocalizationManager.apply_font_to_ui(speaker_label)
-		#if text_label:
-			#LocalizationManager.apply_font_to_ui(text_label)
-		#if continue_indicator:
-			#LocalizationManager.apply_font_to_ui(continue_indicator)
-=======
->>>>>>> parent of 9b2cc3f (japanese is awful to translate)
-=======
->>>>>>> parent of 9b2cc3f (japanese is awful to translate)
+	# Implement font application if needed
+	pass
 
 func start_dialogue(dialogue_id: String):
 	print("=== START DIALOGUE ===")
