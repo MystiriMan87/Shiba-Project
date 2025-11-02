@@ -15,7 +15,7 @@ func _ready():
 		{
 			"title": "Welcome to Finders Keepers",
 			"description": "Use WASD to move your character around the world. Right stick to move on controller.",
-			"image": ""
+			"image": "res://Screenshot 2025-11-02 at 9.31.45 AM.png"
 		},
 		{
 			"title": "Controls",

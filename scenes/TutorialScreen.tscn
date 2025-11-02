@@ -1,11 +1,10 @@
 [gd_scene load_steps=4 format=3 uid="uid://d12jeb2ckwoy"]
 
 [ext_resource type="Script" uid="uid://b6356b0ltfh41" path="res://scenes/tutorial_screen.gd" id="1_yvb13"]
+[ext_resource type="Texture2D" uid="uid://bfdos0ualf1b" path="res://Screenshot 2025-11-02 at 9.31.45 AM.png" id="2_pe08h"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pe08h"]
 bg_color = Color(0.380392, 0.454902, 0.784314, 0.670588)
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_yvb13"]
 
 [node name="TutorialScreen" type="Control"]
 layout_mode = 3
@@ -84,11 +83,13 @@ offset_bottom = 713.0
 
 [node name="ImageRect" type="TextureRect" parent="Panel"]
 layout_mode = 2
-offset_left = 426.0
-offset_top = 251.0
-offset_right = 896.0
-offset_bottom = 654.0
-texture = SubResource("PlaceholderTexture2D_yvb13")
+offset_left = 524.0
+offset_top = 246.0
+offset_right = 1530.0
+offset_bottom = 1106.0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_pe08h")
+expand_mode = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="Panel"]
 visible = false
