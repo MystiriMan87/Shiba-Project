@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://byg0qtj4d0dqv"]
+[gd_scene load_steps=8 format=3 uid="uid://byg0qtj4d0dqv"]
 
 [ext_resource type="Script" uid="uid://buobjj1brmb24" path="res://main_menu.gd" id="1_7vrkn"]
 [ext_resource type="FontFile" uid="uid://vkfuxgs5bk41" path="res://Fonts/PixeloidSans-nR3g1.ttf" id="3_fu7sn"]
 [ext_resource type="FontFile" uid="uid://cuifcrxdin7jw" path="res://Fonts/PixeloidMono-1G8ae.ttf" id="3_jix8l"]
+[ext_resource type="FontFile" uid="uid://bq2tqkp5y2cg2" path="res://Fonts/NotoSansJP-Regular.ttf" id="4_jix8l"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jix8l"]
 bg_color = Color(0.133333, 0.133333, 0.133333, 0)
@@ -91,7 +92,7 @@ offset_right = 631.0
 offset_bottom = 617.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_fonts/font = ExtResource("3_jix8l")
+theme_override_fonts/font = ExtResource("4_jix8l")
 theme_override_font_sizes/font_size = 67
 theme_override_styles/normal = SubResource("StyleBoxFlat_jix8l")
 text = "Start Game
@@ -111,7 +112,7 @@ offset_right = -418.0
 offset_bottom = 227.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_fonts/font = ExtResource("3_jix8l")
+theme_override_fonts/font = ExtResource("4_jix8l")
 theme_override_font_sizes/font_size = 67
 theme_override_styles/normal = SubResource("StyleBoxFlat_glbon")
 text = "Options
@@ -126,7 +127,7 @@ offset_right = 292.0
 offset_bottom = 885.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_fonts/font = ExtResource("3_jix8l")
+theme_override_fonts/font = ExtResource("4_jix8l")
 theme_override_font_sizes/font_size = 67
 theme_override_styles/normal = SubResource("StyleBoxFlat_8qtwp")
 text = "Quit

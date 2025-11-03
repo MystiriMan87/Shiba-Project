@@ -13,12 +13,19 @@ var current_text: String = ""
 var char_index: int = 0
 
 var character_portraits: Dictionary = {
+	# English names
 	"Merchant": "res://portaits/portrait_human_3.png",
 	"Elf Messenger": "res://portaits/portrait_dark_elf_4.png",
 	"Crazed Wizard": "res://portaits/portrait_human_20.png",
 	"Explorer Dave": "res://portaits/portrait_human_20.png",
 	"???": "res://portaits/portrait_human_12.png",
-	"Cowardly Skeleton": "res://portaits/portrait_skeleton.png"
+	"Cowardly Skeleton": "res://portaits/portrait_skeleton.png",
+	# Japanese names - same portraits
+	"商人": "res://portaits/portrait_human_3.png",
+	"エルフの使者": "res://portaits/portrait_dark_elf_4.png",
+	"狂気の魔法使い": "res://portaits/portrait_human_20.png",
+	"探検家デイブ": "res://portaits/portrait_human_20.png",
+	"臆病なスケルトン": "res://portaits/portrait_skeleton.png"
 }
 
 @onready var panel: Panel = $Panel

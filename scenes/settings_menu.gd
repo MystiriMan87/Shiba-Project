@@ -1,271 +1,265 @@
-extends Node
+extends Control
 
-signal language_changed(new_language: String)
+var master_slider: HSlider
+var master_value: Label
+var music_slider: HSlider
+var music_value: Label
+var sfx_slider: HSlider
+var sfx_value: Label
 
-const LANGUAGES = {
-	"en": "English",
-	"ja": "日本語"
-}
-
-var current_language: String = "en"
-
-var translations: Dictionary = {
-	"en": {},
-	"ja": {}
-}
+var fullscreen_checkbox: CheckBox
+var vsync_option: OptionButton
+var resolution_option: OptionButton
+var language_option: OptionButton
 
 func _ready():
-	load_translations()
+	find_ui_elements()
+	connect_signals()
+	load_current_settings()
+	update_ui_text()
 	
-	var saved_language = SettingsManager.settings.gameplay.get("language", "en") if has_node("/root/SettingsManager") else "en"
-	set_language(saved_language)
+	if has_node("/root/LocalizationManager"):
+		LocalizationManager.language_changed.connect(_on_language_changed)
 
-func load_translations():
-	translations["en"] = {
-		# UI
-		"start_game": "Start Game",
-		"settings": "Settings",
-		"quit": "Quit",
-		"back": "Back",
-		"resume": "Resume",
-		"main_menu": "Main Menu",
-		"inventory": "Inventory",
-		"quest_log": "Quest Log",
-		"yes": "Yes",
-		"no": "No",
+func find_ui_elements():
+	var audio_section = find_child("AudioSelection")
+	if audio_section:
+		var master_volume = audio_section.find_child("MasterVolume")
+		if master_volume:
+			master_slider = master_volume.find_child("HSlider")
+			master_value = master_volume.find_child("Value")
 		
-		# Settings
-		"audio": "Audio",
-		"video": "Video",
-		"gameplay": "Gameplay",
-		"language": "Language",
-		"master_volume": "Master Volume",
-		"music_volume": "Music Volume",
-		"sfx_volume": "SFX Volume",
-		"fullscreen": "Fullscreen",
-		"vsync": "VSync",
-		"resolution": "Resolution",
+		var music_volume = audio_section.find_child("MusicVolume")
+		if music_volume:
+			music_slider = music_volume.find_child("HSlider")
+			music_value = music_volume.find_child("Value")
 		
-		# Gameplay
-		"health": "Health",
-		"damage": "Damage",
-		"attack_range": "Range",
-		"attack_speed": "Speed",
-		"level": "Level",
-		"experience": "Experience",
-		
-		# Items
-		"health_potion": "Health Potion",
-		"health_potion_desc": "Restores 2 HP",
-		"dash_potion": "Dash Potion",
-		"dash_potion_desc": "Restores dash energy",
-		"wooden_key": "Wooden Key",
-		"wooden_key_desc": "Opens wooden chests",
-		"iron_key": "Iron Key",
-		"iron_key_desc": "Opens iron chests",
-		"magic_ring": "Magic Ring",
-		"magic_ring_desc": "Deals 2x damage to ghosts",
-		
-		# Weapons
-		"sword": "Sword",
-		"axe": "Axe",
-		"spear": "Spear",
-		"equipped": "Equipped",
-		"weapon_damage": "Damage: {0}",
-		"weapon_range": "Range: {0}",
-		"weapon_speed": "Speed: {0}",
-		
-		# Enemies
-		"slime": "Slime",
-		"skeleton": "Skeleton",
-		"goblin": "Goblin",
-		"ghost": "Ghost",
-		"boss": "Boss",
-		
-		# Quests
-		"quest_active": "Active Quest",
-		"quest_completed": "Quest Completed!",
-		"quest_failed": "Quest Failed",
-		"objectives": "Objectives:",
-		"rewards": "Rewards:",
-		
-		# Notifications
-		"item_picked_up": "Picked up: {0}",
-		"quest_started": "New Quest: {0}",
-		"quest_updated": "Quest Updated: {0}",
-		"enemy_defeated": "Enemy Defeated!",
-		"boss_defeated": "Boss Defeated!",
-		
-		# Death Screen
-		"you_died": "You Died",
-		"respawn": "Respawn",
-		"enemies_killed": "Enemies Killed: {0}",
-		"time_survived": "Time Survived: {0}",
-		
-		# Tutorial
-		"move_tutorial": "Use WASD or Left Stick to move",
-		"attack_tutorial": "Left Click or RT to attack",
-		"dash_tutorial": "Shift or LB to dash",
-		"interact_tutorial": "E or A to interact",
-		
-		# Dialogue
-		"continue_dialogue": "Press [E] to continue",
-		"skip_dialogue": "Press [ESC] to skip"
-	}
+		var sfx_volume = audio_section.find_child("SFXVolume")
+		if sfx_volume:
+			sfx_slider = sfx_volume.find_child("HSlider")
+			sfx_value = sfx_volume.find_child("Value")
 	
-	translations["ja"] = {
-		# UI
-		"start_game": "ゲーム開始",
-		"settings": "設定",
-		"quit": "終了",
-		"back": "戻る",
-		"resume": "再開",
-		"main_menu": "メインメニュー",
-		"inventory": "インベントリ",
-		"quest_log": "クエストログ",
-		"yes": "はい",
-		"no": "いいえ",
+	var video_section = find_child("VideoSection")
+	if video_section:
+		var fullscreen_container = video_section.find_child("Fullscreen")
+		if fullscreen_container:
+			fullscreen_checkbox = fullscreen_container.find_child("CheckBox")
 		
-		# Settings
-		"audio": "オーディオ",
-		"video": "ビデオ",
-		"gameplay": "ゲームプレイ",
-		"language": "言語",
-		"master_volume": "マスター音量",
-		"music_volume": "音楽音量",
-		"sfx_volume": "効果音音量",
-		"fullscreen": "フルスクリーン",
-		"vsync": "垂直同期",
-		"resolution": "解像度",
+		var vsync_container = video_section.find_child("VSync")
+		if vsync_container:
+			vsync_option = vsync_container.find_child("OptionButton")
+			if not vsync_option:
+				vsync_option = vsync_container.find_child("CheckBox")
 		
-		# Gameplay
-		"health": "体力",
-		"damage": "ダメージ",
-		"attack_range": "射程",
-		"attack_speed": "攻撃速度",
-		"level": "レベル",
-		"experience": "経験値",
-		
-		# Items
-		"health_potion": "体力ポーション",
-		"health_potion_desc": "体力を2回復する",
-		"dash_potion": "ダッシュポーション",
-		"dash_potion_desc": "ダッシュエネルギーを回復する",
-		"wooden_key": "木の鍵",
-		"wooden_key_desc": "木製の箱を開ける",
-		"iron_key": "鉄の鍵",
-		"iron_key_desc": "鉄製の箱を開ける",
-		"magic_ring": "魔法の指輪",
-		"magic_ring_desc": "幽霊に2倍のダメージを与える",
-		
-		# Weapons
-		"sword": "剣",
-		"axe": "斧",
-		"spear": "槍",
-		"equipped": "装備中",
-		"weapon_damage": "ダメージ: {0}",
-		"weapon_range": "射程: {0}",
-		"weapon_speed": "速度: {0}",
-		
-		# Enemies
-		"slime": "スライム",
-		"skeleton": "スケルトン",
-		"goblin": "ゴブリン",
-		"ghost": "ゴースト",
-		"boss": "ボス",
-		
-		# Quests
-		"quest_active": "進行中のクエスト",
-		"quest_completed": "クエスト完了！",
-		"quest_failed": "クエスト失敗",
-		"objectives": "目標:",
-		"rewards": "報酬:",
-		
-		# Notifications
-		"item_picked_up": "入手: {0}",
-		"quest_started": "新しいクエスト: {0}",
-		"quest_updated": "クエスト更新: {0}",
-		"enemy_defeated": "敵を倒した！",
-		"boss_defeated": "ボスを倒した！",
-		
-		# Death Screen
-		"you_died": "死亡",
-		"respawn": "復活",
-		"enemies_killed": "倒した敵: {0}",
-		"time_survived": "生存時間: {0}",
-		
-		# Tutorial
-		"move_tutorial": "WASDまたは左スティックで移動",
-		"attack_tutorial": "左クリックまたはRTで攻撃",
-		"dash_tutorial": "シフトまたはLBでダッシュ",
-		"interact_tutorial": "EまたはAで対話",
-		
-		# Dialogue
-		"continue_dialogue": "[E]を押して続ける",
-		"skip_dialogue": "[ESC]を押してスキップ"
-	}
+		var resolution_container = video_section.find_child("Resolution")
+		if resolution_container:
+			resolution_option = resolution_container.find_child("OptionButton")
+	
+	var gameplay_section = find_child("GameplaySection")
+	if gameplay_section:
+		var language_container = gameplay_section.find_child("Language")
+		if language_container:
+			language_option = language_container.find_child("OptionButton")
 
-func set_language(lang_code: String):
-	if not LANGUAGES.has(lang_code):
-		push_warning("Language not supported: " + lang_code)
+func connect_signals():
+	if master_slider:
+		master_slider.value_changed.connect(_on_master_volume_changed)
+		master_slider.min_value = 0
+		master_slider.max_value = 100
+		master_slider.step = 1
+	
+	if music_slider:
+		music_slider.value_changed.connect(_on_music_volume_changed)
+		music_slider.min_value = 0
+		music_slider.max_value = 100
+		music_slider.step = 1
+	
+	if sfx_slider:
+		sfx_slider.value_changed.connect(_on_sfx_volume_changed)
+		sfx_slider.min_value = 0
+		sfx_slider.max_value = 100
+		sfx_slider.step = 1
+	
+	if fullscreen_checkbox:
+		fullscreen_checkbox.toggled.connect(_on_fullscreen_toggled)
+	
+	if vsync_option:
+		vsync_option.item_selected.connect(_on_vsync_selected)
+		vsync_option.clear()
+		vsync_option.add_item("Disabled")
+		vsync_option.add_item("Enabled")
+		vsync_option.add_item("30 FPS")
+		vsync_option.add_item("60 FPS")
+		vsync_option.add_item("120 FPS")
+		vsync_option.add_item("144 FPS")
+	
+	if resolution_option:
+		resolution_option.item_selected.connect(_on_resolution_selected)
+		resolution_option.clear()
+		resolution_option.add_item("1920x1080")
+		resolution_option.add_item("1680x1050")
+		resolution_option.add_item("1600x900")
+		resolution_option.add_item("1366x768")
+		resolution_option.add_item("1280x720")
+	
+	if language_option:
+		language_option.item_selected.connect(_on_language_selected)
+		setup_language_options()
+
+func setup_language_options():
+	if not language_option:
 		return
 	
-	current_language = lang_code
-	print("Language changed to: ", LANGUAGES[lang_code])
-	
-	if has_node("/root/SettingsManager"):
-		SettingsManager.settings.gameplay["language"] = lang_code
-		SettingsManager.save_settings()
-	
-	language_changed.emit(lang_code)
+	language_option.clear()
+	language_option.add_item("English", 0)
+	language_option.set_item_metadata(0, "en")
+	language_option.add_item("日本語", 1)
+	language_option.set_item_metadata(1, "ja")
 
-func get_text(key: String, args: Array = []) -> String:
-	if not translations.has(current_language):
-		return key
+func load_current_settings():
+	if master_slider:
+		master_slider.value = SettingsManager.settings.audio.master_volume * 100
+		if master_value:
+			master_value.text = str(int(master_slider.value)) + "%"
 	
-	var lang_dict = translations[current_language]
-	if not lang_dict.has(key):
-		push_warning("Translation key not found: " + key)
-		return key
+	if music_slider:
+		music_slider.value = SettingsManager.settings.audio.music_volume * 100
+		if music_value:
+			music_value.text = str(int(music_slider.value)) + "%"
 	
-	var text = lang_dict[key]
+	if sfx_slider:
+		sfx_slider.value = SettingsManager.settings.audio.sfx_volume * 100
+		if sfx_value:
+			sfx_value.text = str(int(sfx_slider.value)) + "%"
 	
-	for i in range(args.size()):
-		text = text.replace("{" + str(i) + "}", str(args[i]))
+	if fullscreen_checkbox:
+		fullscreen_checkbox.button_pressed = SettingsManager.settings.video.fullscreen
 	
-	return text
+	if vsync_option and vsync_option is OptionButton:
+		var vsync_mode = SettingsManager.settings.video.get("vsync_mode", 1)
+		vsync_option.selected = vsync_mode
+	
+	if resolution_option:
+		var current_res = SettingsManager.settings.video.resolution
+		var res_string = str(current_res.x) + "x" + str(current_res.y)
+		for i in resolution_option.item_count:
+			if resolution_option.get_item_text(i) == res_string:
+				resolution_option.selected = i
+				break
+	
+	if language_option:
+		var current_lang = LocalizationManager.get_current_language()
+		for i in language_option.item_count:
+			if language_option.get_item_metadata(i) == current_lang:
+				language_option.selected = i
+				break
 
-func t(key: String, args: Array = []) -> String:
-	return get_text(key, args)
-
-func get_current_language() -> String:
-	return current_language
-
-func get_available_languages() -> Dictionary:
-	return LANGUAGES
-
-func add_translation(key: String, en_text: String, ja_text: String):
-	translations["en"][key] = en_text
-	translations["ja"][key] = ja_text
-
-func load_from_csv(file_path: String):
-	if not FileAccess.file_exists(file_path):
-		push_warning("Translation CSV not found: " + file_path)
-		return
+func update_ui_text():
+	var audio_label = find_child("AudioLabel")
+	if audio_label:
+		audio_label.text = LocalizationManager.t("audio")
 	
-	var file = FileAccess.open(file_path, FileAccess.READ)
-	if not file:
-		return
+	var video_label = find_child("VideoLabel")
+	if video_label:
+		video_label.text = LocalizationManager.t("video")
 	
-	var header = file.get_csv_line()
+	var gameplay_label = find_child("GameplayLabel")
+	if gameplay_label:
+		gameplay_label.text = LocalizationManager.t("gameplay")
 	
-	while not file.eof_reached():
-		var line = file.get_csv_line()
-		if line.size() >= 3:
-			var key = line[0]
-			var en_text = line[1]
-			var ja_text = line[2]
-			add_translation(key, en_text, ja_text)
+	var master_container = find_child("MasterVolume")
+	if master_container:
+		for child in master_container.get_children():
+			if child is Label and child.name != "Value":
+				child.text = LocalizationManager.t("master_volume")
+				break
 	
-	file.close()
-	print("Translations loaded from CSV: ", file_path)
+	var music_container = find_child("MusicVolume")
+	if music_container:
+		for child in music_container.get_children():
+			if child is Label and child.name != "Value":
+				child.text = LocalizationManager.t("music_volume")
+				break
+	
+	var sfx_container = find_child("SFXVolume")
+	if sfx_container:
+		for child in sfx_container.get_children():
+			if child is Label and child.name != "Value":
+				child.text = LocalizationManager.t("sfx_volume")
+				break
+	
+	var fullscreen_container = find_child("Fullscreen")
+	if fullscreen_container:
+		for child in fullscreen_container.get_children():
+			if child is Label:
+				child.text = LocalizationManager.t("fullscreen")
+				break
+	
+	var vsync_container = find_child("VSync")
+	if vsync_container:
+		for child in vsync_container.get_children():
+			if child is Label:
+				child.text = LocalizationManager.t("vsync")
+				break
+	
+	var resolution_container = find_child("Resolution")
+	if resolution_container:
+		for child in resolution_container.get_children():
+			if child is Label:
+				child.text = LocalizationManager.t("resolution")
+				break
+	
+	var language_container = find_child("Language")
+	if language_container:
+		for child in language_container.get_children():
+			if child is Label:
+				child.text = LocalizationManager.t("language")
+				break
+	
+	var back_button = find_child("BackButton")
+	if back_button:
+		back_button.text = LocalizationManager.t("back")
+
+func _on_language_changed(new_lang: String):
+	update_ui_text()
+
+func _on_master_volume_changed(value: float):
+	var normalized_value = value / 100.0
+	SettingsManager.set_master_volume(normalized_value)
+	if master_value:
+		master_value.text = str(int(value)) + "%"
+
+func _on_music_volume_changed(value: float):
+	var normalized_value = value / 100.0
+	SettingsManager.set_music_volume(normalized_value)
+	if music_value:
+		music_value.text = str(int(value)) + "%"
+
+func _on_sfx_volume_changed(value: float):
+	var normalized_value = value / 100.0
+	SettingsManager.set_sfx_volume(normalized_value)
+	if sfx_value:
+		sfx_value.text = str(int(value)) + "%"
+
+func _on_fullscreen_toggled(button_pressed: bool):
+	SettingsManager.set_fullscreen(button_pressed)
+
+func _on_vsync_selected(index: int):
+	SettingsManager.set_vsync_mode(index)
+
+func _on_resolution_selected(index: int):
+	if resolution_option:
+		var res_string = resolution_option.get_item_text(index)
+		var parts = res_string.split("x")
+		if parts.size() == 2:
+			var resolution = Vector2i(int(parts[0]), int(parts[1]))
+			SettingsManager.set_resolution(resolution)
+
+func _on_language_selected(index: int):
+	if language_option:
+		var lang_code = language_option.get_item_metadata(index)
+		LocalizationManager.set_language(lang_code)
+
+func _on_back_pressed():
+	SettingsManager.save_settings()
+	get_tree().change_scene_to_file("res://main_menu.tscn")

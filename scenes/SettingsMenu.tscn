@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://cuuwjcs8nvtqa"]
+[gd_scene load_steps=7 format=3 uid="uid://cuuwjcs8nvtqa"]
 
 [ext_resource type="Script" uid="uid://8k2pw38m2a25" path="res://scenes/settings_menu.gd" id="1_yelko"]
 [ext_resource type="FontFile" uid="uid://vkfuxgs5bk41" path="res://Fonts/PixeloidSans-nR3g1.ttf" id="2_1yw23"]
+[ext_resource type="FontFile" uid="uid://bq2tqkp5y2cg2" path="res://Fonts/NotoSansJP-Regular.ttf" id="2_ldnee"]
 [ext_resource type="Script" uid="uid://cf8d3fs7qvs4a" path="res://scenes/gameplaylabel.gd" id="3_dd8lr"]
 [ext_resource type="Script" uid="uid://dube6fvn4iwco" path="res://scenes/title_label.gd" id="3_t7ar5"]
 
@@ -37,7 +38,7 @@ theme_override_constants/separation = 20
 
 [node name="TitleLabel" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_1yw23")
+theme_override_fonts/font = ExtResource("2_ldnee")
 theme_override_font_sizes/font_size = 50
 text = "Settings
 "
@@ -48,7 +49,7 @@ layout_mode = 2
 
 [node name="AudioLabel" type="Label" parent="Panel/VBoxContainer/AudioSelection"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_1yw23")
+theme_override_fonts/font = ExtResource("2_ldnee")
 theme_override_font_sizes/font_size = 25
 text = "Audio"
 
@@ -57,7 +58,7 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/AudioSelection/MasterVolume"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_1yw23")
+theme_override_fonts/font = ExtResource("2_ldnee")
 theme_override_font_sizes/font_size = 19
 text = "Master Volume
 "
@@ -78,7 +79,7 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/AudioSelection/MusicVolume"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_1yw23")
+theme_override_fonts/font = ExtResource("2_ldnee")
 theme_override_font_sizes/font_size = 19
 text = "Music Volume
 "
@@ -99,7 +100,7 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/AudioSelection/SFXVolume"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_1yw23")
+theme_override_fonts/font = ExtResource("2_ldnee")
 theme_override_font_sizes/font_size = 19
 text = "SFX Volume
 "
@@ -120,7 +121,7 @@ layout_mode = 2
 
 [node name="VideoLabel" type="Label" parent="Panel/VBoxContainer/VideoSection"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_1yw23")
+theme_override_fonts/font = ExtResource("2_ldnee")
 theme_override_font_sizes/font_size = 25
 text = "Video
 "
@@ -130,7 +131,7 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/VideoSection/Fullscreen"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_1yw23")
+theme_override_fonts/font = ExtResource("2_ldnee")
 theme_override_font_sizes/font_size = 19
 text = "Fullscreen
 "
@@ -143,7 +144,7 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/VideoSection/VSync"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_1yw23")
+theme_override_fonts/font = ExtResource("2_ldnee")
 theme_override_font_sizes/font_size = 19
 text = "VSync
 "
@@ -156,7 +157,7 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/VideoSection/Resolution"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("2_1yw23")
+theme_override_fonts/font = ExtResource("2_ldnee")
 theme_override_font_sizes/font_size = 19
 text = "Resolution"
 
@@ -172,8 +173,9 @@ text = "Back
 [node name="GameplaySection" type="VBoxContainer" parent="Panel/VBoxContainer"]
 layout_mode = 2
 
-[node name="Gameplaylabel" type="Label" parent="Panel/VBoxContainer/GameplaySection"]
+[node name="Gameplay" type="Label" parent="Panel/VBoxContainer/GameplaySection"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_ldnee")
 theme_override_font_sizes/font_size = 41
 text = "Gameplay"
 script = ExtResource("3_dd8lr")
@@ -183,10 +185,12 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/GameplaySection/Language"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_ldnee")
 text = "Language / 言語"
 
 [node name="OptionButton" type="OptionButton" parent="Panel/VBoxContainer/GameplaySection/Language"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("2_ldnee")
 
 [node name="ControlsLabel" type="Label" parent="Panel"]
 layout_mode = 0

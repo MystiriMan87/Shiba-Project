@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://d12jeb2ckwoy"]
+[gd_scene load_steps=5 format=3 uid="uid://d12jeb2ckwoy"]
 
 [ext_resource type="Script" uid="uid://b6356b0ltfh41" path="res://scenes/tutorial_screen.gd" id="1_yvb13"]
+[ext_resource type="FontFile" uid="uid://bq2tqkp5y2cg2" path="res://Fonts/NotoSansJP-Regular.ttf" id="2_2uywm"]
 [ext_resource type="Texture2D" uid="uid://bfdos0ualf1b" path="res://Screenshot 2025-11-02 at 9.31.45 AM.png" id="2_pe08h"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pe08h"]
@@ -47,6 +48,7 @@ layout_mode = 2
 offset_top = 63.0
 offset_right = 1920.0
 offset_bottom = 132.0
+theme_override_fonts/font = ExtResource("2_2uywm")
 theme_override_font_sizes/font_size = 50
 text = "TESTING"
 horizontal_alignment = 1
@@ -58,6 +60,7 @@ offset_left = 1019.0
 offset_top = 266.0
 offset_right = 1401.0
 offset_bottom = 639.0
+theme_override_fonts/font = ExtResource("2_2uywm")
 theme_override_font_sizes/font_size = 25
 text = "TESTING"
 horizontal_alignment = 1
@@ -83,10 +86,10 @@ offset_bottom = 713.0
 
 [node name="ImageRect" type="TextureRect" parent="Panel"]
 layout_mode = 2
-offset_left = 524.0
-offset_top = 246.0
-offset_right = 1530.0
-offset_bottom = 1106.0
+offset_left = 381.0
+offset_top = 266.0
+offset_right = 1387.0
+offset_bottom = 1126.0
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("2_pe08h")
 expand_mode = 1

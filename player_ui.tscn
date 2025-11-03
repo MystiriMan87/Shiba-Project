@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://cqk6unim2ftgo"]
+[gd_scene load_steps=24 format=3 uid="uid://cqk6unim2ftgo"]
 
 [ext_resource type="Script" uid="uid://bov65j62y0be8" path="res://scripts/PlayerUI.gd" id="1_lwipk"]
 [ext_resource type="Texture2D" uid="uid://d12anw6sa6wxg" path="res://Assets/16x64 Red Simple Healthbar.png" id="2_654h1"]
@@ -15,6 +15,7 @@
 [ext_resource type="Texture2D" uid="uid://7jsd5egoaoi5" path="res://Assets/pngwing.com.png" id="10_cbg41"]
 [ext_resource type="FontFile" uid="uid://vkfuxgs5bk41" path="res://Fonts/PixeloidSans-nR3g1.ttf" id="10_wotjm"]
 [ext_resource type="AudioStream" uid="uid://owjcku7p77uw" path="res://audio/enemy felled SFX.mp3" id="12_qadsr"]
+[ext_resource type="FontFile" uid="uid://bq2tqkp5y2cg2" path="res://Fonts/NotoSansJP-Regular.ttf" id="13_s8sf8"]
 [ext_resource type="Script" uid="uid://b5n6ipdt4fymh" path="res://scripts/DeathScreen.gd" id="16_y7vyt"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hiloj"]
@@ -303,18 +304,21 @@ vertical_alignment = 1
 
 [node name="WeaponDamageLabel" type="Label" parent="InventoryPanel/EquippedWeaponPanel/EquippedVBox"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("13_s8sf8")
 text = "Damage: 0 "
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="WeaponRangeLabel" type="Label" parent="InventoryPanel/EquippedWeaponPanel/EquippedVBox"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("13_s8sf8")
 text = "Range: 0 "
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="WeaponSpeedLabel" type="Label" parent="InventoryPanel/EquippedWeaponPanel/EquippedVBox"]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("13_s8sf8")
 text = "Speed: 0"
 horizontal_alignment = 1
 vertical_alignment = 1

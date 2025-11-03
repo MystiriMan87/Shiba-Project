@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://bkcsm36nf4kyd"]
 
 [ext_resource type="Script" uid="uid://ouw84ow3cenv" path="res://dialogue_box.gd" id="1_senjy"]
-[ext_resource type="FontFile" uid="uid://vkfuxgs5bk41" path="res://Fonts/PixeloidSans-nR3g1.ttf" id="2_n23yb"]
+[ext_resource type="FontFile" uid="uid://bq2tqkp5y2cg2" path="res://Fonts/NotoSansJP-Regular.ttf" id="2_n23yb"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_senjy"]
 bg_color = Color(0.137255, 0.137255, 0.137255, 0.647059)

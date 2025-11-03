@@ -862,11 +862,11 @@ func update_equipped_weapon_display():
 		if equipped_weapon_name:
 			equipped_weapon_name.text = "None"
 		if equipped_weapon_damage:
-			equipped_weapon_damage.text = "Damage: --"
+			equipped_weapon_damage.text = "Damage - ダメージ: --"
 		if equipped_weapon_range:
-			equipped_weapon_range.text = "Range: --"
+			equipped_weapon_range.text = "Range - 範囲: --"
 		if equipped_weapon_speed:
-			equipped_weapon_speed.text = "Speed: --"
+			equipped_weapon_speed.text = "Speed - スピード: --"
 		if equipped_weapon_icon:
 			equipped_weapon_icon.texture = null
 	else:
@@ -875,14 +875,14 @@ func update_equipped_weapon_display():
 			equipped_weapon_name.text = equipped.get("name", "Unknown")
 		
 		if equipped_weapon_damage:
-			equipped_weapon_damage.text = "Damage: " + str(equipped.get("damage", 0))
+			equipped_weapon_damage.text = "Damage -  ダメージ: " + str(equipped.get("damage", 0))
 		
 		if equipped_weapon_range:
-			equipped_weapon_range.text = "Range: " + str(equipped.get("attack_range", 0))
+			equipped_weapon_range.text = "Range - 範囲: " + str(equipped.get("attack_range", 0))
 		
 		if equipped_weapon_speed:
 			var speed = equipped.get("attack_speed", 1.0)
-			equipped_weapon_speed.text = "Speed: " + str(snapped(speed, 0.1))
+			equipped_weapon_speed.text = "Speed - スピード: " + str(snapped(speed, 0.1))
 		
 		# Load weapon icon
 		if equipped_weapon_icon:
@@ -963,9 +963,9 @@ func show_item_description(item: Dictionary):
 			var attack_speed = item_data.get("attack_speed", 1.0)
 			var attack_range = item_data.get("attack_range", 0)
 			
-			stats_text += "Damage: " + str(damage) + "\n"
-			stats_text += "Speed: " + str(snapped(attack_speed, 0.1)) + "\n"
-			stats_text += "Range: " + str(attack_range)
+			stats_text += "Damage - ダメージ: " + str(damage) + "\n"
+			stats_text += "Speed - スピード: " + str(snapped(attack_speed, 0.1)) + "\n"
+			stats_text += "Range - レンジ: " + str(attack_range)
 		
 		elif item_type.to_lower() == "consumable":
 			var effect = item_data.get("effect", "").replace("_", " ").capitalize()
