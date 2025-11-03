@@ -4,7 +4,7 @@ extends CanvasLayer
 @onready var quest_container: VBoxContainer = $Panel/MarginContainer/QuestContainer
 var quest_manager: Node = null
 
-@export var custom_font_path: String = "res://Fonts/PixeloidSans-nR3g1.ttf"  
+@export var custom_font_path: String = "res://Fonts/NotoSansJP-Regular.ttf"  
 @export var title_font_size: int = 24  # Quest title size
 @export var objective_font_size: int = 18  # Objective text size
 @export var no_quest_font_size: int = 20  # "No quests" message size
@@ -21,6 +21,8 @@ func _ready():
 		quest_manager.quest_updated.connect(_on_quest_updated)
 		quest_manager.quest_started.connect(_on_quest_started)
 		quest_manager.quest_completed.connect(_on_quest_completed)
+	if has_node("/root/LocalizationManager"):
+		LocalizationManager.language_changed.connect(_on_language_changed)
 	
 	refresh_quests()
 
@@ -75,9 +77,13 @@ func refresh_quests():
 		create_quest_display(quest_data)
 
 func create_quest_display(quest_data: Dictionary):
-	# Quest title
+	# Quest title - TRANSLATE IT
 	var title_label = Label.new()
-	title_label.text = quest_data.name
+	var quest_name = quest_data.name if "name" in quest_data else ""
+	# If it has a translation key, use that, otherwise use the name directly
+	if "name_key" in quest_data:
+		quest_name = LocalizationManager.t(quest_data.name_key)
+	title_label.text = quest_name
 	apply_font_to_label(title_label, title_font_size)
 	title_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
 	quest_container.add_child(title_label)
@@ -98,13 +104,18 @@ func create_quest_display(quest_data: Dictionary):
 		apply_font_to_label(status_label, objective_font_size)
 		objective_hbox.add_child(status_label)
 		
-		# Objective text with progress
+		# Objective text with progress - TRANSLATE IT
 		var obj_label = Label.new()
 		var progress_text = ""
 		if "required" in objective and objective.required > 1:
 			progress_text = " (%d/%d)" % [objective.current, objective.required]
 		
-		obj_label.text = objective.description + progress_text
+		# Translate objective description
+		var obj_desc = objective.description if "description" in objective else ""
+		if "desc_key" in objective:
+			obj_desc = LocalizationManager.t(objective.desc_key)
+		
+		obj_label.text = obj_desc + progress_text
 		apply_font_to_label(obj_label, objective_font_size)
 		
 		if objective.completed:
@@ -119,6 +130,9 @@ func create_quest_display(quest_data: Dictionary):
 	var spacer = Control.new()
 	spacer.custom_minimum_size = Vector2(0, 10)
 	quest_container.add_child(spacer)
-
+	
 func show_notification(message: String):
 	print("QUEST NOTIFICATION: ", message)
+	
+func _on_language_changed(_lang: String):
+	refresh_quests()

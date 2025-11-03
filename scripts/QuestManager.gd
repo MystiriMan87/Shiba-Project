@@ -1,4 +1,3 @@
-# QuestManager.gd
 extends Node
 
 signal quest_started(quest_id: String)
@@ -20,17 +19,13 @@ func load_quests_database():
 		"tutorial_quest": {
 			"id": "tutorial_quest",
 			"name": "Welcome to the Dungeon",
+			"name_key": "tutorial_quest_name",
 			"description": "Learn the basics of survival in the dungeon.",
+			"desc_key": "tutorial_quest_desc",
 			"objectives": [
-				#{
-					#"description": "Move around using WASD",
-					#"type": "custom",  # Will be manually completed
-					#"required": 1,
-					#"current": 0,
-					#"completed": false
-				#},
 				{
 					"description": "Attack an enemy",
+					"desc_key": "tutorial_quest_obj_0",
 					"type": "kill_enemy",
 					"target": "any",
 					"required": 1,
@@ -39,6 +34,7 @@ func load_quests_database():
 				},
 				{
 					"description": "Open a chest",
+					"desc_key": "tutorial_quest_obj_1",
 					"type": "open_chest",
 					"required": 1,
 					"current": 0,
@@ -56,10 +52,13 @@ func load_quests_database():
 		"retrieve_firegem": {
 			"id": "retrieve_firegem",
 			"name": "Sacred Fire Gem",
+			"name_key": "retrieve_firegem_name",
 			"description": "The dungeon contains a sacred relic called the firegem. The old wizard asks you to retrieve it. He hasn't mentioned its use...",
+			"desc_key": "retrieve_firegem_desc",
 			"objectives": [
 				{
 					"description": "Collect the Fire Gem",
+					"desc_key": "retrieve_firegem_obj_0",
 					"type": "collect_item",
 					"target": "fire_gem",
 					"required": 1,
@@ -78,10 +77,13 @@ func load_quests_database():
 		"slay_goblins": {
 			"id": "slay_goblins",
 			"name": "Goblin Slayer",
+			"name_key": "slay_goblins_name",
 			"description": "The Dark Elf messenger asked you to clear out the dungeon from goblins",
+			"desc_key": "slay_goblins_desc",
 			"objectives": [
 				{
 					"description": "Defeat 10 goblin enemies",
+					"desc_key": "slay_goblins_obj_0",
 					"type": "kill_enemy",
 					"target": "goblin_enemy",
 					"required": 10,
@@ -97,43 +99,16 @@ func load_quests_database():
 			"auto_accept": false
 		},
 		
-		#"collect_keys": {
-			#"id": "collect_keys",
-			#"name": "Key Collector",
-			#"description": "Find and collect keys scattered throughout the dungeon.",
-			#"objectives": [
-				#{
-					#"description": "Collect 3 wooden keys",
-					#"type": "collect_item",
-					#"target": "wooden_key",
-					#"required": 3,
-					#"current": 0,
-					#"completed": false
-				#},
-				#{
-					#"description": "Collect 1 iron key",
-					#"type": "collect_item",
-					#"target": "iron_key",
-					#"required": 1,
-					#"current": 0,
-					#"completed": false
-				#}
-			#],
-			#"rewards": {
-				#"gold": 75,
-				#"items": ["golden_key"],
-				#"experience": 150
-			#},
-			#"auto_accept": false
-		#},
-		
 		"treasure_hunter": {
 			"id": "treasure_hunter",
 			"name": "Treasure Hunter",
+			"name_key": "treasure_hunter_name",
 			"description": "Open treasure chests to find valuable loot.",
+			"desc_key": "treasure_hunter_desc",
 			"objectives": [
 				{
 					"description": "Open 1 chest(s)",
+					"desc_key": "treasure_hunter_obj_0",
 					"type": "open_chest",
 					"required": 1,
 					"current": 0,
@@ -146,37 +121,7 @@ func load_quests_database():
 				"experience": 200
 			},
 			"auto_accept": false
-		},
-		
-		#"merchant_delivery": {
-			#"id": "merchant_delivery",
-			#"name": "Merchant's Request",
-			#"description": "The merchant needs materials. Deliver them for a reward.",
-			#"objectives": [
-				#{
-					#"description": "Collect 10 iron ore",
-					#"type": "collect_item",
-					#"target": "iron_ore",
-					#"required": 10,
-					#"current": 0,
-					#"completed": false
-				#},
-				#{
-					#"description": "Return to the merchant",
-					#"type": "talk_to_npc",
-					#"target": "merchant",
-					#"required": 1,
-					#"current": 0,
-					#"completed": false
-				#}
-			#],
-			#"rewards": {
-				#"gold": 200,
-				#"items": ["steel_sword"],
-				#"experience": 300
-			#},
-			#"auto_accept": false
-		#}
+		}
 	}
 
 func start_quest(quest_id: String) -> bool:
@@ -193,8 +138,8 @@ func start_quest(quest_id: String) -> bool:
 		print("Quest not found: ", quest_id)
 		return false
 	
-	# Create a copy of the quest data
-	var quest_data = quests_database[quest_id].duplicate(true)
+	# Create a copy of the quest data with translations
+	var quest_data = get_localized_quest_data(quest_id)
 	active_quests[quest_id] = quest_data
 	
 	print("Quest started: ", quest_data.name)
@@ -348,14 +293,15 @@ func give_quest_rewards(rewards: Dictionary):
 		print("Rewarded ", rewards.experience, " experience")
 
 func get_active_quests() -> Dictionary:
-	return active_quests
+	"""Returns active quests with current language translations"""
+	var translated_quests = {}
+	for quest_id in active_quests:
+		translated_quests[quest_id] = get_localized_quest_data(quest_id)
+	return translated_quests
 
 func get_quest_data(quest_id: String) -> Dictionary:
-	if quest_id in active_quests:
-		return active_quests[quest_id]
-	elif quests_database.has(quest_id):
-		return quests_database[quest_id]
-	return {}
+	"""Returns quest data with translations for current language"""
+	return get_localized_quest_data(quest_id)
 
 func is_quest_active(quest_id: String) -> bool:
 	return quest_id in active_quests
@@ -387,3 +333,38 @@ func load_quests(save_data: Dictionary):
 		failed_quests = save_data.failed_quests
 	
 	quest_updated.emit()
+	
+func get_localized_quest_data(quest_id: String) -> Dictionary:
+	"""Returns a quest with translated name, description, and objectives"""
+	var quest = quests_database.get(quest_id, {})
+	if quest.is_empty():
+		return {}
+	
+	var localized = quest.duplicate(true)
+	
+	# Only translate if LocalizationManager exists
+	if not has_node("/root/LocalizationManager"):
+		return localized
+	
+	# Translate quest name
+	if "name_key" in quest:
+		var translated_name = LocalizationManager.t(quest.name_key)
+		# Only use translation if it's not the key itself (meaning translation exists)
+		if translated_name != quest.name_key:
+			localized.name = translated_name
+	
+	# Translate quest description
+	if "desc_key" in quest:
+		var translated_desc = LocalizationManager.t(quest.desc_key)
+		if translated_desc != quest.desc_key:
+			localized.description = translated_desc
+	
+	# Translate objectives
+	if "objectives" in localized:
+		for i in range(localized.objectives.size()):
+			if "desc_key" in quest.objectives[i]:
+				var translated_obj = LocalizationManager.t(quest.objectives[i].desc_key)
+				if translated_obj != quest.objectives[i].desc_key:
+					localized.objectives[i].description = translated_obj
+	
+	return localized

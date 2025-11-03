@@ -8,16 +8,54 @@ var active_container: VBoxContainer = null
 var completed_container: VBoxContainer = null
 var available_container: VBoxContainer = null
 
+@export var custom_font_path: String = "res://Fonts/NotoSansJP-Regular.ttf"
+var custom_font: Font = null
+
 func _ready():
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	add_to_group("quest_log_ui")
 	hide()
+	
+	# Load custom font first
+	load_custom_font()
 	
 	quest_manager = get_node_or_null("/root/QuestManager")
 	if not quest_manager:
 		print("ERROR: QuestManager not found!")
 	
 	find_containers()
+	
+	# Connect to language changes FIRST
+	if has_node("/root/LocalizationManager"):
+		LocalizationManager.language_changed.connect(_on_language_changed)
+	
+	# Then translate after connection is made
+	translate_tabs()
+
+func load_custom_font():
+	"""Load the custom font from the specified path"""
+	if FileAccess.file_exists(custom_font_path):
+		custom_font = load(custom_font_path)
+		print("Custom font loaded for QuestLog: ", custom_font_path)
+	else:
+		print("WARNING: Custom font not found at ", custom_font_path, " - using default font")
+
+func apply_font_to_label(label: Label, font_size: int):
+	"""Apply custom font and size to a label"""
+	if custom_font:
+		label.add_theme_font_override("font", custom_font)
+	label.add_theme_font_size_override("font_size", font_size)
+
+func apply_font_to_button(button: Button, font_size: int):
+	"""Apply custom font and size to a button"""
+	if custom_font:
+		button.add_theme_font_override("font", custom_font)
+	button.add_theme_font_size_override("font_size", font_size)
+
+func _on_language_changed(_lang: String):
+	translate_tabs()
+	if visible:
+		refresh_all_tabs()
 
 func find_containers():
 	var tabs = get_node_or_null("Panel/MarginContainer/TabContainer")
@@ -26,7 +64,6 @@ func find_containers():
 		return
 	
 	for tab_idx in tabs.get_tab_count():
-		var tab_name = tabs.get_tab_title(tab_idx)
 		var tab_control = tabs.get_tab_control(tab_idx)
 		
 		if tab_control:
@@ -34,16 +71,15 @@ func find_containers():
 			if scroll:
 				var vbox = scroll.get_node_or_null("VBoxContainer")
 				if vbox:
-					match tab_name:
-						"Active":
-							active_container = vbox
-							print("Found Active container")
-						"Completed":
-							completed_container = vbox
-							print("Found Completed container")
-						"Available":
-							available_container = vbox
-							print("Found Available container")
+					if tab_idx == 0:
+						active_container = vbox
+						print("Found Active container")
+					elif tab_idx == 1:
+						completed_container = vbox
+						print("Found Completed container")
+					elif tab_idx == 2:
+						available_container = vbox
+						print("Found Available container")
 
 func open_quest_log():
 	print("Opening quest log...")
@@ -61,7 +97,6 @@ func open_quest_log():
 	
 	refresh_all_tabs()
 
-
 func close_quest_log():
 	print("Closing quest log...")
 	hide()
@@ -69,11 +104,10 @@ func close_quest_log():
 	
 	var virtual_cursor = get_node_or_null("/root/VirtualCursor")
 	if virtual_cursor:
-		print("Locking ursor back to orbit... ")
+		print("Locking cursor back to orbit... ")
 		virtual_cursor.on_menu_closed()
 		print("Cursor orbit_around_player: ", virtual_cursor.orbit_around_player)
-		
-
+	
 	quest_log_closed.emit()
 
 func refresh_all_tabs():
@@ -98,8 +132,8 @@ func refresh_active_quests():
 	
 	if active_quests.is_empty():
 		var label = Label.new()
-		label.text = "No active quests"
-		label.add_theme_font_size_override("font_size", 16)
+		label.text = LocalizationManager.t("no_active_quests")
+		apply_font_to_label(label, 16)
 		active_container.add_child(label)
 		return
 	
@@ -119,14 +153,14 @@ func refresh_completed_quests():
 	
 	if completed_quests.is_empty():
 		var label = Label.new()
-		label.text = "No completed quests yet"
-		label.add_theme_font_size_override("font_size", 16)
+		label.text = LocalizationManager.t("no_completed_quests")
+		apply_font_to_label(label, 16)
 		completed_container.add_child(label)
 		return
 	
 	for quest_id in completed_quests:
 		var quest_data = quest_manager.get_quest_data(quest_id)
-		create_simple_quest_panel(quest_data, completed_container, "COMPLETED")
+		create_simple_quest_panel(quest_data, completed_container, LocalizationManager.t("quest_completed"))
 
 func refresh_available_quests():
 	if not available_container:
@@ -140,8 +174,8 @@ func refresh_available_quests():
 	
 	if available_quests.is_empty():
 		var label = Label.new()
-		label.text = "No available quests"
-		label.add_theme_font_size_override("font_size", 16)
+		label.text = LocalizationManager.t("no_available_quests")
+		apply_font_to_label(label, 16)
 		available_container.add_child(label)
 		return
 	
@@ -166,20 +200,20 @@ func create_detailed_quest_panel(quest_data: Dictionary, container: VBoxContaine
 	
 	var title = Label.new()
 	title.text = quest_data.name
-	title.add_theme_font_size_override("font_size", 20)
+	apply_font_to_label(title, 20)
 	title.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2))
 	content_vbox.add_child(title)
 	
 	var desc = Label.new()
 	desc.text = quest_data.description
-	desc.add_theme_font_size_override("font_size", 14)
+	apply_font_to_label(desc, 14)
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD
 	content_vbox.add_child(desc)
 	
 	if show_objectives:
 		var obj_header = Label.new()
-		obj_header.text = "\nObjectives:"
-		obj_header.add_theme_font_size_override("font_size", 16)
+		obj_header.text = "\n" + LocalizationManager.t("objectives")
+		apply_font_to_label(obj_header, 16)
 		content_vbox.add_child(obj_header)
 		
 		for objective in quest_data.objectives:
@@ -187,7 +221,7 @@ func create_detailed_quest_panel(quest_data: Dictionary, container: VBoxContaine
 			
 			var status = Label.new()
 			status.text = "✓ " if objective.completed else "○ "
-			status.add_theme_font_size_override("font_size", 14)
+			apply_font_to_label(status, 14)
 			status.add_theme_color_override("font_color", Color(0.2, 1.0, 0.2) if objective.completed else Color(0.8, 0.8, 0.8))
 			obj_hbox.add_child(status)
 			
@@ -196,33 +230,39 @@ func create_detailed_quest_panel(quest_data: Dictionary, container: VBoxContaine
 			if "required" in objective and objective.required > 1:
 				progress = " (%d/%d)" % [objective.current, objective.required]
 			obj_text.text = objective.description + progress
-			obj_text.add_theme_font_size_override("font_size", 14)
+			apply_font_to_label(obj_text, 14)
 			obj_hbox.add_child(obj_text)
 			
 			content_vbox.add_child(obj_hbox)
 	
 	if "rewards" in quest_data:
 		var rewards_label = Label.new()
-		rewards_label.text = "\nRewards:"
-		rewards_label.add_theme_font_size_override("font_size", 16)
+		rewards_label.text = "\n" + LocalizationManager.t("rewards")
+		apply_font_to_label(rewards_label, 16)
 		content_vbox.add_child(rewards_label)
 		
 		var rewards = quest_data.rewards
 		if "gold" in rewards:
 			var gold_label = Label.new()
-			gold_label.text = "  • %d Gold" % rewards.gold
+			gold_label.text = "  • %d " % rewards.gold + LocalizationManager.t("gold")
+			apply_font_to_label(gold_label, 14)
 			gold_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.0))
 			content_vbox.add_child(gold_label)
 		
 		if "items" in rewards:
 			for item_id in rewards.items:
 				var item_label = Label.new()
-				item_label.text = "  • " + item_id.capitalize()
+				var translated_item = LocalizationManager.t(item_id)
+				if translated_item == item_id:
+					translated_item = item_id.capitalize()
+				item_label.text = "  • " + translated_item
+				apply_font_to_label(item_label, 14)
 				content_vbox.add_child(item_label)
 		
 		if "experience" in rewards:
 			var xp_label = Label.new()
 			xp_label.text = "  • %d XP" % rewards.experience
+			apply_font_to_label(xp_label, 14)
 			content_vbox.add_child(xp_label)
 	
 	container.add_child(panel)
@@ -236,13 +276,13 @@ func create_simple_quest_panel(quest_data: Dictionary, container: VBoxContainer,
 	
 	var name_label = Label.new()
 	name_label.text = quest_data.name
-	name_label.add_theme_font_size_override("font_size", 16)
+	apply_font_to_label(name_label, 16)
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hbox.add_child(name_label)
 	
 	var status_label = Label.new()
 	status_label.text = status_text
-	status_label.add_theme_font_size_override("font_size", 14)
+	apply_font_to_label(status_label, 14)
 	status_label.add_theme_color_override("font_color", Color(0.2, 1.0, 0.2))
 	hbox.add_child(status_label)
 	
@@ -268,17 +308,18 @@ func create_quest_with_accept(quest_data: Dictionary, container: VBoxContainer):
 	
 	var title = Label.new()
 	title.text = quest_data.name
-	title.add_theme_font_size_override("font_size", 18)
+	apply_font_to_label(title, 18)
 	content_vbox.add_child(title)
 	
 	var desc = Label.new()
 	desc.text = quest_data.description
-	desc.add_theme_font_size_override("font_size", 14)
+	apply_font_to_label(desc, 14)
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD
 	content_vbox.add_child(desc)
 	
 	var accept_button = Button.new()
-	accept_button.text = "Accept Quest"
+	accept_button.text = LocalizationManager.t("accept_quest")
+	apply_font_to_button(accept_button, 14)
 	accept_button.custom_minimum_size = Vector2(120, 40)
 	accept_button.pressed.connect(_on_accept_quest.bind(quest_data.id))
 	hbox.add_child(accept_button)
@@ -314,3 +355,18 @@ func _input(event):
 	if event.is_action_pressed("open_quest_log"):
 		close_quest_log()
 		get_viewport().set_input_as_handled()
+		
+func translate_tabs():
+	var tabs = get_node_or_null("Panel/MarginContainer/TabContainer")
+	if not tabs:
+		print("ERROR: TabContainer not found for translation!")
+		return
+		
+	if tabs.get_tab_count() < 3:
+		print("ERROR: Not enough tabs found!")
+		return
+		
+	tabs.set_tab_title(0, LocalizationManager.t("quest_tab_active"))
+	tabs.set_tab_title(1, LocalizationManager.t("quest_tab_completed"))
+	tabs.set_tab_title(2, LocalizationManager.t("quest_tab_available"))
+	print("Tabs translated to: ", LocalizationManager.get_current_language())
