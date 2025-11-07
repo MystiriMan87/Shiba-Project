@@ -95,16 +95,29 @@ func connect_signals():
 	
 	if resolution_option:
 		resolution_option.item_selected.connect(_on_resolution_selected)
-		resolution_option.clear()
-		resolution_option.add_item("1920x1080")
-		resolution_option.add_item("1680x1050")
-		resolution_option.add_item("1600x900")
-		resolution_option.add_item("1366x768")
-		resolution_option.add_item("1280x720")
+		setup_resolution_options()
 	
 	if language_option:
 		language_option.item_selected.connect(_on_language_selected)
 		setup_language_options()
+
+func setup_resolution_options():
+	"""Populate resolution dropdown with all available resolutions"""
+	if not resolution_option:
+		return
+	
+	resolution_option.clear()
+	
+	# Get all available resolutions from SettingsManager
+	var resolutions = SettingsManager.get_available_resolutions()
+	
+	# Add each resolution with descriptive text
+	for i in range(resolutions.size()):
+		var res = resolutions[i]
+		var display_text = SettingsManager.get_resolution_string(res)
+		resolution_option.add_item(display_text, i)
+		# Store the actual Vector2i as metadata for easy retrieval
+		resolution_option.set_item_metadata(i, res)
 
 func setup_language_options():
 	if not language_option:
@@ -139,11 +152,13 @@ func load_current_settings():
 		var vsync_mode = SettingsManager.settings.video.get("vsync_mode", 1)
 		vsync_option.selected = vsync_mode
 	
+	# Load current resolution and select it in dropdown
 	if resolution_option:
 		var current_res = SettingsManager.settings.video.resolution
-		var res_string = str(current_res.x) + "x" + str(current_res.y)
+		# Find the matching resolution in the dropdown
 		for i in resolution_option.item_count:
-			if resolution_option.get_item_text(i) == res_string:
+			var res_metadata = resolution_option.get_item_metadata(i)
+			if res_metadata == current_res:
 				resolution_option.selected = i
 				break
 	
@@ -222,6 +237,13 @@ func update_ui_text():
 
 func _on_language_changed(new_lang: String):
 	update_ui_text()
+	# Refresh resolution options to update their display text
+	if resolution_option:
+		var current_selection = resolution_option.selected
+		setup_resolution_options()
+		# Restore selection after refresh
+		if current_selection >= 0 and current_selection < resolution_option.item_count:
+			resolution_option.selected = current_selection
 
 func _on_master_volume_changed(value: float):
 	var normalized_value = value / 100.0
@@ -248,12 +270,12 @@ func _on_vsync_selected(index: int):
 	SettingsManager.set_vsync_mode(index)
 
 func _on_resolution_selected(index: int):
+	"""Handle resolution selection using metadata"""
 	if resolution_option:
-		var res_string = resolution_option.get_item_text(index)
-		var parts = res_string.split("x")
-		if parts.size() == 2:
-			var resolution = Vector2i(int(parts[0]), int(parts[1]))
+		var resolution = resolution_option.get_item_metadata(index)
+		if resolution and resolution is Vector2i:
 			SettingsManager.set_resolution(resolution)
+			print("Resolution changed to: ", SettingsManager.get_resolution_string(resolution))
 
 func _on_language_selected(index: int):
 	if language_option:

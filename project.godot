@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Shiba project game"
 run/main_scene="uid://byg0qtj4d0dqv"
-config/features=PackedStringArray("4.4", "GL Compatibility")
+config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
@@ -29,13 +29,12 @@ LoadingScreen="*res://scenes/LoadingScreen.tscn"
 SettingsManager="*res://scripts/SettingsManager.gd"
 VirtualCursor="*res://scripts/VirtualCursor.gd"
 LocalizationManager="*res://scripts/LocalizationManager.gd"
+WindowFixer="res://WindowFixer.gd"
 
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
-window/size/mode=2
-window/stretch/mode="viewport"
 
 [editor_plugins]
 
@@ -171,3 +170,4 @@ open_quest_log={
 textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true

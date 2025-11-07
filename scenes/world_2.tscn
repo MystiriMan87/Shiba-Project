@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=4 uid="uid://7l5npwiefw66"]
+[gd_scene load_steps=35 format=4 uid="uid://7l5npwiefw66"]
 
 [ext_resource type="PackedScene" uid="uid://bmrnrfe6psbj2" path="res://quest_ui.tscn" id="1_hgrhv"]
 [ext_resource type="PackedScene" uid="uid://bkcsm36nf4kyd" path="res://dialogue_box.tscn" id="2_dr8ba"]
@@ -24,7 +24,6 @@
 [ext_resource type="PackedScene" uid="uid://cme4secwfuob2" path="res://torch.tscn" id="22_s8ivg"]
 [ext_resource type="Texture2D" uid="uid://tj1xrpvfbv3u" path="res://light.png" id="23_ab5jv"]
 [ext_resource type="PackedScene" uid="uid://dpctdss2lq6w3" path="res://ghost_enemy.tscn" id="24_rbd1q"]
-[ext_resource type="PackedScene" uid="uid://co1aha623au6i" path="res://mimic_enemy.tscn" id="25_3xk2h"]
 [ext_resource type="PackedScene" uid="uid://bq7bbdmxxgdbv" path="res://level_change_pedestal.tscn" id="26_gph3w"]
 [ext_resource type="PackedScene" uid="uid://dlsog5o45sqr6" path="res://scenes/PauseMenu.tscn" id="27_0airf"]
 
@@ -536,22 +535,9 @@ wander_radius = 100.0
 position = Vector2(-248, -1254)
 wander_radius = 100.0
 
-[node name="Goblin_enemy2" parent="." instance=ExtResource("12_co50f")]
-position = Vector2(1262, -172)
-wander_radius = 100.0
-
-[node name="Goblin_enemy5" parent="." instance=ExtResource("12_co50f")]
-position = Vector2(201, -958)
-scale = Vector2(5, 5)
-wander_radius = 100.0
-
 [node name="Goblin_enemy6" parent="." instance=ExtResource("12_co50f")]
 position = Vector2(204, -809)
 scale = Vector2(5, 5)
-wander_radius = 100.0
-
-[node name="Goblin_enemy3" parent="." instance=ExtResource("12_co50f")]
-position = Vector2(1274, 84)
 wander_radius = 100.0
 
 [node name="Goblin_enemy4" parent="." instance=ExtResource("12_co50f")]
@@ -624,34 +610,6 @@ scale = Vector2(3, 3)
 position = Vector2(-224, 96)
 scale = Vector2(3, 3)
 
-[node name="SpikeTrap21" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-160, -160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap22" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-96, -160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap23" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-32, -160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap24" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(32, -160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap25" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(96, -160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap26" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(160, -160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap27" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(224, -160)
-scale = Vector2(3, 3)
-
 [node name="SpikeTrap28" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
 position = Vector2(224, -96)
 scale = Vector2(3, 3)
@@ -682,26 +640,6 @@ scale = Vector2(3, 3)
 
 [node name="SpikeTrap35" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
 position = Vector2(-224, -96)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap36" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-224, -160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap37" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(352, -160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap38" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(416, -160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap39" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(480, -160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap40" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(544, -160)
 scale = Vector2(3, 3)
 
 [node name="SpikeTrap41" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
@@ -760,40 +698,12 @@ scale = Vector2(3, 3)
 position = Vector2(288, -32)
 scale = Vector2(3, 3)
 
-[node name="SpikeTrap52" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(288, -160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap60" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(224, -224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap75" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(352, -224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap76" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(416, -224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap91" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(480, -224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap92" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(544, -224)
-scale = Vector2(3, 3)
-
 [node name="SpikeTrap93" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
 position = Vector2(608, -224)
 scale = Vector2(3, 3)
 
 [node name="SpikeTrap94" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
 position = Vector2(672, -224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap95" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(288, -224)
 scale = Vector2(3, 3)
 
 [node name="SpikeTrap54" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
@@ -868,156 +778,12 @@ scale = Vector2(3, 3)
 position = Vector2(288, 160)
 scale = Vector2(3, 3)
 
-[node name="SpikeTrap85" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(352, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap86" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(416, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap87" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(480, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap88" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(544, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap89" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(608, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap90" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(672, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap100" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(288, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap101" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-160, 224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap102" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-96, 224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap103" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-32, 224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap104" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(32, 224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap105" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(96, 224)
-scale = Vector2(3, 3)
-
 [node name="SpikeTrap106" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
 position = Vector2(160, 224)
 scale = Vector2(3, 3)
 
 [node name="SpikeTrap107" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
 position = Vector2(224, 224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap108" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(224, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap109" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(160, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap110" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(96, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap111" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(32, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap112" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-32, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap113" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-96, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap114" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-160, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap115" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-224, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap116" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-224, 224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap117" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-672, 224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap118" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-608, 224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap119" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-544, 224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap120" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-480, 224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap121" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-416, 224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap122" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-352, 224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap123" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-288, 224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap124" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-288, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap125" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-352, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap126" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-416, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap127" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-480, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap128" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-544, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap129" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-608, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap130" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-672, 288)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap135" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-544, 96)
 scale = Vector2(3, 3)
 
 [node name="SpikeTrap136" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
@@ -1052,22 +818,6 @@ scale = Vector2(3, 3)
 position = Vector2(-480, 160)
 scale = Vector2(3, 3)
 
-[node name="SpikeTrap144" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-544, 160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap145" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-608, 160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap146" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-672, 160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap151" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-544, -32)
-scale = Vector2(3, 3)
-
 [node name="SpikeTrap152" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
 position = Vector2(-480, -32)
 scale = Vector2(3, 3)
@@ -1100,74 +850,6 @@ scale = Vector2(3, 3)
 position = Vector2(-480, 32)
 scale = Vector2(3, 3)
 
-[node name="SpikeTrap165" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-672, -160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap166" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-608, -160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap167" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-544, -160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap168" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-480, -160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap169" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-416, -160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap170" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-352, -160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap171" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-288, -160)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap43" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-160, -224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap44" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(160, -224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap59" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-224, -224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap179" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-672, -224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap180" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-608, -224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap181" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-544, -224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap182" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-480, -224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap190" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-416, -224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap191" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-352, -224)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap192" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-288, -224)
-scale = Vector2(3, 3)
-
 [node name="SpikeTrap193" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
 position = Vector2(-252, -1046)
 
@@ -1190,35 +872,12 @@ scale = Vector2(3, 3)
 position = Vector2(-480, -96)
 scale = Vector2(3, 3)
 
-[node name="SpikeTrap176" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-544, -96)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap177" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-608, -96)
-scale = Vector2(3, 3)
-
-[node name="SpikeTrap178" parent="SpikeTraps" instance=ExtResource("11_a2svu")]
-position = Vector2(-672, -96)
-scale = Vector2(3, 3)
-
 [node name="CanvasModulate" parent="." instance=ExtResource("13_a2svu")]
+visible = false
 color = Color(0.270222, 0.270222, 0.270222, 1)
 
 [node name="Area2D" parent="." instance=ExtResource("16_gph3w")]
 position = Vector2(672, -32)
-
-[node name="darkElf_enemy" parent="." instance=ExtResource("17_rg7ok")]
-position = Vector2(1122, -35)
-scale = Vector2(3, 3)
-max_health = 8
-speed = 150
-
-[node name="darkElf_enemy2" parent="." instance=ExtResource("17_rg7ok")]
-position = Vector2(1999, -941)
-scale = Vector2(3, 3)
-max_health = 8
-speed = 150
 
 [node name="darkElf_enemy6" parent="." instance=ExtResource("17_rg7ok")]
 position = Vector2(2098, -829)
@@ -1226,20 +885,8 @@ scale = Vector2(3, 3)
 max_health = 8
 speed = 150
 
-[node name="darkElf_enemy7" parent="." instance=ExtResource("17_rg7ok")]
-position = Vector2(1976, -796)
-scale = Vector2(3, 3)
-max_health = 8
-speed = 150
-
 [node name="darkElf_enemy3" parent="." instance=ExtResource("17_rg7ok")]
 position = Vector2(1903, -974)
-scale = Vector2(3, 3)
-max_health = 8
-speed = 150
-
-[node name="darkElf_enemy4" parent="." instance=ExtResource("17_rg7ok")]
-position = Vector2(1909, -900)
 scale = Vector2(3, 3)
 max_health = 8
 speed = 150
@@ -1269,19 +916,20 @@ npc_name = "Bob"
 dialogue_audio_path = "res://audio/mamie_gibberish_2-95772.mp3"
 
 [node name="Brazier" parent="." instance=ExtResource("19_f53ia")]
-position = Vector2(1040, -1049)
+position = Vector2(1116, -1048)
 scale = Vector2(4, 4)
 
 [node name="Brazier2" parent="." instance=ExtResource("19_f53ia")]
-position = Vector2(1184, -1049)
+visible = false
+position = Vector2(1045, -1052)
 scale = Vector2(4, 4)
 
 [node name="Brazier3" parent="." instance=ExtResource("19_f53ia")]
-position = Vector2(1042, -185)
+position = Vector2(1189, -183)
 scale = Vector2(4, 4)
 
 [node name="Brazier4" parent="." instance=ExtResource("20_7uo55")]
-position = Vector2(1188, -184)
+position = Vector2(1041, -185)
 scale = Vector2(4, 4)
 
 [node name="Chest" parent="." instance=ExtResource("21_7uo55")]
@@ -1293,6 +941,7 @@ position = Vector2(-76, -831)
 scale = Vector2(3, 3)
 
 [node name="PointLight2D2" type="PointLight2D" parent="Torch"]
+visible = false
 position = Vector2(0, -1.66669)
 scale = Vector2(0.333333, 0.333333)
 color = Color(0.95526, 0.40126, 1.15514e-06, 1)
@@ -1303,6 +952,7 @@ position = Vector2(1039, -1827)
 scale = Vector2(3, 3)
 
 [node name="PointLight2D2" type="PointLight2D" parent="Torch2"]
+visible = false
 position = Vector2(0, -1.66669)
 scale = Vector2(0.333333, 0.333333)
 color = Color(0.95526, 0.40126, 1.15514e-06, 1)
@@ -1313,6 +963,7 @@ position = Vector2(-243, -1762)
 scale = Vector2(3, 3)
 
 [node name="PointLight2D2" type="PointLight2D" parent="Torch5"]
+visible = false
 position = Vector2(0, -1.66669)
 scale = Vector2(0.333333, 0.333333)
 color = Color(0.95526, 0.40126, 1.15514e-06, 1)
@@ -1323,6 +974,7 @@ position = Vector2(1263, -1833)
 scale = Vector2(3, 3)
 
 [node name="PointLight2D2" type="PointLight2D" parent="Torch3"]
+visible = false
 position = Vector2(0, -1.66669)
 scale = Vector2(0.333333, 0.333333)
 color = Color(0.95526, 0.40126, 1.15514e-06, 1)
@@ -1333,6 +985,7 @@ position = Vector2(2046, -1769)
 scale = Vector2(3, 3)
 
 [node name="PointLight2D2" type="PointLight2D" parent="Torch6"]
+visible = false
 position = Vector2(0, -1.66669)
 scale = Vector2(0.333333, 0.333333)
 color = Color(0.95526, 0.40126, 1.15514e-06, 1)
@@ -1343,6 +996,7 @@ position = Vector2(-102, -326)
 scale = Vector2(3, 3)
 
 [node name="PointLight2D2" type="PointLight2D" parent="Torch7"]
+visible = false
 position = Vector2(0, -1.66669)
 scale = Vector2(0.333333, 0.333333)
 color = Color(0.95526, 0.40126, 1.15514e-06, 1)
@@ -1353,6 +1007,7 @@ position = Vector2(97, -328)
 scale = Vector2(3, 3)
 
 [node name="PointLight2D2" type="PointLight2D" parent="Torch8"]
+visible = false
 position = Vector2(0, -1.66669)
 scale = Vector2(0.333333, 0.333333)
 color = Color(0.95526, 0.40126, 1.15514e-06, 1)
@@ -1363,6 +1018,7 @@ position = Vector2(2133, -1043)
 scale = Vector2(3, 3)
 
 [node name="PointLight2D2" type="PointLight2D" parent="Torch4"]
+visible = false
 position = Vector2(0, -1.66669)
 scale = Vector2(0.333333, 0.333333)
 color = Color(0.95526, 0.40126, 1.15514e-06, 1)
@@ -1373,6 +1029,7 @@ position = Vector2(933, -3348)
 scale = Vector2(3, 3)
 
 [node name="PointLight2D2" type="PointLight2D" parent="Torch9"]
+visible = false
 position = Vector2(0, -1.66669)
 scale = Vector2(0.333333, 0.333333)
 color = Color(0.95526, 0.40126, 1.15514e-06, 1)
@@ -1383,6 +1040,7 @@ position = Vector2(1367, -3348)
 scale = Vector2(3, 3)
 
 [node name="PointLight2D2" type="PointLight2D" parent="Torch10"]
+visible = false
 position = Vector2(0, -1.66669)
 scale = Vector2(0.333333, 0.333333)
 color = Color(0.95526, 0.40126, 1.15514e-06, 1)
@@ -1409,51 +1067,10 @@ max_health = 25
 detection_range = 200
 
 [node name="ghost_enemy5" parent="." instance=ExtResource("24_rbd1q")]
-position = Vector2(1143, -2493)
+position = Vector2(1143, -2477)
 scale = Vector2(3.5, 3.5)
 max_health = 25
 detection_range = 200
-
-[node name="ghost_enemy6" parent="." instance=ExtResource("24_rbd1q")]
-position = Vector2(1499, -2495)
-scale = Vector2(3.5, 3.5)
-max_health = 25
-detection_range = 200
-
-[node name="ghost_enemy7" parent="." instance=ExtResource("24_rbd1q")]
-position = Vector2(753, -2493)
-scale = Vector2(3.5, 3.5)
-max_health = 25
-detection_range = 200
-
-[node name="ghost_enemy8" parent="." instance=ExtResource("24_rbd1q")]
-position = Vector2(752, -2311)
-scale = Vector2(3.5, 3.5)
-max_health = 25
-detection_range = 200
-
-[node name="ghost_enemy9" parent="." instance=ExtResource("24_rbd1q")]
-position = Vector2(1534, -2307)
-scale = Vector2(3.5, 3.5)
-max_health = 25
-detection_range = 200
-
-[node name="ghost_enemy3" parent="." instance=ExtResource("24_rbd1q")]
-position = Vector2(1361, -2309)
-scale = Vector2(3.5, 3.5)
-max_health = 25
-detection_range = 200
-
-[node name="ghost_enemy4" parent="." instance=ExtResource("24_rbd1q")]
-position = Vector2(940, -2312)
-scale = Vector2(3.5, 3.5)
-max_health = 25
-detection_range = 200
-
-[node name="mimic_enemy" parent="." instance=ExtResource("25_3xk2h")]
-position = Vector2(-675, 26)
-scale = Vector2(4, 4)
-loot_items = Array[String](["health_potion", "coin", "coin", "scythe"])
 
 [node name="Level_Change_Pedestal" parent="." instance=ExtResource("26_gph3w")]
 position = Vector2(1152, -3250)

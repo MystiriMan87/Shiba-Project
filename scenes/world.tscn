@@ -6069,6 +6069,7 @@ visibility_layer = 1023
 texture_filter = 1
 
 [node name="PointLight2D" type="PointLight2D" parent="PointLight"]
+visible = false
 z_index = 1
 position = Vector2(1410, 543)
 color = Color(0.677152, 0.250678, 0, 1)
@@ -6076,6 +6077,7 @@ energy = 2.0
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D2" type="PointLight2D" parent="PointLight"]
+visible = false
 z_index = 1
 position = Vector2(614, 471)
 color = Color(0.677152, 0.250678, 0, 1)
@@ -6083,6 +6085,7 @@ energy = 2.0
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D3" type="PointLight2D" parent="PointLight"]
+visible = false
 z_index = 1
 position = Vector2(256, 1265)
 color = Color(0.677152, 0.250678, 0, 1)
@@ -6090,6 +6093,7 @@ energy = 2.0
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D4" type="PointLight2D" parent="PointLight"]
+visible = false
 z_index = 1
 position = Vector2(760, 1269)
 color = Color(0.677152, 0.250678, 0, 1)
@@ -6097,6 +6101,7 @@ energy = 2.0
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D5" type="PointLight2D" parent="PointLight"]
+visible = false
 z_index = 1
 position = Vector2(-535, 1122)
 color = Color(0.677152, 0.250678, 0, 1)
@@ -6104,6 +6109,7 @@ energy = 2.0
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D6" type="PointLight2D" parent="PointLight"]
+visible = false
 z_index = 1
 position = Vector2(37, 1987)
 color = Color(0.677152, 0.250678, 0, 1)
@@ -6111,6 +6117,7 @@ energy = 2.0
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D7" type="PointLight2D" parent="PointLight"]
+visible = false
 z_index = 1
 position = Vector2(976, 1983)
 color = Color(0.677152, 0.250678, 0, 1)
@@ -6118,6 +6125,7 @@ energy = 2.0
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D8" type="PointLight2D" parent="PointLight"]
+visible = false
 z_index = 1
 position = Vector2(897, 2222)
 color = Color(0.677152, 0.250678, 0, 1)
@@ -6125,6 +6133,7 @@ energy = 2.0
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D9" type="PointLight2D" parent="PointLight"]
+visible = false
 z_index = 1
 position = Vector2(252, 2292)
 color = Color(0.677152, 0.250678, 0, 1)
@@ -6132,6 +6141,7 @@ energy = 2.0
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D10" type="PointLight2D" parent="PointLight"]
+visible = false
 z_index = 1
 position = Vector2(395, 3062)
 color = Color(0.677152, 0.250678, 0, 1)
@@ -6139,6 +6149,7 @@ energy = 2.0
 texture = ExtResource("12_q5onr")
 
 [node name="PointLight2D11" type="PointLight2D" parent="PointLight"]
+visible = false
 z_index = 1
 position = Vector2(617, 3061)
 color = Color(0.677152, 0.250678, 0, 1)
@@ -6226,6 +6237,7 @@ input_pickable = true
 loot_items = Array[String](["health_potion", "steel_hammer", "coin", "coin"])
 
 [node name="CanvasModulate" parent="." instance=ExtResource("17_4kbfs")]
+visible = false
 position = Vector2(62, 52)
 
 [node name="Torch" parent="." instance=ExtResource("13_jhx03")]
@@ -6316,18 +6328,6 @@ position = Vector2(-313, 1592)
 [node name="SkeletonEnemyV3" parent="Enemies" instance=ExtResource("10_w7kh3")]
 position = Vector2(506, 1495)
 
-[node name="SkeletonEnemyV6" parent="Enemies" instance=ExtResource("10_w7kh3")]
-position = Vector2(654, 2522)
-
-[node name="SkeletonEnemyV7" parent="Enemies" instance=ExtResource("10_w7kh3")]
-position = Vector2(107, 2640)
-
-[node name="SkeletonEnemyV8" parent="Enemies" instance=ExtResource("10_w7kh3")]
-position = Vector2(-106, 2177)
-
-[node name="SkeletonEnemyV9" parent="Enemies" instance=ExtResource("10_w7kh3")]
-position = Vector2(1082, 2196)
-
 [node name="Goblin_enemy" parent="Enemies" instance=ExtResource("4_rup4s")]
 position = Vector2(108, 2271)
 wander_radius = 100.0
@@ -6338,14 +6338,6 @@ wander_radius = 100.0
 
 [node name="Goblin_enemy3" parent="Enemies" instance=ExtResource("4_rup4s")]
 position = Vector2(420, 2621)
-wander_radius = 100.0
-
-[node name="Goblin_enemy4" parent="Enemies" instance=ExtResource("4_rup4s")]
-position = Vector2(919, 2445)
-wander_radius = 100.0
-
-[node name="Goblin_enemy5" parent="Enemies" instance=ExtResource("4_rup4s")]
-position = Vector2(977, 2271)
 wander_radius = 100.0
 
 [node name="Goblin_enemy6" parent="Enemies" instance=ExtResource("4_rup4s")]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=4 uid="uid://cg55iyfat0xtl"]
+[gd_scene load_steps=33 format=4 uid="uid://cg55iyfat0xtl"]
 
 [ext_resource type="Script" uid="uid://c8dew88u6ily3" path="res://world_3.gd" id="1_25pf3"]
 [ext_resource type="PackedScene" uid="uid://ny2bd86mtevm" path="res://player_camera.tscn" id="2_ca0go"]
@@ -16,9 +16,6 @@
 [ext_resource type="PackedScene" uid="uid://co1aha623au6i" path="res://mimic_enemy.tscn" id="14_0y0n7"]
 [ext_resource type="PackedScene" uid="uid://bukx3e2x3wdgr" path="res://canvas_modulate.tscn" id="15_k1ce2"]
 [ext_resource type="Texture2D" uid="uid://tj1xrpvfbv3u" path="res://light.png" id="16_28be5"]
-[ext_resource type="PackedScene" uid="uid://0soyg5pq7u3d" path="res://mysterious_NPC.tscn" id="17_4g73v"]
-[ext_resource type="Script" uid="uid://cwr05foje27n4" path="res://mysterious_npc.gd" id="18_a5d4e"]
-[ext_resource type="PackedScene" uid="uid://be8kk06nbgra5" path="res://skeleton_NPC.tscn" id="19_vfvtr"]
 [ext_resource type="PackedScene" uid="uid://bq7bbdmxxgdbv" path="res://level_change_pedestal.tscn" id="20_3ub13"]
 [ext_resource type="PackedScene" uid="uid://dlsog5o45sqr6" path="res://scenes/PauseMenu.tscn" id="20_25pf3"]
 [ext_resource type="PackedScene" uid="uid://dspx1svbrq84n" path="res://scenes/SpikeTrap_alter.tscn" id="21_ca0go"]
@@ -1565,51 +1562,44 @@ position = Vector2(2806, 1942)
 scale = Vector2(4, 4)
 
 [node name="CanvasModulate" parent="." instance=ExtResource("15_k1ce2")]
+visible = false
 
 [node name="PointLights_Blue" type="Node" parent="."]
 
 [node name="PointLight2D" type="PointLight2D" parent="PointLights_Blue"]
+visible = false
 position = Vector2(-254, 2200)
 color = Color(0.099287, 0.56585, 0.903192, 1)
 energy = 2.0
 texture = ExtResource("16_28be5")
 
 [node name="PointLight2D2" type="PointLight2D" parent="PointLights_Blue"]
+visible = false
 position = Vector2(-252, 3064)
 color = Color(0.099287, 0.56585, 0.903192, 1)
 energy = 2.0
 texture = ExtResource("16_28be5")
 
 [node name="PointLight2D3" type="PointLight2D" parent="PointLights_Blue"]
+visible = false
 position = Vector2(-755, 3062)
 color = Color(0.099287, 0.56585, 0.903192, 1)
 energy = 2.0
 texture = ExtResource("16_28be5")
 
 [node name="PointLight2D4" type="PointLight2D" parent="PointLights_Blue"]
+visible = false
 position = Vector2(-469, 3640)
 color = Color(0.099287, 0.56585, 0.903192, 1)
 energy = 2.0
 texture = ExtResource("16_28be5")
 
 [node name="PointLight2D5" type="PointLight2D" parent="PointLights_Blue"]
+visible = false
 position = Vector2(248, 3420)
 color = Color(0.099287, 0.56585, 0.903192, 1)
 energy = 2.0
 texture = ExtResource("16_28be5")
-
-[node name="MysteriousNPC" parent="." instance=ExtResource("17_4g73v")]
-visible = false
-position = Vector2(-2793, 3296)
-scale = Vector2(1.5, 1.5)
-script = ExtResource("18_a5d4e")
-dialogue_id = "mysterious_npc"
-interaction_range = 60.0
-
-[node name="SkeletonNPC" parent="." instance=ExtResource("19_vfvtr")]
-visible = false
-position = Vector2(2841, 2544)
-scale = Vector2(1.5, 1.5)
 
 [node name="Level_Change_Pedestal" parent="." instance=ExtResource("20_3ub13")]
 visible = false
@@ -1641,70 +1631,68 @@ position = Vector2(1185, 2551)
 [node name="PointLights_White" type="Node" parent="."]
 
 [node name="PointLight2D" type="PointLight2D" parent="PointLights_White"]
+visible = false
 position = Vector2(-399, 1191)
 color = Color(0.912254, 0.167559, 1.92523e-07, 1)
 energy = 1.48
 texture = ExtResource("16_28be5")
 
 [node name="PointLight2D2" type="PointLight2D" parent="PointLights_White"]
+visible = false
 position = Vector2(390, 1190)
 color = Color(0.912254, 0.167559, 1.92523e-07, 1)
 energy = 1.48
 texture = ExtResource("16_28be5")
 
 [node name="PointLight2D3" type="PointLight2D" parent="PointLights_White"]
+visible = false
 position = Vector2(899, 1912)
 color = Color(0.912254, 0.167559, 1.92523e-07, 1)
 energy = 1.48
 texture = ExtResource("16_28be5")
 
 [node name="PointLight2D6" type="PointLight2D" parent="PointLights_White"]
+visible = false
 position = Vector2(-757, 1550)
 color = Color(0.912254, 0.167559, 1.92523e-07, 1)
 energy = 1.48
 texture = ExtResource("16_28be5")
 
 [node name="PointLight2D7" type="PointLight2D" parent="PointLights_White"]
+visible = false
 position = Vector2(-832, 902)
 color = Color(0.912254, 0.167559, 1.92523e-07, 1)
 energy = 1.48
 texture = ExtResource("16_28be5")
 
 [node name="PointLight2D8" type="PointLight2D" parent="PointLights_White"]
+visible = false
 position = Vector2(-4, 285)
 scale = Vector2(1.63867, 1.58008)
 energy = 1.48
 texture = ExtResource("16_28be5")
 
 [node name="PointLight2D4" type="PointLight2D" parent="PointLights_White"]
+visible = false
 position = Vector2(970, 2780)
 color = Color(1, 0.285932, 0.162754, 1)
 energy = 2.54
 texture = ExtResource("16_28be5")
 
 [node name="PointLight2D5" type="PointLight2D" parent="PointLights_White"]
+visible = false
 position = Vector2(1476, 2780)
 color = Color(1, 0.265608, 0.137334, 1)
 energy = 2.97
 texture = ExtResource("16_28be5")
 
 [node name="PointLight2D9" type="PointLight2D" parent="PointLights_White"]
+visible = false
 position = Vector2(456, 4790)
 scale = Vector2(2.28027, 2.24121)
 texture = ExtResource("16_28be5")
 
 [node name="Enemies" type="Node" parent="."]
-
-[node name="SkeletonEnemyV2" parent="Enemies" instance=ExtResource("23_h0hyi")]
-position = Vector2(-938, 1745)
-scale = Vector2(4, 4)
-wander_radius = 10.0
-
-[node name="SkeletonEnemyV3" parent="Enemies" instance=ExtResource("23_h0hyi")]
-position = Vector2(-638, 1684)
-scale = Vector2(4, 4)
-max_health = 10
-wander_radius = 10.0
 
 [node name="SkeletonEnemyV4" parent="Enemies" instance=ExtResource("23_h0hyi")]
 position = Vector2(-774, 1755)
@@ -1714,14 +1702,6 @@ wander_radius = 10.0
 
 [node name="Enemy" parent="Enemies" instance=ExtResource("24_bgf5n")]
 position = Vector2(-1007, 1091)
-max_health = 6
-
-[node name="Enemy2" parent="Enemies" instance=ExtResource("24_bgf5n")]
-position = Vector2(-827, 1087)
-max_health = 6
-
-[node name="Enemy3" parent="Enemies" instance=ExtResource("24_bgf5n")]
-position = Vector2(-641, 1050)
 max_health = 6
 
 [node name="Goblin_enemy" parent="Enemies" instance=ExtResource("25_mmbe8")]
@@ -1734,16 +1714,6 @@ position = Vector2(-332, 2342)
 scale = Vector2(4, 4)
 wander_radius = 100.0
 
-[node name="Goblin_enemy3" parent="Enemies" instance=ExtResource("25_mmbe8")]
-position = Vector2(-200, 2405)
-scale = Vector2(4, 4)
-wander_radius = 100.0
-
-[node name="Goblin_enemy4" parent="Enemies" instance=ExtResource("25_mmbe8")]
-position = Vector2(-98, 2339)
-scale = Vector2(4, 4)
-wander_radius = 100.0
-
 [node name="goblinRogue_enemy" parent="Enemies" instance=ExtResource("26_isq8n")]
 position = Vector2(-803, 3239)
 scale = Vector2(4, 4)
@@ -1752,18 +1722,6 @@ wander_radius = 10.0
 
 [node name="goblinRogue_enemy2" parent="Enemies" instance=ExtResource("26_isq8n")]
 position = Vector2(-570, 3215)
-scale = Vector2(4, 4)
-max_health = 7
-wander_radius = 10.0
-
-[node name="goblinRogue_enemy3" parent="Enemies" instance=ExtResource("26_isq8n")]
-position = Vector2(-382, 3258)
-scale = Vector2(4, 4)
-max_health = 7
-wander_radius = 10.0
-
-[node name="goblinRogue_enemy4" parent="Enemies" instance=ExtResource("26_isq8n")]
-position = Vector2(-230, 3209)
 scale = Vector2(4, 4)
 max_health = 7
 wander_radius = 10.0

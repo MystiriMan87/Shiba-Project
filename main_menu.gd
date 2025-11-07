@@ -7,6 +7,9 @@ extends Control
 var button_original_positions: Dictionary = {}
 
 func _ready():
+	#get_tree().root.size = Vector2i(1920, 1080)
+	#get_tree().root.content_scale_size = Vector2i(1920, 1080)
+	#DisplayServer.window_set_size(Vector2i(1920, 1080))
 	setup_button_animations()
 	update_ui_text()
 	

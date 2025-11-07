@@ -66,18 +66,18 @@ func spawn_pickup_item(item_id: String, position: Vector2, quantity: int = 1):
 	add_child(pickup)
 	print("Spawned ", item_id, " x", quantity, " at ", position)
 
-func _on_enemy_died(enemy_position: Vector2):
-	# Random chance to drop an item
-	if randf() < 0.3:  # 30% drop rate
-		var possible_items = ["health_potion", "magic_crystal", "iron_sword"]
-		var random_item = possible_items[randi() % possible_items.size()]
-		var random_quantity = 1
-		
-		# Sometimes drop more consumables
-		if random_item in ["health_potion", "magic_crystal"]:
-			random_quantity = randi_range(1, 3)
-		
-		spawn_pickup_item(random_item, enemy_position, random_quantity)
+#func _on_enemy_died(enemy_position: Vector2):
+	## Random chance to drop an item
+	#if randf() < 0.3:  # 30% drop rate
+		#var possible_items = ["health_potion", "magic_crystal", "iron_sword"]
+		#var random_item = possible_items[randi() % possible_items.size()]
+		#var random_quantity = 1
+		#
+		## Sometimes drop more consumables
+		#if random_item in ["health_potion", "magic_crystal"]:
+			#random_quantity = randi_range(1, 3)
+		#
+		#spawn_pickup_item(random_item, enemy_position, random_quantity)
 
 func _input(event):
 	if event is InputEventKey and event.pressed:

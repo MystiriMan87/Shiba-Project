@@ -985,273 +985,304 @@ script = ExtResource("1_gqhal")
 background_music_path = "res://audio/flute-rain-flute-loop-ambient-short-loop-340800.mp3"
 background_music_volume = -20.0
 
-[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
-layer = 1
-visible = false
-scroll_offset = Vector2(5, 5)
-scroll_base_offset = Vector2(5, 5)
-scroll_limit_begin = Vector2(1, 1)
-scroll_limit_end = Vector2(5, 5)
-
-[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
-motion_offset = Vector2(5, 5)
-motion_mirroring = Vector2(1, 1)
-
-[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/ParallaxLayer"]
-position = Vector2(448, -464)
-scale = Vector2(4, 4)
-texture = ExtResource("2_7f5op")
-region_enabled = true
-region_rect = Rect2(0, 0, 16, 16)
-
 [node name="Water" type="Node" parent="."]
 
 [node name="WaterRipples" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-133, 194)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples22" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(843, 403)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples23" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(1158, 294)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples24" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(1121, 497)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples25" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(1282, -9.99997)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples26" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(1516, -228)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples27" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(1469, 191)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples28" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(1290, -377)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples29" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(1399, -617)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples30" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(1278, -960)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples37" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(1472, -1200)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples38" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(1264, -1281)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples40" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(1371, -1580)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples41" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(848, -1749)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples42" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(761, -1557)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples43" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(363, -1555)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples44" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(521, -1952)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples45" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(132, -1360)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples46" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-134, -1102)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples47" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(171, -1109)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples48" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-315, -887)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples49" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-1434, -63.0001)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples50" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-912, 482)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples39" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(523, -1360)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples31" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(998, -660)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples32" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(448, -1009)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples33" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(130, -832)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples34" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(522, -790)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples35" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-125, -36)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples2" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-685, 245)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples3" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-354, 377)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples36" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-379, 225)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples4" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-1153, 264)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples5" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-1030, -98)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples6" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-1175, -395)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples7" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-1081, -699)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples8" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-717, -894)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples9" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-939, -893)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples10" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-426, -588)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples11" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-185, -487)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples12" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-273, -240)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples13" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-284, -375)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples14" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-73, 535)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples15" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(-67, -628)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples16" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(280, -635)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples17" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(517, -629)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples18" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(77.0001, 294)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples19" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(214, 417)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples20" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(322, 303)
 scale = Vector2(5, 5)
 
 [node name="WaterRipples21" parent="Water" instance=ExtResource("20_a07od")]
+visible = false
 z_index = 6
 position = Vector2(574, 369)
 scale = Vector2(5, 5)
@@ -1394,6 +1425,7 @@ texture = ExtResource("27_3ggi2")
 texture_scale = 10.03
 
 [node name="CanvasModulate" parent="." instance=ExtResource("28_8metk")]
+visible = false
 color = Color(0.188235, 0.223529, 0.564706, 1)
 
 [node name="Campfire" parent="." instance=ExtResource("18_3t717")]
@@ -1401,6 +1433,7 @@ position = Vector2(-680, -442)
 scale = Vector2(5.5, 5.5)
 
 [node name="PointLight2D2" type="PointLight2D" parent="Campfire"]
+visible = false
 position = Vector2(0.181824, 0.18182)
 scale = Vector2(0.164063, 0.150923)
 color = Color(0.826998, 0.453565, 7.70092e-07, 1)
@@ -1430,12 +1463,14 @@ position = Vector2(280, -362)
 scale = Vector2(4, 4)
 
 [node name="PointLight2D" type="PointLight2D" parent="."]
+visible = false
 position = Vector2(117, -362)
 scale = Vector2(0.693359, 0.660156)
 color = Color(0.950637, 0.49272, 0, 1)
 texture = ExtResource("27_3ggi2")
 
 [node name="PointLight2D2" type="PointLight2D" parent="."]
+visible = false
 position = Vector2(280, -362)
 scale = Vector2(0.693359, 0.660156)
 color = Color(0.950637, 0.49272, 0, 1)

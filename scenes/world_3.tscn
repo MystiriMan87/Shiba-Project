@@ -1494,88 +1494,103 @@ position = Vector2(2806, 1942)
 scale = Vector2(4, 4)
 
 [node name="CanvasModulate" parent="." instance=ExtResource("14_b3666")]
+visible = false
 
 [node name="PointLights" type="Node" parent="."]
 
 [node name="PointLight2D" type="PointLight2D" parent="PointLights"]
+visible = false
 position = Vector2(1547, 1846)
 scale = Vector2(1.41992, 1.51758)
 energy = 1.2
 texture = ExtResource("15_obkij")
 
 [node name="PointLight2D14" type="PointLight2D" parent="PointLights"]
+visible = false
 position = Vector2(1119, 1401)
 scale = Vector2(1.41992, 1.51758)
 energy = 1.2
 texture = ExtResource("15_obkij")
 
 [node name="PointLight2D2" type="PointLight2D" parent="PointLights"]
+visible = false
 position = Vector2(1545, 2697)
 scale = Vector2(1.41992, 1.51758)
 energy = 1.2
 texture = ExtResource("15_obkij")
 
 [node name="PointLight2D13" type="PointLight2D" parent="PointLights"]
+visible = false
 position = Vector2(4.00001, 2660)
 scale = Vector2(3.32031, 2.70508)
 energy = 0.39
 texture = ExtResource("15_obkij")
 
 [node name="PointLight2D3" type="PointLight2D" parent="PointLights"]
+visible = false
 position = Vector2(1545, 3562)
 scale = Vector2(1.41992, 1.51758)
 energy = 1.2
 texture = ExtResource("15_obkij")
 
 [node name="PointLight2D4" type="PointLight2D" parent="PointLights"]
+visible = false
 position = Vector2(975, 4141)
 scale = Vector2(1.41992, 1.51758)
 energy = 1.2
 texture = ExtResource("15_obkij")
 
 [node name="PointLight2D11" type="PointLight2D" parent="PointLights"]
+visible = false
 position = Vector2(2458, 2157)
 scale = Vector2(1.41992, 1.51758)
 energy = 1.2
 texture = ExtResource("15_obkij")
 
 [node name="PointLight2D5" type="PointLight2D" parent="PointLights"]
+visible = false
 position = Vector2(-970, 4139)
 scale = Vector2(1.41992, 1.51758)
 energy = 1.2
 texture = ExtResource("15_obkij")
 
 [node name="PointLight2D6" type="PointLight2D" parent="PointLights"]
+visible = false
 position = Vector2(-1553, 3563)
 scale = Vector2(1.41992, 1.51758)
 energy = 1.2
 texture = ExtResource("15_obkij")
 
 [node name="PointLight2D7" type="PointLight2D" parent="PointLights"]
+visible = false
 position = Vector2(-1549, 2696)
 scale = Vector2(1.41992, 1.51758)
 energy = 1.2
 texture = ExtResource("15_obkij")
 
 [node name="PointLight2D12" type="PointLight2D" parent="PointLights"]
+visible = false
 position = Vector2(-2637, 3103)
 scale = Vector2(1.41992, 1.51758)
 energy = 0.33
 texture = ExtResource("15_obkij")
 
 [node name="PointLight2D8" type="PointLight2D" parent="PointLights"]
+visible = false
 position = Vector2(-1549, 1909)
 scale = Vector2(1.41992, 1.51758)
 energy = 1.2
 texture = ExtResource("15_obkij")
 
 [node name="PointLight2D9" type="PointLight2D" parent="PointLights"]
+visible = false
 position = Vector2(-895, 1401)
 scale = Vector2(1.41992, 1.51758)
 energy = 1.2
 texture = ExtResource("15_obkij")
 
 [node name="PointLight2D10" type="PointLight2D" parent="PointLights"]
+visible = false
 position = Vector2(30.0001, 1326)
 scale = Vector2(1.41992, 1.51758)
 energy = 1.2
@@ -1594,30 +1609,6 @@ scale = Vector2(1.5, 1.5)
 
 [node name="Enemies" type="Node" parent="."]
 
-[node name="SkeletonEnemyV2" parent="Enemies" instance=ExtResource("20_3tiay")]
-position = Vector2(-168, 3124)
-scale = Vector2(5, 5)
-
-[node name="SkeletonEnemyV3" parent="Enemies" instance=ExtResource("20_3tiay")]
-position = Vector2(125, 3114)
-scale = Vector2(5, 5)
-
-[node name="SkeletonEnemyV4" parent="Enemies" instance=ExtResource("20_3tiay")]
-position = Vector2(-31, 3276)
-scale = Vector2(5, 5)
-
-[node name="SkeletonEnemyV5" parent="Enemies" instance=ExtResource("20_3tiay")]
-position = Vector2(148, 2901)
-scale = Vector2(5, 5)
-
-[node name="SkeletonEnemyV6" parent="Enemies" instance=ExtResource("20_3tiay")]
-position = Vector2(-167, 2900)
-scale = Vector2(5, 5)
-
-[node name="ghost_enemy" parent="Enemies" instance=ExtResource("21_kvd0n")]
-position = Vector2(-17, 2997)
-scale = Vector2(5, 5)
-
 [node name="ghost_enemy2" parent="Enemies" instance=ExtResource("21_kvd0n")]
 position = Vector2(-315, 3295)
 scale = Vector2(5, 5)
@@ -1632,6 +1623,10 @@ scale = Vector2(5, 5)
 
 [node name="ghost_enemy5" parent="Enemies" instance=ExtResource("21_kvd0n")]
 position = Vector2(285, 3264)
+scale = Vector2(5, 5)
+
+[node name="SkeletonEnemyV2" parent="Enemies" instance=ExtResource("20_3tiay")]
+position = Vector2(-2.0000305, 3125.0002)
 scale = Vector2(5, 5)
 
 [node name="Level_Change_Pedestal" parent="." instance=ExtResource("20_retbw")]
