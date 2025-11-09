@@ -260,7 +260,7 @@ func reset_to_defaults():
 		"video": {
 			"fullscreen": false,
 			"vsync_mode": 1,
-			"resolution": Vector2i(1920, 1080)
+			"resolution": get_viewport().set_size(Vector2i(640, 480))
 		},
 		"audio": {
 			"master_volume": 1.0,

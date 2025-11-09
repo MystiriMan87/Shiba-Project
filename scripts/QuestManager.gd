@@ -11,6 +11,9 @@ var active_quests = {}
 var completed_quests = []
 var failed_quests = []
 
+var is_processing_kill: bool = false
+
+
 func _ready():
 	load_quests_database()
 
@@ -226,16 +229,7 @@ func check_quest_completion(quest_id: String):
 	if all_complete:
 		complete_quest(quest_id)
 
-# Event handlers for automatic quest progress tracking
-func on_enemy_killed(enemy_type: String):
-	"""Call this when player kills an enemy"""
-	for quest_id in active_quests:
-		var quest_data = active_quests[quest_id]
-		for i in range(quest_data.objectives.size()):
-			var objective = quest_data.objectives[i]
-			if objective.type == "kill_enemy" and not objective.completed:
-				if objective.target == "any" or objective.target == enemy_type:
-					update_objective(quest_id, i, 1)
+
 
 func on_item_collected(item_id: String, amount: int = 1):
 	"""Call this when player collects an item"""
@@ -288,7 +282,6 @@ func give_quest_rewards(rewards: Dictionary):
 			item_manager.add_item_to_inventory(item_id, 1)
 			print("Rewarded item: ", item_id)
 	
-	# Give experience (you can hook this up to your XP system)
 	if "experience" in rewards:
 		print("Rewarded ", rewards.experience, " experience")
 
@@ -349,7 +342,6 @@ func get_localized_quest_data(quest_id: String) -> Dictionary:
 	# Translate quest name
 	if "name_key" in quest:
 		var translated_name = LocalizationManager.t(quest.name_key)
-		# Only use translation if it's not the key itself (meaning translation exists)
 		if translated_name != quest.name_key:
 			localized.name = translated_name
 	
@@ -368,3 +360,21 @@ func get_localized_quest_data(quest_id: String) -> Dictionary:
 					localized.objectives[i].description = translated_obj
 	
 	return localized
+
+
+func on_enemy_killed(enemy_type: String):
+	"""Call this when player kills an enemy"""
+	if is_processing_kill:
+		return  # Prevent recursive calls
+	
+	is_processing_kill = true
+	
+	for quest_id in active_quests:
+		var quest_data = active_quests[quest_id]
+		for i in range(quest_data.objectives.size()):
+			var objective = quest_data.objectives[i]
+			if objective.type == "kill_enemy" and not objective.completed:
+				if objective.target == "any" or objective.target == enemy_type:
+					update_objective(quest_id, i, 1)
+	
+	is_processing_kill = false

@@ -30,12 +30,14 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = 753.0
+offset_bottom = 479.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.380392, 0.454902, 0.784314, 0.670588)
 
 [node name="TitleLabel" type="Label" parent="."]
-layout_mode = 2
+layout_mode = 0
 offset_left = 140.0
 offset_top = 123.0
 offset_right = 913.0
@@ -48,7 +50,6 @@ vertical_alignment = 1
 
 [node name="Spacer" type="Control" parent="."]
 custom_minimum_size = Vector2(0, 50)
-layout_mode = 2
 anchors_preset = 0
 offset_left = 573.5
 offset_top = 593.5
@@ -71,7 +72,7 @@ grow_vertical = 2
 theme_override_constants/separation = 20
 
 [node name="WIPLabel" type="Label" parent="."]
-layout_mode = 2
+layout_mode = 0
 offset_left = 384.0
 offset_top = 254.0
 offset_right = 870.0
@@ -85,7 +86,7 @@ vertical_alignment = 1
 
 [node name="StartButton" type="Button" parent="."]
 custom_minimum_size = Vector2(300, 60)
-layout_mode = 2
+layout_mode = 0
 offset_left = 75.0
 offset_top = 525.0
 offset_right = 631.0
@@ -101,16 +102,14 @@ alignment = 0
 icon_alignment = 1
 
 [node name="SettingsButton" type="Button" parent="."]
-layout_mode = 2
-anchor_left = 0.5
+layout_mode = 1
+anchors_preset = 4
 anchor_top = 0.5
-anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -885.0
-offset_top = 104.0
-offset_right = -418.0
-offset_bottom = 227.0
-grow_horizontal = 2
+offset_left = 75.0
+offset_top = 126.0
+offset_right = 321.0
+offset_bottom = 224.0
 grow_vertical = 2
 theme_override_fonts/font = ExtResource("4_jix8l")
 theme_override_font_sizes/font_size = 67
@@ -118,15 +117,14 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_glbon")
 text = "Options
 "
 alignment = 0
+icon_alignment = 1
 
 [node name="QuitButton" type="Button" parent="."]
-layout_mode = 2
+layout_mode = 0
 offset_left = 75.0
-offset_top = 793.0
+offset_top = 807.0
 offset_right = 292.0
-offset_bottom = 885.0
-grow_horizontal = 2
-grow_vertical = 2
+offset_bottom = 905.0
 theme_override_fonts/font = ExtResource("4_jix8l")
 theme_override_font_sizes/font_size = 67
 theme_override_styles/normal = SubResource("StyleBoxFlat_8qtwp")

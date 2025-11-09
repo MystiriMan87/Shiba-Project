@@ -171,36 +171,37 @@ class EchoGhost:
 			if is_instance_valid(self) and sprite:
 				sprite.modulate = original_mod)
 
-@export var speed = 300
-@export var friction = 0.2
-@export var acceleration = 0.1
-@export var attack_damage = 1
-@export var attack_duration = 0.4
-@export var attack_cooldown = 0.1
-@export var dash_speed = 700
-@export var dash_duration = 0.10
-@export var dash_cooldown = 0.8
-@export var dash_iframe_duration = 0.1
+# ===== EXPORT VARIABLES =====
+@export var speed: float = 300.0
+@export var friction: float = 0.2
+@export var acceleration: float = 0.1
+@export var attack_damage: int = 1
+@export var attack_duration: float = 0.4
+@export var attack_cooldown: float = 0.1
+@export var dash_speed: float = 700.0
+@export var dash_duration: float = 0.10
+@export var dash_cooldown: float = 0.8
+@export var dash_iframe_duration: float = 0.1
 @export var max_dash_energy: int = 100
 @export var dash_cost: int = 25
 @export var dash_regen_rate: float = 20.0
-@export var dash_afterimage_interval = 0.03
-@export var dash_afterimage_lifetime = 0.2
-@export var max_health = 5
-@export var damage_immunity_duration = 0.3
-@export var knockback_resistance = 0.5
-@export var min_animation_speed = 0.5
-@export var max_animation_speed = 4.0
-@export var speed_threshold = 50
-@export var swing_arc_degrees = 120
-@export var swing_duration = 0.3
-@export var swing_offset_distance = 30
-@export var enable_trail_effect = true
-@export var trail_fade_duration = 0.2
-@export var attack_range = 50
-@export var swing_arc_half_angle = 60
-@export var pickup_range = 40
-@export var auto_pickup_enabled = true
+@export var dash_afterimage_interval: float = 0.03
+@export var dash_afterimage_lifetime: float = 0.2
+@export var max_health: int = 5
+@export var damage_immunity_duration: float = 0.3
+@export var knockback_resistance: float = 0.5
+@export var min_animation_speed: float = 0.5
+@export var max_animation_speed: float = 4.0
+@export var speed_threshold: float = 50.0
+@export var swing_arc_degrees: float = 120.0
+@export var swing_duration: float = 0.3
+@export var swing_offset_distance: float = 30.0
+@export var enable_trail_effect: bool = true
+@export var trail_fade_duration: float = 0.2
+@export var attack_range: float = 50.0
+@export var swing_arc_half_angle: float = 60.0
+@export var pickup_range: float = 40.0
+@export var auto_pickup_enabled: bool = true
 @export_group("Sound Effects")
 @export var hit_sound_path: String = "res://audio/hit_sound.wav"
 @export var hit_sound_volume: float = -10.0
@@ -221,9 +222,9 @@ class EchoGhost:
 @export var footstep_pitch_base: float = 1.0
 @export var footstep_pitch_variation: float = 0.1
 @export var footstep_interval: float = 0.4
-@export var trail_color = Color.WHITE
-@export var trail_width = 3.0
-@export var trail_max_alpha = 0.8
+@export var trail_color: Color = Color.WHITE
+@export var trail_width: float = 3.0
+@export var trail_max_alpha: float = 0.8
 @export var echo_record_duration: float = 1.0
 @export var echo_max_charges: int = 3
 @export var echo_move_speed: float = 900.0
@@ -232,6 +233,7 @@ class EchoGhost:
 @export var echo_recall_sound_path: String = ""
 @export var echo_recall_sound_volume: float = 0.0
 
+# ===== CONSTANTS =====
 const FOOTSTEP_SOUND = preload("res://audio/reverb-footstep-cave-basement-abandoned-place-315027.mp3")
 const HIT_SOUND = preload("res://audio/hit_sound.mp3")
 const PICKUP_SOUND = preload("res://audio/pickup_sound.mp3")
@@ -239,43 +241,43 @@ const HURT_SOUND = preload("res://audio/hurt_sound.mp3")
 const SWORD_SLICE_SOUND = preload("res://audio/violent-sword-slice-393848.mp3")
 const DASH_SOUND = preload("res://audio/dash-sfx.mp3")
 
-
+# ===== REGULAR VARIABLES =====
 var HitEffectScene := preload("res://scenes/HitEffect.tscn")
-var is_attacking = false
-var attack_timer = 0.0
-var cooldown_timer = 0.0
-var last_direction = Vector2.DOWN
-var is_dashing = false
-var dash_timer = 0.0
-var dash_cooldown_timer = 0.0
-var dash_direction = Vector2.ZERO
-var is_dash_iframe = false
-var dash_flash_timer = 0.0
-var dash_afterimage_timer = 0.0
+var is_attacking: bool = false
+var attack_timer: float = 0.0
+var cooldown_timer: float = 0.0
+var last_direction: Vector2 = Vector2.DOWN
+var is_dashing: bool = false
+var dash_timer: float = 0.0
+var dash_cooldown_timer: float = 0.0
+var dash_direction: Vector2 = Vector2.ZERO
+var is_dash_iframe: bool = false
+var dash_flash_timer: float = 0.0
+var dash_afterimage_timer: float = 0.0
 var dash_energy: int = 0
-var mouse_attack_direction = Vector2.RIGHT
+var mouse_attack_direction: Vector2 = Vector2.RIGHT
 var controller_deadzone: float = 0.3
 var facing_direction: int = 1
 var right_stick_active: bool = false
-var swing_start_angle = 0.0
-var swing_end_angle = 0.0
-var swing_current_progress = 0.0
-var is_swing_animating = false
-var trail_positions = []
-var max_trail_length = 8
+var swing_start_angle: float = 0.0
+var swing_end_angle: float = 0.0
+var swing_current_progress: float = 0.0
+var is_swing_animating: bool = false
+var trail_positions: Array = []
+var max_trail_length: int = 8
 var magic_ring_sprite: Sprite2D = null
 var ring_follow_distance: float = 30.0
 var ring_follow_speed: float = 8.0
 var current_health: int = 0
-var is_taking_damage = false
-var damage_immunity_timer = 0.0
-var damage_flash_timer = 0.0
-var damage_flash_duration = 0.1
-var player_knockback_velocity = Vector2.ZERO
-var knockback_friction = 0.8
-var knockback_threshold = 15.0
-var current_animation = ""
-var is_moving = false
+var is_taking_damage: bool = false
+var damage_immunity_timer: float = 0.0
+var damage_flash_timer: float = 0.0
+var damage_flash_duration: float = 0.1
+var player_knockback_velocity: Vector2 = Vector2.ZERO
+var knockback_friction: float = 0.8
+var knockback_threshold: float = 15.0
+var current_animation: String = ""
+var is_moving: bool = false
 var footstep_audio_player: AudioStreamPlayer2D = null
 var footstep_timer: float = 0.0
 var hit_audio_player: AudioStreamPlayer2D = null
@@ -658,6 +660,7 @@ func _input(event):
 					facing_direction = 1 if right_stick.x > 0 else -1
 
 func _physics_process(delta):
+	
 	var right_stick = Vector2(
 		Input.get_joy_axis(0, JOY_AXIS_RIGHT_X),
 		Input.get_joy_axis(0, JOY_AXIS_RIGHT_Y))
@@ -758,12 +761,14 @@ func _physics_process(delta):
 		if dash_energy != before:
 			dash_energy_changed.emit(dash_energy)
 	if magic_ring_sprite and is_instance_valid(magic_ring_sprite):
-		var target_pos = global_position - (velocity.normalized() * ring_follow_distance)
-		if velocity.length() < 10:
+		var target_pos = global_position
+		if velocity.length() > 10:
+			target_pos = global_position - (velocity.normalized() * ring_follow_distance)
+		else:
 			target_pos = global_position + Vector2(0, ring_follow_distance)
 		magic_ring_sprite.global_position = magic_ring_sprite.global_position.lerp(target_pos, ring_follow_speed * delta)
 		magic_ring_sprite.position.y += sin(Time.get_ticks_msec() * 0.003) * 0.5
-
+		
 func get_damage_against_enemy(enemy: Node) -> int:
 	var base_damage = attack_damage
 	var item_manager = get_node_or_null("/root/ItemManager")

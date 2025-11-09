@@ -18,6 +18,8 @@ extends CharacterBody2D
 @export var lunge_speed: float = 150.0
 @export var lunge_duration: float = 0.12
 @export var enemy_type: String = "skeleton"
+var is_being_freed: bool = false
+
 
 # Knockback exports - NEW SYSTEM
 @export var can_be_knocked_back: bool = true
@@ -134,7 +136,7 @@ func find_player():
 		player = players[0]
 
 func _physics_process(delta):
-	if is_dead:
+	if is_dead or is_being_freed:
 		return
 	
 	if damage_timer > 0.0:
@@ -143,13 +145,12 @@ func _physics_process(delta):
 	if attack_timer > 0:
 		attack_timer -= delta
 	
-	# NEW KNOCKBACK SYSTEM - Apply knockback friction continuously
 	if knockback_velocity.length() > 5:
 		is_being_knocked_back = true
 		velocity = knockback_velocity
-		knockback_velocity *= knockback_friction  # Smooth friction deceleration
-		move_and_collide(velocity * delta)
-		return  # Skip normal movement while being knocked back
+		knockback_velocity *= knockback_friction
+		move_and_slide()  
+		return
 	else:
 		is_being_knocked_back = false
 		knockback_velocity = Vector2.ZERO
@@ -167,7 +168,7 @@ func _physics_process(delta):
 			handle_death_state(delta)
 	
 	apply_player_separation(delta)
-	move_and_collide(velocity * delta)
+	move_and_slide()  # CHANGED: Use
 
 func update_direction(direction: Vector2):
 	if direction == Vector2.ZERO:
@@ -296,6 +297,9 @@ func change_state(new_state: SkeletonState):
 	current_state = new_state
 
 func start_attack():
+	if is_being_freed or is_dead:
+		return
+	
 	is_attacking = true
 	attack_timer = attack_cooldown
 	
@@ -311,25 +315,40 @@ func start_attack():
 	
 	var scaled: float = max(animation_player.speed_scale, 0.001)
 	var hit_time: float = (attack_len * attack_hit_ratio) / scaled
+	
+	# SAFE AWAIT - Check if still valid
 	await get_tree().create_timer(hit_time).timeout
 	
-	if player and player.has_method("take_damage") and global_position.distance_to(player.global_position) <= attack_range:
+	if is_being_freed or is_dead:
+		return
+	
+	if player and is_instance_valid(player) and player.has_method("take_damage") and global_position.distance_to(player.global_position) <= attack_range:
 		player.take_damage(int(damage), self)
 	
 	var dir: Vector2 = Vector2.ZERO
-	if player:
+	if player and is_instance_valid(player):
 		dir = (player.global_position - global_position).normalized()
 	if dir != Vector2.ZERO:
 		velocity = dir * lunge_speed
 	
 	var rest_time: float = (attack_len - (attack_len * attack_hit_ratio)) / scaled
 	var lunge_time: float = min(lunge_duration, max(0.0, rest_time * 0.6))
+	
 	if lunge_time > 0.0:
 		await get_tree().create_timer(lunge_time).timeout
+	
+	if is_being_freed or is_dead:
+		return
+	
 	velocity = Vector2.ZERO
 	var remain_time: float = max(0.0, rest_time - lunge_time)
+	
 	if remain_time > 0.0:
 		await get_tree().create_timer(remain_time).timeout
+	
+	if is_being_freed or is_dead:
+		return
+	
 	is_attacking = false
 	change_state(SkeletonState.WALKING)
 
@@ -465,3 +484,6 @@ func force_state_reset():
 	
 	if collision_shape:
 		collision_shape.disabled = false
+
+func _exit_tree():
+	is_being_freed = true
